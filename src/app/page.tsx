@@ -6,5 +6,5 @@ export default function Home() {
         Project foundation. Compare Lists functionality comes in a later task.
       </p>
     </main>
-  )
+  );
 }

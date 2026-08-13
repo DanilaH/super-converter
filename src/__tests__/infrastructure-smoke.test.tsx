@@ -1,10 +1,10 @@
-import { useState } from "react"
-import { describe, expect, it } from "vitest"
-import { render, screen } from "@testing-library/react"
-import userEvent from "@testing-library/user-event"
+import { useState } from "react";
+import { describe, expect, it } from "vitest";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 function SmokeButton() {
-  const [clicked, setClicked] = useState(false)
+  const [clicked, setClicked] = useState(false);
 
   return (
     <div>
@@ -13,22 +13,22 @@ function SmokeButton() {
       </button>
       <p>{clicked ? "Done" : "Pending"}</p>
     </div>
-  )
+  );
 }
 
 describe("test infrastructure", () => {
   it("renders a component, performs a user action and asserts with jest-dom", async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup();
 
-    render(<SmokeButton />)
+    render(<SmokeButton />);
 
-    const button = screen.getByRole("button", { name: "Mark as done" })
-    expect(button).toBeInTheDocument()
-    expect(screen.getByText("Pending")).toBeVisible()
+    const button = screen.getByRole("button", { name: "Mark as done" });
+    expect(button).toBeInTheDocument();
+    expect(screen.getByText("Pending")).toBeVisible();
 
-    await user.click(button)
+    await user.click(button);
 
-    expect(screen.getByText("Done")).toBeInTheDocument()
-    expect(screen.queryByText("Pending")).not.toBeInTheDocument()
-  })
-})
+    expect(screen.getByText("Done")).toBeInTheDocument();
+    expect(screen.queryByText("Pending")).not.toBeInTheDocument();
+  });
+});
