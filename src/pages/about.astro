@@ -1,0 +1,46 @@
+---
+import { englishContent } from "@/content/en";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+
+const { about } = englishContent;
+---
+
+<BaseLayout>
+  <div class="about">
+    <h1>{about.heading}</h1>
+    {about.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+    <p class="tool-link">
+      <a href="/#compare-tool-heading">{about.toolLinkLabel}</a>
+    </p>
+  </div>
+</BaseLayout>
+
+<style>
+  .about {
+    max-width: var(--container-editorial);
+    padding-block: var(--space-6) var(--space-7);
+  }
+
+  .about h1 {
+    margin-block: 0 var(--space-5);
+    font-size: var(--font-size-h1-mobile);
+    line-height: var(--line-height-h1-mobile);
+    font-weight: var(--font-weight-h1);
+  }
+
+  @media (min-width: 760px) {
+    .about h1 {
+      font-size: var(--font-size-h1);
+      line-height: var(--line-height-h1);
+    }
+  }
+
+  .about p {
+    margin-block: 0 var(--space-4);
+  }
+
+  .about .tool-link {
+    margin-block-start: var(--space-5);
+    font-weight: var(--font-weight-control);
+  }
+</style>
