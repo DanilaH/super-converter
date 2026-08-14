@@ -19,13 +19,13 @@ Everything runs client-side. List data never leaves the browser.
 
 ## Stack
 
-Approved target: Astro, TypeScript (strict), vanilla browser APIs, static output, pnpm.
-
-The small legacy Next/React foundation remains only until the dedicated CL-007 migration.
+Astro, TypeScript (strict), vanilla browser APIs, static output, pnpm.
 
 ## Development
 
 ```bash
 pnpm install
 pnpm dev
+pnpm build
+pnpm preview
 ```
