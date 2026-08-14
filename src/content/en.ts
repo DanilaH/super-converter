@@ -12,7 +12,9 @@ export type CompareMessages = {
   ignoreCase: string;
   removeDuplicates: string;
   results: string;
+  row: string;
   rows: string;
+  item: string;
   items: string;
   differences: string;
   onlyA: string;
@@ -58,7 +60,9 @@ export const englishContent = {
     ignoreCase: "Ignore case",
     removeDuplicates: "Remove duplicates",
     results: "Results",
+    row: "row",
     rows: "rows",
+    item: "item",
     items: "items",
     differences: "Differences",
     onlyA: "Only A",

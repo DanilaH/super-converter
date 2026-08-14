@@ -24,7 +24,14 @@ const resultViews = [
 ] as const;
 ---
 
-<section data-compare-tool aria-labelledby="compare-tool-heading">
+<section
+  data-compare-tool
+  aria-labelledby="compare-tool-heading"
+  data-label-row={compare.row}
+  data-label-rows={compare.rows}
+  data-label-item={compare.item}
+  data-label-items={compare.items}
+>
   <div class="tool-heading">
     <h2 id="compare-tool-heading">{compare.heading}</h2>
     <button type="button" data-load-example disabled>
@@ -119,7 +126,7 @@ const resultViews = [
   <section data-results hidden class="results">
     <h3>{compare.results}</h3>
 
-    <dl data-summary class="summary">
+    <dl data-summary class="summary" hidden>
       <div class="summary-item">
         <dt>{compare.onlyA}</dt>
         <dd data-summary-only-a>0</dd>
@@ -139,6 +146,7 @@ const resultViews = [
       data-result-tabs
       class="tabs"
       aria-label={compare.results}
+      hidden
     >
       {
         resultViews.map((view) => (
@@ -184,6 +192,12 @@ const resultViews = [
     <p class="noscript">{compare.noscript}</p>
   </noscript>
 </section>
+
+<script>
+  import { mountCompareTool } from "../scripts/compare-tool";
+
+  mountCompareTool();
+</script>
 
 <style>
   section[data-compare-tool] {
@@ -307,6 +321,11 @@ const resultViews = [
   }
 
   .results[hidden] {
+    display: none;
+  }
+
+  .summary[hidden],
+  .tabs[hidden] {
     display: none;
   }
 
