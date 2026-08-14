@@ -3,15 +3,12 @@
 /.pnp
 .pnp.js
 
+# astro
+/.astro/
+/dist/
+
 # testing
 /coverage
-
-# next.js
-/.next/
-/out/
-
-# production
-/build
 
 # misc
 .DS_Store
@@ -31,4 +28,3 @@ pnpm-debug.log*
 
 # typescript
 *.tsbuildinfo
-next-env.d.ts

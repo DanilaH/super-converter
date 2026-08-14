@@ -1,0 +1,22 @@
+---
+import { englishContent } from "@/content/en";
+import SiteFooter from "@/components/SiteFooter.astro";
+import SiteHeader from "@/components/SiteHeader.astro";
+import "../styles/global.css";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{englishContent.siteName}</title>
+  </head>
+  <body class="shell">
+    <SiteHeader />
+    <main class="main">
+      <slot />
+    </main>
+    <SiteFooter />
+  </body>
+</html>

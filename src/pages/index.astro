@@ -1,0 +1,77 @@
+---
+import { englishContent } from "@/content/en";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+
+const { home } = englishContent;
+---
+
+<BaseLayout>
+  <div class="intro">
+    <h1>{home.heading}</h1>
+    <p class="description">{home.description}</p>
+    <p class="privacy">{home.privacy}</p>
+
+    <section class="tool-placeholder">
+      <h2>{home.toolPlaceholder.heading}</h2>
+      <p>{home.toolPlaceholder.description}</p>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .intro {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding-block: var(--space-6);
+  }
+
+  .intro h1 {
+    margin: 0;
+    font-size: var(--font-size-h1-mobile);
+    line-height: var(--line-height-h1-mobile);
+    font-weight: var(--font-weight-h1);
+  }
+
+  @media (min-width: 760px) {
+    .intro h1 {
+      font-size: var(--font-size-h1);
+      line-height: var(--line-height-h1);
+    }
+  }
+
+  .description {
+    margin: 0;
+    max-width: var(--container-editorial);
+    font-size: var(--font-size-body);
+    line-height: var(--line-height-body);
+  }
+
+  .privacy {
+    margin: 0;
+    max-width: var(--container-editorial);
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-body-secondary);
+    line-height: var(--line-height-body-secondary);
+  }
+
+  .tool-placeholder {
+    margin-top: var(--space-6);
+    padding-top: var(--space-5);
+    border-top: var(--border-default);
+  }
+
+  .tool-placeholder h2 {
+    margin: 0;
+    font-size: var(--font-size-h3);
+    line-height: var(--line-height-h3);
+    font-weight: var(--font-weight-h3);
+  }
+
+  .tool-placeholder p {
+    margin: var(--space-2) 0 0;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-body-secondary);
+    line-height: var(--line-height-body-secondary);
+  }
+</style>
