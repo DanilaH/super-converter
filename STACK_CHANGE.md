@@ -93,11 +93,12 @@ If substantial Next/React implementation exists: do not delete it automatically.
 
 The goal is simplicity, not framework purity at any cost.
 
-## Immediate implementation decision
+## Current implementation decision
 
-The next task is the dedicated Astro foundation migration recorded as
-`CL-007` in `IMPLEMENTATION_PLAN.md`. Domain work resumes only after that PR is
-reviewed and the static Astro build is green.
+The Astro migration was completed in `CL-007`. Parsing/normalization and set
+comparison were completed in `CL-008` and `CL-009`. The next package is
+`CL-010`, which completes the remaining pure comparison domain before DOM work.
+The consolidated Issue-driven sequence is defined in `IMPLEMENTATION_PLAN.md`.
 
 ## Updated authoritative files
 
