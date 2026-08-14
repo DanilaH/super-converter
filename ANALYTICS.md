@@ -806,7 +806,7 @@ stack trace
 Forbidden:
 
 ```text
-React state dump
+application state dump
 textarea values
 DOM snapshot
 event payload with pasted text

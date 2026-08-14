@@ -13,11 +13,15 @@ Everything runs client-side. List data never leaves the browser.
 - [ARCHITECTURE.md](ARCHITECTURE.md) — technical boundaries
 - [ANALYTICS.md](ANALYTICS.md) — privacy-safe analytics
 - [LAUNCH_PLAN.md](LAUNCH_PLAN.md) — release sequence
+- [STACK_CHANGE.md](STACK_CHANGE.md) — approved Astro migration decision
+- [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) — small task roadmap
 - [AGENTS.md](AGENTS.md) — operational contract for coding agents
 
 ## Stack
 
-Next.js App Router, React, TypeScript (strict), CSS Modules, pnpm.
+Approved target: Astro, TypeScript (strict), vanilla browser APIs, static output, pnpm.
+
+The small legacy Next/React foundation remains only until the dedicated CL-007 migration.
 
 ## Development
 

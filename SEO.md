@@ -1147,7 +1147,7 @@ Design уже предусматривает:
 Implementation должен дополнительно контролировать:
 
 - client bundle;
-- hydration scope;
+- client-script scope;
 - layout shift;
 - third-party scripts.
 
