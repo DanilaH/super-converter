@@ -1,0 +1,447 @@
+---
+import { englishContent } from "@/content/en";
+import { DEFAULT_COMPARE_OPTIONS } from "@/features/compare-lists/model/defaults";
+
+const { compare } = englishContent;
+const options = DEFAULT_COMPARE_OPTIONS;
+
+const resultViews = [
+  {
+    value: "differences",
+    id: "tab-differences",
+    label: compare.differences,
+    selected: true,
+  },
+  { value: "onlyA", id: "tab-only-a", label: compare.onlyA, selected: false },
+  { value: "onlyB", id: "tab-only-b", label: compare.onlyB, selected: false },
+  {
+    value: "matches",
+    id: "tab-matches",
+    label: compare.matches,
+    selected: false,
+  },
+  { value: "all", id: "tab-all", label: compare.all, selected: false },
+] as const;
+---
+
+<section data-compare-tool aria-labelledby="compare-tool-heading">
+  <div class="tool-heading">
+    <h2 id="compare-tool-heading">{compare.heading}</h2>
+    <button type="button" data-load-example disabled>
+      {compare.loadExample}
+    </button>
+  </div>
+
+  <div class="lists">
+    <div class="list">
+      <label for="list-a">{compare.listA}</label>
+      <textarea
+        id="list-a"
+        name="list-a"
+        data-list-a
+        rows="10"
+        placeholder={compare.pastePlaceholder}
+        spellcheck="false"></textarea>
+      <div class="list-footer">
+        <output for="list-a" data-list-a-count>0 {compare.rows}</output>
+        <button type="button" data-clear-list-a disabled>
+          {compare.clear}
+        </button>
+      </div>
+    </div>
+
+    <button type="button" class="swap" data-swap-lists disabled>
+      {compare.swap}
+    </button>
+
+    <div class="list">
+      <label for="list-b">{compare.listB}</label>
+      <textarea
+        id="list-b"
+        name="list-b"
+        data-list-b
+        rows="10"
+        placeholder={compare.pastePlaceholder}
+        spellcheck="false"></textarea>
+      <div class="list-footer">
+        <output for="list-b" data-list-b-count>0 {compare.rows}</output>
+        <button type="button" data-clear-list-b disabled>
+          {compare.clear}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <fieldset data-compare-options class="options">
+    <legend>{compare.comparisonOptions}</legend>
+    <label class="option">
+      <input
+        type="checkbox"
+        id="option-trim-whitespace"
+        name="trim-whitespace"
+        data-option-trim-whitespace
+        checked={options.trimWhitespace}
+      />
+      {compare.trimWhitespace}
+    </label>
+    <label class="option">
+      <input
+        type="checkbox"
+        id="option-ignore-empty-lines"
+        name="ignore-empty-lines"
+        data-option-ignore-empty-lines
+        checked={options.ignoreEmptyLines}
+      />
+      {compare.ignoreEmptyLines}
+    </label>
+    <label class="option">
+      <input
+        type="checkbox"
+        id="option-ignore-case"
+        name="ignore-case"
+        data-option-ignore-case
+        checked={options.ignoreCase}
+      />
+      {compare.ignoreCase}
+    </label>
+    <label class="option">
+      <input
+        type="checkbox"
+        id="option-remove-duplicates"
+        name="remove-duplicates"
+        data-option-remove-duplicates
+        checked={options.removeDuplicates}
+      />
+      {compare.removeDuplicates}
+    </label>
+  </fieldset>
+
+  <section data-results hidden class="results">
+    <h3>{compare.results}</h3>
+
+    <dl data-summary class="summary">
+      <div class="summary-item">
+        <dt>{compare.onlyA}</dt>
+        <dd data-summary-only-a>0</dd>
+      </div>
+      <div class="summary-item">
+        <dt>{compare.matches}</dt>
+        <dd data-summary-matches>0</dd>
+      </div>
+      <div class="summary-item">
+        <dt>{compare.onlyB}</dt>
+        <dd data-summary-only-b>0</dd>
+      </div>
+    </dl>
+
+    <div
+      role="tablist"
+      data-result-tabs
+      class="tabs"
+      aria-label={compare.results}
+    >
+      {
+        resultViews.map((view) => (
+          <button
+            type="button"
+            role="tab"
+            id={view.id}
+            class="tab"
+            aria-controls="result-panel"
+            aria-selected={view.selected}
+            tabindex={view.selected ? 0 : -1}
+            data-result-tab={view.value}
+          >
+            {view.label}
+          </button>
+        ))
+      }
+    </div>
+
+    <div
+      role="tabpanel"
+      id="result-panel"
+      class="panel"
+      aria-labelledby="tab-differences"
+      data-result-panel
+    >
+      <h4 class="panel-heading" data-result-heading>{compare.differences}</h4>
+      <p class="panel-count" data-result-count>0 {compare.items}</p>
+      <pre class="viewer" data-result-viewer tabindex="0"></pre>
+    </div>
+
+    <p
+      class="visually-hidden"
+      data-local-feedback
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+    >
+    </p>
+  </section>
+
+  <noscript>
+    <p class="noscript">{compare.noscript}</p>
+  </noscript>
+</section>
+
+<style>
+  section[data-compare-tool] {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    margin-top: var(--space-6);
+    padding-top: var(--space-5);
+    border-top: var(--border-default);
+  }
+
+  .tool-heading {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  .tool-heading h2 {
+    margin: 0;
+    font-size: var(--font-size-h2-mobile);
+    line-height: var(--line-height-h2-mobile);
+    font-weight: var(--font-weight-h2);
+  }
+
+  .lists {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+    align-items: start;
+  }
+
+  .list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .list label {
+    font-size: var(--font-size-ui-label);
+    line-height: var(--line-height-ui-label);
+    font-weight: var(--font-weight-ui-label);
+    letter-spacing: var(--letter-spacing-ui-label);
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+  }
+
+  .list textarea {
+    width: 100%;
+    min-height: 220px;
+    padding: var(--space-3);
+    border: var(--border-default);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-size: var(--font-size-result-data);
+    line-height: var(--line-height-result-data);
+    resize: vertical;
+  }
+
+  .list textarea:focus-visible {
+    outline: var(--focus-outline);
+    outline-offset: var(--focus-outline-offset);
+  }
+
+  .list-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+  }
+
+  .list-footer output {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-body-secondary);
+    line-height: var(--line-height-body-secondary);
+  }
+
+  .swap {
+    justify-self: center;
+  }
+
+  .options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3) var(--space-4);
+    margin: 0;
+    padding: var(--space-3) var(--space-4);
+    border: var(--border-default);
+    border-radius: var(--radius-md);
+  }
+
+  .options legend {
+    padding-inline: var(--space-1);
+    font-size: var(--font-size-ui-label);
+    line-height: var(--line-height-ui-label);
+    font-weight: var(--font-weight-ui-label);
+    letter-spacing: var(--letter-spacing-ui-label);
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+  }
+
+  .option {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--font-size-control);
+    line-height: var(--line-height-control);
+    font-weight: var(--font-weight-control);
+  }
+
+  .results {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    margin-top: var(--space-2);
+    padding-top: var(--space-5);
+    border-top: var(--border-default);
+  }
+
+  .results[hidden] {
+    display: none;
+  }
+
+  .results h3,
+  .panel-heading {
+    margin: 0;
+    font-size: var(--font-size-h3);
+    line-height: var(--line-height-h3);
+    font-weight: var(--font-weight-h3);
+  }
+
+  .summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-5);
+    margin: 0;
+  }
+
+  .summary-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    margin: 0;
+  }
+
+  .summary-item dt {
+    font-size: var(--font-size-ui-label);
+    line-height: var(--line-height-ui-label);
+    font-weight: var(--font-weight-ui-label);
+    letter-spacing: var(--letter-spacing-ui-label);
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+  }
+
+  .summary-item dd {
+    margin: 0;
+    font-size: var(--font-size-summary-number);
+    line-height: var(--line-height-summary-number);
+    font-weight: var(--font-weight-summary-number);
+  }
+
+  .tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .tab {
+    padding: var(--space-1) var(--space-3);
+    border: var(--border-default);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-size: var(--font-size-control);
+    line-height: var(--line-height-control);
+    font-weight: var(--font-weight-control);
+    cursor: pointer;
+  }
+
+  .tab[aria-selected="true"] {
+    border-color: var(--color-border-strong);
+    background: var(--color-surface-muted);
+  }
+
+  .panel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .panel-count {
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-body-secondary);
+    line-height: var(--line-height-body-secondary);
+  }
+
+  .viewer {
+    margin: 0;
+    min-height: 120px;
+    max-width: 100%;
+    padding: var(--space-3);
+    border: var(--border-default);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-muted);
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-size: var(--font-size-result-data);
+    line-height: var(--line-height-result-data);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  .viewer:focus-visible {
+    outline: var(--focus-outline);
+    outline-offset: var(--focus-outline-offset);
+  }
+
+  .noscript {
+    margin: 0;
+    padding: var(--space-3);
+    border: var(--border-default);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-muted);
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-body-secondary);
+    line-height: var(--line-height-body-secondary);
+  }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  @media (min-width: 760px) {
+    .tool-heading h2 {
+      font-size: var(--font-size-h2);
+      line-height: var(--line-height-h2);
+    }
+
+    .lists {
+      grid-template-columns: 1fr auto 1fr;
+      gap: var(--space-3);
+      align-items: center;
+    }
+
+    .list textarea {
+      min-height: 280px;
+    }
+  }
+</style>
