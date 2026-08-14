@@ -2,6 +2,7 @@ import { compareLists } from "../features/compare-lists/lib/compare-lists";
 import { formatResult } from "../features/compare-lists/lib/format-result";
 import type {
   CompareOptions,
+  CompareResult,
   ResultType,
 } from "../features/compare-lists/model/types";
 
@@ -17,6 +18,9 @@ type Labels = {
   rows: string;
   item: string;
   items: string;
+  noDifferences: string;
+  sameValues: string;
+  noMatches: string;
 };
 
 type Hooks = {
@@ -33,8 +37,17 @@ type Hooks = {
   ignoreCase: HTMLInputElement;
   removeDuplicates: HTMLInputElement;
   results: HTMLElement;
+  emptyResults: HTMLElement;
+  summary: HTMLElement;
+  summaryOnlyA: HTMLElement;
+  summaryMatches: HTMLElement;
+  summaryOnlyB: HTMLElement;
+  resultTabs: HTMLElement;
+  resultPanel: HTMLElement;
+  resultHeading: HTMLElement;
   resultCount: HTMLElement;
   resultViewer: HTMLElement;
+  tabs: HTMLButtonElement[];
 };
 
 const RESULT_TYPES: readonly ResultType[] = [
@@ -144,6 +157,8 @@ function mountRoot(root: HTMLElement): void {
     recompute();
   });
 
+  setupTabs(hooks, state, recompute);
+
   hooks.clearListA.disabled = false;
   hooks.clearListB.disabled = false;
   hooks.swap.disabled = false;
@@ -169,8 +184,19 @@ function findHooks(root: HTMLElement): Hooks {
     ignoreCase: requireElement(root, "[data-option-ignore-case]"),
     removeDuplicates: requireElement(root, "[data-option-remove-duplicates]"),
     results: requireElement(root, "[data-results]"),
+    emptyResults: requireElement(root, "[data-empty-results]"),
+    summary: requireElement(root, "[data-summary]"),
+    summaryOnlyA: requireElement(root, "[data-summary-only-a]"),
+    summaryMatches: requireElement(root, "[data-summary-matches]"),
+    summaryOnlyB: requireElement(root, "[data-summary-only-b]"),
+    resultTabs: requireElement(root, "[data-result-tabs]"),
+    resultPanel: requireElement(root, "[data-result-panel]"),
+    resultHeading: requireElement(root, "[data-result-heading]"),
     resultCount: requireElement(root, "[data-result-count]"),
     resultViewer: requireElement(root, "[data-result-viewer]"),
+    tabs: Array.from(
+      root.querySelectorAll<HTMLButtonElement>("[data-result-tab]"),
+    ),
   };
 }
 
@@ -191,6 +217,9 @@ function readLabels(root: HTMLElement): Labels {
     rows: root.dataset.labelRows ?? "",
     item: root.dataset.labelItem ?? "",
     items: root.dataset.labelItems ?? "",
+    noDifferences: root.dataset.labelNoDifferences ?? "",
+    sameValues: root.dataset.labelSameValues ?? "",
+    noMatches: root.dataset.labelNoMatches ?? "",
   };
   for (const [name, value] of Object.entries(labels)) {
     if (value === "") {
@@ -227,7 +256,11 @@ function createRecompute(
 ): () => void {
   return () => {
     if (state.listA === "" && state.listB === "") {
-      hooks.results.hidden = true;
+      hooks.results.hidden = false;
+      hooks.emptyResults.hidden = false;
+      hooks.summary.hidden = true;
+      hooks.resultTabs.hidden = true;
+      hooks.resultPanel.hidden = true;
       hooks.resultViewer.textContent = "";
       hooks.resultCount.textContent = `0 ${labels.items}`;
       hooks.listACount.textContent = `0 ${labels.rows}`;
@@ -235,8 +268,13 @@ function createRecompute(
       return;
     }
 
-    hooks.results.hidden = false;
     const result = compareLists(state.listA, state.listB, state.options);
+
+    hooks.results.hidden = false;
+    hooks.emptyResults.hidden = true;
+    hooks.summary.hidden = false;
+    hooks.resultTabs.hidden = false;
+    hooks.resultPanel.hidden = false;
     hooks.listACount.textContent = pluralize(
       result.stats.rowsA,
       labels.row,
@@ -247,16 +285,119 @@ function createRecompute(
       labels.row,
       labels.rows,
     );
-    hooks.resultViewer.textContent = formatResult(
-      result,
-      state.activeResult,
-    ).text;
-    hooks.resultCount.textContent = pluralize(
-      result.differences.length,
-      labels.item,
-      labels.items,
-    );
+    hooks.summaryOnlyA.textContent = String(result.stats.onlyA);
+    hooks.summaryMatches.textContent = String(result.stats.matches);
+    hooks.summaryOnlyB.textContent = String(result.stats.onlyB);
+
+    renderResult(hooks, labels, state, result);
   };
+}
+
+function renderResult(
+  hooks: Hooks,
+  labels: Labels,
+  state: ToolState,
+  result: CompareResult,
+): void {
+  const count = resultCountFor(state.activeResult, result);
+  hooks.resultCount.textContent = pluralize(count, labels.item, labels.items);
+
+  if (count === 0) {
+    if (state.activeResult === "differences") {
+      hooks.resultViewer.textContent = `${labels.noDifferences}\n\n${labels.sameValues}`;
+      return;
+    }
+    if (state.activeResult === "matches") {
+      hooks.resultViewer.textContent = labels.noMatches;
+      return;
+    }
+  }
+
+  hooks.resultViewer.textContent = formatResult(
+    result,
+    state.activeResult,
+  ).text;
+}
+
+function resultCountFor(type: ResultType, result: CompareResult): number {
+  switch (type) {
+    case "differences":
+      return result.differences.length;
+    case "onlyA":
+      return result.onlyA.length;
+    case "onlyB":
+      return result.onlyB.length;
+    case "matches":
+      return result.matches.length;
+    case "all":
+      return result.union.length;
+  }
+}
+
+function setupTabs(
+  hooks: Hooks,
+  state: ToolState,
+  recompute: () => void,
+): void {
+  const tabs = hooks.tabs;
+
+  const selectTab = (tab: HTMLButtonElement): void => {
+    const value = tab.dataset.resultTab ?? "";
+    if (!isResultType(value)) {
+      return;
+    }
+    state.activeResult = value;
+    for (const candidate of tabs) {
+      const selected = candidate === tab;
+      candidate.setAttribute("aria-selected", String(selected));
+      candidate.tabIndex = selected ? 0 : -1;
+    }
+    hooks.resultPanel.setAttribute("aria-labelledby", tab.id);
+    hooks.resultHeading.textContent = tab.textContent;
+    recompute();
+  };
+
+  for (const [index, tab] of tabs.entries()) {
+    tab.addEventListener("click", () => {
+      selectTab(tab);
+    });
+    tab.addEventListener("keydown", (event) => {
+      const nextIndex = nextTabIndex(tabs.length, index, event);
+      if (nextIndex === null) {
+        return;
+      }
+      event.preventDefault();
+      selectTab(tabs[nextIndex]);
+      tabs[nextIndex].focus();
+    });
+  }
+
+  const activeTab = tabs.find(
+    (tab) => tab.dataset.resultTab === state.activeResult,
+  );
+  if (activeTab) {
+    hooks.resultPanel.setAttribute("aria-labelledby", activeTab.id);
+    hooks.resultHeading.textContent = activeTab.textContent;
+  }
+}
+
+function nextTabIndex(
+  count: number,
+  current: number,
+  event: KeyboardEvent,
+): number | null {
+  switch (event.key) {
+    case "ArrowRight":
+      return (current + 1) % count;
+    case "ArrowLeft":
+      return (current - 1 + count) % count;
+    case "Home":
+      return 0;
+    case "End":
+      return count - 1;
+    default:
+      return null;
+  }
 }
 
 function pluralize(count: number, singular: string, plural: string): string {

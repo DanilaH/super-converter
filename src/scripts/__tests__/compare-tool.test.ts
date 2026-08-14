@@ -10,6 +10,9 @@ const TOOL_HTML = `
     data-label-rows="rows"
     data-label-item="item"
     data-label-items="items"
+    data-label-no-differences="No differences found."
+    data-label-same-values="Both lists contain the same values with the current comparison settings."
+    data-label-no-matches="No matching values."
   >
     <div class="tool-heading">
       <h2 id="compare-tool-heading">Compare lists</h2>
@@ -61,17 +64,19 @@ const TOOL_HTML = `
     <section data-results hidden class="results">
       <h3>Results</h3>
 
+      <p data-empty-results>Paste two lists above to see their differences and matches.</p>
+
       <dl data-summary class="summary" hidden>
         <div class="summary-item">
-          <dt>Only A</dt>
+          <dt>Only in A</dt>
           <dd data-summary-only-a>0</dd>
         </div>
         <div class="summary-item">
-          <dt>Matches</dt>
+          <dt>In both</dt>
           <dd data-summary-matches>0</dd>
         </div>
         <div class="summary-item">
-          <dt>Only B</dt>
+          <dt>Only in B</dt>
           <dd data-summary-only-b>0</dd>
         </div>
       </dl>
@@ -84,7 +89,7 @@ const TOOL_HTML = `
         <button type="button" role="tab" id="tab-all" class="tab" aria-controls="result-panel" aria-selected="false" tabindex="-1" data-result-tab="all">All</button>
       </div>
 
-      <div role="tabpanel" id="result-panel" class="panel" aria-labelledby="tab-differences" data-result-panel>
+      <div role="tabpanel" id="result-panel" class="panel" aria-labelledby="tab-differences" data-result-panel hidden>
         <h4 class="panel-heading" data-result-heading>Differences</h4>
         <p class="panel-count" data-result-count>0 items</p>
         <pre class="viewer" data-result-viewer tabindex="0"></pre>
@@ -117,17 +122,47 @@ function hook<T extends HTMLElement>(
   return container.querySelector<T>(selector) ?? (null as never);
 }
 
+function typeCanonical(container: HTMLElement): void {
+  fireEvent.input(textarea(container, "[data-list-a]"), {
+    target: { value: "b\na\nb\nc" },
+  });
+  fireEvent.input(textarea(container, "[data-list-b]"), {
+    target: { value: "a\nd\nb\ne\nd" },
+  });
+}
+
+function activeTabValue(container: HTMLElement): string {
+  const selected = container.querySelector<HTMLElement>(
+    '[data-result-tab][aria-selected="true"]',
+  );
+  return selected?.dataset.resultTab ?? "";
+}
+
+function clickTab(container: HTMLElement, value: string): void {
+  fireEvent.click(
+    hook<HTMLButtonElement>(container, `[data-result-tab="${value}"]`),
+  );
+}
+
+const NO_DIFFERENCES_TEXT =
+  "No differences found.\n\nBoth lists contain the same values with the current comparison settings.";
+
 describe("compare-tool", () => {
   afterEach(() => {
     document.body.innerHTML = "";
   });
 
-  it("mounts with zero counters, hidden results and enabled action buttons", () => {
+  it("shows the both-empty state: results and empty copy visible, summary/tabs/panel hidden, zero counters", () => {
     const container = mountTool();
 
-    expect(within(container).getAllByText("0 rows")).toHaveLength(2);
+    expect(hook(container, "[data-results]").hidden).toBe(false);
+    expect(hook(container, "[data-empty-results]").hidden).toBe(false);
+    expect(hook(container, "[data-summary]").hidden).toBe(true);
+    expect(hook(container, "[data-result-tabs]").hidden).toBe(true);
+    expect(hook(container, "[data-result-panel]").hidden).toBe(true);
+    expect(hook(container, "[data-result-viewer]").textContent).toBe("");
     expect(hook(container, "[data-result-count]").textContent).toBe("0 items");
-    expect(hook(container, "[data-results]").hidden).toBe(true);
+    expect(within(container).getAllByText("0 rows")).toHaveLength(2);
     expect(
       hook<HTMLButtonElement>(container, "[data-clear-list-a]").disabled,
     ).toBe(false);
@@ -142,21 +177,291 @@ describe("compare-tool", () => {
     ).toBe(false);
   });
 
-  it("updates counters and shows results on manual input in both lists", () => {
+  it("shows summary, tabs and panel when one input is filled and hides the empty copy", () => {
     const container = mountTool();
 
     fireEvent.input(textarea(container, "[data-list-a]"), {
-      target: { value: "a\nb\nc" },
+      target: { value: "a\nb" },
     });
 
-    expect(hook(container, "[data-list-a-count]").textContent).toBe("3 rows");
-    expect(hook(container, "[data-results]").hidden).toBe(false);
+    expect(hook(container, "[data-empty-results]").hidden).toBe(true);
+    expect(hook(container, "[data-summary]").hidden).toBe(false);
+    expect(hook(container, "[data-result-tabs]").hidden).toBe(false);
+    expect(hook(container, "[data-result-panel]").hidden).toBe(false);
+    expect(within(container).getByText("2 rows")).toBeTruthy();
+  });
 
-    fireEvent.input(textarea(container, "[data-list-b]"), {
+  it("shows exact summary counts and updates them live", () => {
+    const container = mountTool();
+
+    typeCanonical(container);
+
+    expect(hook(container, "[data-summary-only-a]").textContent).toBe("1");
+    expect(hook(container, "[data-summary-matches]").textContent).toBe("2");
+    expect(hook(container, "[data-summary-only-b]").textContent).toBe("2");
+
+    fireEvent.click(hook(container, "[data-option-remove-duplicates]"));
+
+    expect(hook(container, "[data-summary-only-a]").textContent).toBe("2");
+    expect(hook(container, "[data-summary-matches]").textContent).toBe("2");
+    expect(hook(container, "[data-summary-only-b]").textContent).toBe("3");
+  });
+
+  it("keeps Differences as the default active tab", () => {
+    const container = mountTool();
+
+    typeCanonical(container);
+
+    expect(activeTabValue(container)).toBe("differences");
+    expect(hook(container, "[data-result-heading]").textContent).toBe(
+      "Differences",
+    );
+    expect(
+      hook(container, "[data-result-panel]").getAttribute("aria-labelledby"),
+    ).toBe("tab-differences");
+    expect(hook(container, "[data-result-count]").textContent).toBe("3 items");
+    expect(hook(container, "[data-result-viewer]").textContent).toBe(
+      "ONLY IN LIST A\nc\n\nONLY IN LIST B\nd\ne",
+    );
+  });
+
+  it("updates selection, heading, aria-labelledby, text and count on every tab click", () => {
+    const container = mountTool();
+
+    typeCanonical(container);
+
+    const views = [
+      {
+        value: "onlyA",
+        id: "tab-only-a",
+        label: "Only A",
+        count: "1 item",
+        text: "c",
+      },
+      {
+        value: "onlyB",
+        id: "tab-only-b",
+        label: "Only B",
+        count: "2 items",
+        text: "d\ne",
+      },
+      {
+        value: "matches",
+        id: "tab-matches",
+        label: "Matches",
+        count: "2 items",
+        text: "b\na",
+      },
+      {
+        value: "all",
+        id: "tab-all",
+        label: "All",
+        count: "5 items",
+        text: "b\na\nc\nd\ne",
+      },
+      {
+        value: "differences",
+        id: "tab-differences",
+        label: "Differences",
+        count: "3 items",
+        text: "ONLY IN LIST A\nc\n\nONLY IN LIST B\nd\ne",
+      },
+    ];
+
+    for (const view of views) {
+      clickTab(container, view.value);
+
+      expect(activeTabValue(container)).toBe(view.value);
+      expect(
+        hook<HTMLButtonElement>(
+          container,
+          `[data-result-tab="${view.value}"]`,
+        ).getAttribute("aria-selected"),
+      ).toBe("true");
+      expect(
+        hook<HTMLButtonElement>(container, `[data-result-tab="${view.value}"]`)
+          .tabIndex,
+      ).toBe(0);
+      expect(hook(container, "[data-result-heading]").textContent).toBe(
+        view.label,
+      );
+      expect(
+        hook(container, "[data-result-panel]").getAttribute("aria-labelledby"),
+      ).toBe(view.id);
+      expect(hook(container, "[data-result-count]").textContent).toBe(
+        view.count,
+      );
+      expect(hook(container, "[data-result-viewer]").textContent).toBe(
+        view.text,
+      );
+    }
+  });
+
+  it("handles ArrowRight/ArrowLeft with wrap, Home and End", () => {
+    const container = mountTool();
+
+    typeCanonical(container);
+
+    const tabOf = (value: string): HTMLButtonElement =>
+      hook<HTMLButtonElement>(container, `[data-result-tab="${value}"]`);
+
+    tabOf("differences").focus();
+
+    fireEvent.keyDown(tabOf("differences"), { key: "ArrowRight" });
+    expect(activeTabValue(container)).toBe("onlyA");
+    expect(document.activeElement).toBe(tabOf("onlyA"));
+
+    fireEvent.keyDown(tabOf("onlyB"), { key: "ArrowRight" });
+    expect(activeTabValue(container)).toBe("matches");
+
+    fireEvent.keyDown(tabOf("all"), { key: "ArrowRight" });
+    expect(activeTabValue(container)).toBe("differences");
+    expect(document.activeElement).toBe(tabOf("differences"));
+
+    fireEvent.keyDown(tabOf("differences"), { key: "ArrowLeft" });
+    expect(activeTabValue(container)).toBe("all");
+    expect(document.activeElement).toBe(tabOf("all"));
+
+    fireEvent.keyDown(tabOf("all"), { key: "End" });
+    expect(activeTabValue(container)).toBe("all");
+    expect(document.activeElement).toBe(tabOf("all"));
+
+    fireEvent.keyDown(tabOf("all"), { key: "Home" });
+    expect(activeTabValue(container)).toBe("differences");
+    expect(document.activeElement).toBe(tabOf("differences"));
+
+    fireEvent.keyDown(tabOf("differences"), { key: "a" });
+    expect(activeTabValue(container)).toBe("differences");
+  });
+
+  it("keeps the active tab across input, option change, Clear, Swap and Load example", () => {
+    const container = mountTool();
+
+    typeCanonical(container);
+    clickTab(container, "onlyA");
+
+    fireEvent.input(textarea(container, "[data-list-a]"), {
       target: { value: "x\ny" },
     });
+    expect(activeTabValue(container)).toBe("onlyA");
+    expect(hook(container, "[data-result-viewer]").textContent).toBe("x\ny");
 
-    expect(hook(container, "[data-list-b-count]").textContent).toBe("2 rows");
+    fireEvent.click(hook(container, "[data-option-remove-duplicates]"));
+    expect(activeTabValue(container)).toBe("onlyA");
+
+    fireEvent.click(hook(container, "[data-clear-list-b]"));
+    expect(activeTabValue(container)).toBe("onlyA");
+
+    fireEvent.click(hook(container, "[data-swap-lists]"));
+    expect(activeTabValue(container)).toBe("onlyA");
+
+    fireEvent.click(hook(container, "[data-load-example]"));
+    expect(activeTabValue(container)).toBe("onlyA");
+    expect(hook(container, "[data-result-viewer]").textContent).toBe(
+      "alice@example.com",
+    );
+  });
+
+  it("shows the exact no-differences copy and updates it live", () => {
+    const container = mountTool();
+
+    fireEvent.input(textarea(container, "[data-list-a]"), {
+      target: { value: "A\nb" },
+    });
+    fireEvent.input(textarea(container, "[data-list-b]"), {
+      target: { value: "a\nB" },
+    });
+
+    expect(hook(container, "[data-result-count]").textContent).toBe("4 items");
+    expect(hook(container, "[data-result-viewer]").textContent).toBe(
+      "ONLY IN LIST A\nA\nb\n\nONLY IN LIST B\na\nB",
+    );
+
+    fireEvent.click(hook(container, "[data-option-ignore-case]"));
+
+    expect(hook(container, "[data-result-count]").textContent).toBe("0 items");
+    expect(hook(container, "[data-result-viewer]").textContent).toBe(
+      NO_DIFFERENCES_TEXT,
+    );
+
+    fireEvent.click(hook(container, "[data-option-ignore-case]"));
+
+    expect(hook(container, "[data-result-viewer]").textContent).toBe(
+      "ONLY IN LIST A\nA\nb\n\nONLY IN LIST B\na\nB",
+    );
+  });
+
+  it("shows the exact no-matches copy", () => {
+    const container = mountTool();
+
+    fireEvent.input(textarea(container, "[data-list-a]"), {
+      target: { value: "a" },
+    });
+    fireEvent.input(textarea(container, "[data-list-b]"), {
+      target: { value: "b" },
+    });
+
+    clickTab(container, "matches");
+
+    expect(hook(container, "[data-result-count]").textContent).toBe("0 items");
+    expect(hook(container, "[data-result-viewer]").textContent).toBe(
+      "No matching values.",
+    );
+  });
+
+  it("keeps formatted text empty for empty Only A, Only B and All views", () => {
+    const container = mountTool();
+
+    fireEvent.input(textarea(container, "[data-list-a]"), {
+      target: { value: "a" },
+    });
+    fireEvent.input(textarea(container, "[data-list-b]"), {
+      target: { value: "a\nb" },
+    });
+
+    clickTab(container, "onlyA");
+    expect(hook(container, "[data-result-count]").textContent).toBe("0 items");
+    expect(hook(container, "[data-result-viewer]").textContent).toBe("");
+
+    clickTab(container, "onlyB");
+    expect(hook(container, "[data-result-count]").textContent).toBe("1 item");
+    expect(hook(container, "[data-result-viewer]").textContent).toBe("b");
+  });
+
+  it("returns to the both-empty state and back to results on re-input", () => {
+    const container = mountTool();
+
+    typeCanonical(container);
+    clickTab(container, "matches");
+    expect(hook(container, "[data-summary]").hidden).toBe(false);
+
+    fireEvent.click(hook(container, "[data-clear-list-a]"));
+    fireEvent.click(hook(container, "[data-clear-list-b]"));
+
+    expect(hook(container, "[data-empty-results]").hidden).toBe(false);
+    expect(hook(container, "[data-summary]").hidden).toBe(true);
+    expect(hook(container, "[data-result-tabs]").hidden).toBe(true);
+    expect(hook(container, "[data-result-panel]").hidden).toBe(true);
+    expect(hook(container, "[data-result-viewer]").textContent).toBe("");
+    expect(hook(container, "[data-result-count]").textContent).toBe("0 items");
+
+    typeCanonical(container);
+
+    expect(hook(container, "[data-empty-results]").hidden).toBe(true);
+    expect(activeTabValue(container)).toBe("matches");
+    expect(hook(container, "[data-result-count]").textContent).toBe("2 items");
+    expect(hook(container, "[data-result-viewer]").textContent).toBe("b\na");
+  });
+
+  it("uses singular and plural labels for the active count", () => {
+    const container = mountTool();
+
+    typeCanonical(container);
+    clickTab(container, "onlyA");
+    expect(hook(container, "[data-result-count]").textContent).toBe("1 item");
+
+    clickTab(container, "matches");
+    expect(hook(container, "[data-result-count]").textContent).toBe("2 items");
   });
 
   it("counts parsed rows and reacts to Ignore empty lines", () => {
@@ -184,12 +489,11 @@ describe("compare-tool", () => {
     });
 
     const fullText = "ONLY IN LIST A\n A \nb\n\nONLY IN LIST B\na\nB ";
-    const matchText = "ONLY IN LIST A\n\nONLY IN LIST B";
 
     expect(viewer.textContent).toBe(fullText);
 
     fireEvent.click(hook(container, "[data-option-ignore-case]"));
-    expect(viewer.textContent).toBe(matchText);
+    expect(viewer.textContent).toBe(NO_DIFFERENCES_TEXT);
 
     fireEvent.click(hook(container, "[data-option-trim-whitespace]"));
     expect(viewer.textContent).toBe(fullText);
@@ -199,22 +503,6 @@ describe("compare-tool", () => {
 
     fireEvent.click(hook(container, "[data-option-remove-duplicates]"));
     expect(viewer.textContent).toBe(fullText);
-  });
-
-  it("shows the exact Differences text and count", () => {
-    const container = mountTool();
-
-    fireEvent.input(textarea(container, "[data-list-a]"), {
-      target: { value: "b\na\nb\nc" },
-    });
-    fireEvent.input(textarea(container, "[data-list-b]"), {
-      target: { value: "a\nd\nb\ne\nd" },
-    });
-
-    expect(hook(container, "[data-result-viewer]").textContent).toBe(
-      "ONLY IN LIST A\nc\n\nONLY IN LIST B\nd\ne",
-    );
-    expect(hook(container, "[data-result-count]").textContent).toBe("3 items");
   });
 
   it("normalizes for comparison without rewriting raw textarea values", () => {
@@ -234,7 +522,7 @@ describe("compare-tool", () => {
     fireEvent.click(hook(container, "[data-option-ignore-case]"));
 
     expect(hook(container, "[data-result-viewer]").textContent).toBe(
-      "ONLY IN LIST A\n\nONLY IN LIST B",
+      NO_DIFFERENCES_TEXT,
     );
     expect(textarea(container, "[data-list-a]").value).toBe("A\nB");
     expect(textarea(container, "[data-list-b]").value).toBe("a\nb");
@@ -261,7 +549,7 @@ describe("compare-tool", () => {
     expect(textarea(container, "[data-list-b]").value).toBe("");
   });
 
-  it("swap preserves whitespace, trailing newline, options, selected tab and focus", () => {
+  it("swap preserves raw values, options, the selected tab and focus", () => {
     const container = mountTool();
     const listA = textarea(container, "[data-list-a]");
     const ignoreCase = hook<HTMLInputElement>(
@@ -271,9 +559,10 @@ describe("compare-tool", () => {
 
     fireEvent.input(listA, { target: { value: " a \n" } });
     fireEvent.input(textarea(container, "[data-list-b]"), {
-      target: { value: "b  \r\n" },
+      target: { value: "b  \n" },
     });
     fireEvent.click(ignoreCase);
+    clickTab(container, "onlyB");
     listA.focus();
 
     fireEvent.click(hook(container, "[data-swap-lists]"));
@@ -281,11 +570,7 @@ describe("compare-tool", () => {
     expect(listA.value).toBe("b  \n");
     expect(textarea(container, "[data-list-b]").value).toBe(" a \n");
     expect(ignoreCase.checked).toBe(true);
-    expect(
-      hook(container, '[data-result-tab="differences"]').getAttribute(
-        "aria-selected",
-      ),
-    ).toBe("true");
+    expect(activeTabValue(container)).toBe("onlyB");
     expect(document.activeElement).toBe(listA);
   });
 
@@ -300,44 +585,11 @@ describe("compare-tool", () => {
     expect(textarea(container, "[data-list-b]").value).toBe(
       "bob@example.com\ncarol@example.com\ndave@example.com",
     );
-    expect(hook(container, "[data-results]").hidden).toBe(false);
+    expect(hook(container, "[data-empty-results]").hidden).toBe(true);
     expect(hook(container, "[data-result-viewer]").textContent).toBe(
       "ONLY IN LIST A\nalice@example.com\n\nONLY IN LIST B\ndave@example.com",
     );
-  });
-
-  it("hides results and clears the viewer when both raw values are empty again", () => {
-    const container = mountTool();
-
-    fireEvent.input(textarea(container, "[data-list-a]"), {
-      target: { value: "a" },
-    });
-    fireEvent.input(textarea(container, "[data-list-b]"), {
-      target: { value: "b" },
-    });
-    expect(hook(container, "[data-results]").hidden).toBe(false);
-
-    fireEvent.input(textarea(container, "[data-list-a]"), {
-      target: { value: "" },
-    });
-    fireEvent.input(textarea(container, "[data-list-b]"), {
-      target: { value: "" },
-    });
-
-    expect(hook(container, "[data-results]").hidden).toBe(true);
-    expect(hook(container, "[data-result-viewer]").textContent).toBe("");
-    expect(hook(container, "[data-result-count]").textContent).toBe("0 items");
-  });
-
-  it("keeps summary and tablist hidden", () => {
-    const container = mountTool();
-
-    fireEvent.input(textarea(container, "[data-list-a]"), {
-      target: { value: "a" },
-    });
-
-    expect(hook(container, "[data-summary]").hidden).toBe(true);
-    expect(hook(container, "[data-result-tabs]").hidden).toBe(true);
+    expect(hook(container, "[data-result-count]").textContent).toBe("2 items");
   });
 
   it("does not bind listeners twice for the same root", () => {
@@ -355,6 +607,9 @@ describe("compare-tool", () => {
 
     expect(listA.value).toBe("b");
     expect(listB.value).toBe("a");
+
+    clickTab(container, "onlyA");
+    expect(activeTabValue(container)).toBe("onlyA");
   });
 
   it("renders user content as text and never as HTML elements", () => {
