@@ -770,6 +770,28 @@ describe("copy and download", () => {
     expect(writeText).toHaveBeenCalledWith("ONLY IN LIST A\n\nONLY IN LIST B");
   });
 
+  it("never puts the no-matches UI copy into the clipboard", async () => {
+    const writeText = mockClipboard();
+    const container = mountTool();
+
+    fireEvent.input(textarea(container, "[data-list-a]"), {
+      target: { value: "a" },
+    });
+    fireEvent.input(textarea(container, "[data-list-b]"), {
+      target: { value: "b" },
+    });
+    clickTab(container, "matches");
+
+    expect(hook(container, "[data-result-viewer]").textContent).toBe(
+      "No matching values.",
+    );
+
+    fireEvent.click(hook(container, "[data-copy-result]"));
+    await flushPromises();
+
+    expect(writeText).toHaveBeenCalledWith("");
+  });
+
   it("copies an empty string for an empty active result", async () => {
     const writeText = mockClipboard();
     const container = mountTool();
@@ -837,10 +859,34 @@ describe("copy and download", () => {
 
     expect(feedback.textContent).toBe(COPY_ERROR_TEXT);
     expect(copy.textContent).toBe("Copy");
+    expect(copy.disabled).toBe(false);
 
     vi.advanceTimersByTime(4000);
 
     expect(feedback.textContent).toBe("");
+    expect(copy.disabled).toBe(false);
+  });
+
+  it("shows the exact local error when the Clipboard API has no writeText", () => {
+    vi.useFakeTimers();
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: {},
+    });
+    const container = mountCanvas();
+    const copy = hook<HTMLButtonElement>(container, "[data-copy-result]");
+    const feedback = hook(container, "[data-local-feedback]");
+
+    fireEvent.click(copy);
+
+    expect(feedback.textContent).toBe(COPY_ERROR_TEXT);
+    expect(copy.textContent).toBe("Copy");
+    expect(copy.disabled).toBe(false);
+
+    vi.advanceTimersByTime(4000);
+
+    expect(feedback.textContent).toBe("");
+    expect(copy.disabled).toBe(false);
   });
 
   it("a new Copy click restarts its own feedback interval", async () => {
@@ -903,6 +949,9 @@ describe("copy and download", () => {
   it("creates a temporary anchor with href and download, clicks it and removes it", () => {
     const { create } = mockUrls();
     const clickSpy = mockAnchorClick();
+    const removeSpy = vi
+      .spyOn(HTMLAnchorElement.prototype, "remove")
+      .mockImplementation(() => {});
     const container = mountCanvas();
 
     fireEvent.click(hook(container, "[data-download-result]"));
@@ -912,7 +961,7 @@ describe("copy and download", () => {
     expect(anchor.getAttribute("href")).toBe(create.mock.results[0].value);
     expect(anchor.download).toBe("compare-lists-differences.txt");
     expect(clickSpy).toHaveBeenCalledTimes(1);
-    expect(anchor.isConnected).toBe(false);
+    expect(removeSpy).toHaveBeenCalledTimes(1);
   });
 
   it("revokes each object URL exactly once, even when the anchor click throws", () => {
@@ -920,6 +969,9 @@ describe("copy and download", () => {
     mockAnchorClick().mockImplementation(() => {
       throw new Error("boom");
     });
+    const removeSpy = vi
+      .spyOn(HTMLAnchorElement.prototype, "remove")
+      .mockImplementation(() => {});
     const container = mountCanvas();
 
     fireEvent.click(hook(container, "[data-download-result]"));
@@ -927,6 +979,7 @@ describe("copy and download", () => {
     expect(create).toHaveBeenCalledTimes(1);
     expect(revoke).toHaveBeenCalledTimes(1);
     expect(revoke).toHaveBeenCalledWith("blob:mock-1");
+    expect(removeSpy).toHaveBeenCalledTimes(1);
   });
 
   it("revokes the object URL exactly once on a normal download", () => {

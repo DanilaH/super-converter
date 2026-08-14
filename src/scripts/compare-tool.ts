@@ -374,6 +374,7 @@ function setupCopy(hooks: Hooks, labels: Labels, state: ToolState): void {
     const clipboard = navigator.clipboard;
     const writeText = clipboard?.writeText;
     if (!writeText) {
+      hooks.copyResult.disabled = state.listA === "" && state.listB === "";
       showCopyError(hooks, labels, state);
       return;
     }
