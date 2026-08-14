@@ -12,6 +12,13 @@ export type CompareMessages = {
   ignoreCase: string;
   removeDuplicates: string;
   results: string;
+  emptyResults: string;
+  noDifferences: string;
+  sameValues: string;
+  noMatches: string;
+  onlyInA: string;
+  inBoth: string;
+  onlyInB: string;
   row: string;
   rows: string;
   item: string;
@@ -60,6 +67,14 @@ export const englishContent = {
     ignoreCase: "Ignore case",
     removeDuplicates: "Remove duplicates",
     results: "Results",
+    emptyResults: "Paste two lists above to see their differences and matches.",
+    noDifferences: "No differences found.",
+    sameValues:
+      "Both lists contain the same values with the current comparison settings.",
+    noMatches: "No matching values.",
+    onlyInA: "Only in A",
+    inBoth: "In both",
+    onlyInB: "Only in B",
     row: "row",
     rows: "rows",
     item: "item",

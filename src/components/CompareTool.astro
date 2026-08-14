@@ -31,6 +31,9 @@ const resultViews = [
   data-label-rows={compare.rows}
   data-label-item={compare.item}
   data-label-items={compare.items}
+  data-label-no-differences={compare.noDifferences}
+  data-label-same-values={compare.sameValues}
+  data-label-no-matches={compare.noMatches}
 >
   <div class="tool-heading">
     <h2 id="compare-tool-heading">{compare.heading}</h2>
@@ -126,17 +129,19 @@ const resultViews = [
   <section data-results hidden class="results">
     <h3>{compare.results}</h3>
 
+    <p data-empty-results>{compare.emptyResults}</p>
+
     <dl data-summary class="summary" hidden>
       <div class="summary-item">
-        <dt>{compare.onlyA}</dt>
+        <dt>{compare.onlyInA}</dt>
         <dd data-summary-only-a>0</dd>
       </div>
       <div class="summary-item">
-        <dt>{compare.matches}</dt>
+        <dt>{compare.inBoth}</dt>
         <dd data-summary-matches>0</dd>
       </div>
       <div class="summary-item">
-        <dt>{compare.onlyB}</dt>
+        <dt>{compare.onlyInB}</dt>
         <dd data-summary-only-b>0</dd>
       </div>
     </dl>
@@ -172,6 +177,7 @@ const resultViews = [
       class="panel"
       aria-labelledby="tab-differences"
       data-result-panel
+      hidden
     >
       <h4 class="panel-heading" data-result-heading>{compare.differences}</h4>
       <p class="panel-count" data-result-count>0 {compare.items}</p>
@@ -325,7 +331,8 @@ const resultViews = [
   }
 
   .summary[hidden],
-  .tabs[hidden] {
+  .tabs[hidden],
+  .panel[hidden] {
     display: none;
   }
 
@@ -406,6 +413,7 @@ const resultViews = [
   .viewer {
     margin: 0;
     min-height: 120px;
+    max-height: 360px;
     max-width: 100%;
     padding: var(--space-3);
     border: var(--border-default);
@@ -417,6 +425,7 @@ const resultViews = [
     line-height: var(--line-height-result-data);
     white-space: pre-wrap;
     overflow-wrap: anywhere;
+    overflow-y: auto;
   }
 
   .viewer:focus-visible {
@@ -461,6 +470,10 @@ const resultViews = [
 
     .list textarea {
       min-height: 280px;
+    }
+
+    .viewer {
+      max-height: 440px;
     }
   }
 </style>
