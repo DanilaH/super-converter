@@ -29,12 +29,16 @@ export class DevelopmentAnalytics implements Analytics {
     name: Name,
     payload: AnalyticsEventMap[Name],
   ): void {
+    if (payload === undefined) {
+      this.logger(`[analytics] ${name}`);
+      return;
+    }
     this.logger(`[analytics] ${name}`, payload);
   }
 }
 
 export function defaultAnalytics(): Analytics {
-  if (import.meta.env.DEV) {
+  if (import.meta.env.MODE === "development") {
     return new DevelopmentAnalytics();
   }
   return new NoopAnalytics();

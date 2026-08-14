@@ -1,5 +1,7 @@
 import type { ResultType } from "../../compare-lists/model/types";
-import type { SizeBucket } from "../lib/size-bucket";
+
+export type SizeBucket =
+  "0" | "1-10" | "11-100" | "101-1000" | "1001-10000" | "10001+";
 
 export type AnalyticsEventMap = {
   tool_used: {

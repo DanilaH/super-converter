@@ -136,61 +136,61 @@ function mountRoot(root: HTMLElement, analytics: Analytics): void {
 
   hooks.listA.addEventListener("input", (event) => {
     state.listA = hooks.listA.value;
-    recompute();
-    handleToolInput(analytics, state, event);
+    const result = recompute();
+    handleToolInput(analytics, state, result, event);
   });
   hooks.listB.addEventListener("input", (event) => {
     state.listB = hooks.listB.value;
-    recompute();
-    handleToolInput(analytics, state, event);
+    const result = recompute();
+    handleToolInput(analytics, state, result, event);
   });
   hooks.trimWhitespace.addEventListener("change", () => {
     state.options.trimWhitespace = hooks.trimWhitespace.checked;
-    recompute();
+    const result = recompute();
     safeTrack(analytics, "option_changed", {
       option: "trimWhitespace",
       enabled: hooks.trimWhitespace.checked,
     });
-    scheduleComparisonCompleted(analytics, state);
+    scheduleComparisonCompleted(analytics, state, result);
   });
   hooks.ignoreEmptyLines.addEventListener("change", () => {
     state.options.ignoreEmptyLines = hooks.ignoreEmptyLines.checked;
-    recompute();
+    const result = recompute();
     safeTrack(analytics, "option_changed", {
       option: "ignoreEmptyLines",
       enabled: hooks.ignoreEmptyLines.checked,
     });
-    scheduleComparisonCompleted(analytics, state);
+    scheduleComparisonCompleted(analytics, state, result);
   });
   hooks.ignoreCase.addEventListener("change", () => {
     state.options.ignoreCase = hooks.ignoreCase.checked;
-    recompute();
+    const result = recompute();
     safeTrack(analytics, "option_changed", {
       option: "ignoreCase",
       enabled: hooks.ignoreCase.checked,
     });
-    scheduleComparisonCompleted(analytics, state);
+    scheduleComparisonCompleted(analytics, state, result);
   });
   hooks.removeDuplicates.addEventListener("change", () => {
     state.options.removeDuplicates = hooks.removeDuplicates.checked;
-    recompute();
+    const result = recompute();
     safeTrack(analytics, "option_changed", {
       option: "removeDuplicates",
       enabled: hooks.removeDuplicates.checked,
     });
-    scheduleComparisonCompleted(analytics, state);
+    scheduleComparisonCompleted(analytics, state, result);
   });
   hooks.clearListA.addEventListener("click", () => {
     hooks.listA.value = "";
     state.listA = "";
-    recompute();
-    scheduleComparisonCompleted(analytics, state);
+    const result = recompute();
+    scheduleComparisonCompleted(analytics, state, result);
   });
   hooks.clearListB.addEventListener("click", () => {
     hooks.listB.value = "";
     state.listB = "";
-    recompute();
-    scheduleComparisonCompleted(analytics, state);
+    const result = recompute();
+    scheduleComparisonCompleted(analytics, state, result);
   });
   hooks.swap.addEventListener("click", () => {
     const previousA = hooks.listA.value;
@@ -198,8 +198,8 @@ function mountRoot(root: HTMLElement, analytics: Analytics): void {
     hooks.listB.value = previousA;
     state.listA = hooks.listA.value;
     state.listB = hooks.listB.value;
-    recompute();
-    scheduleComparisonCompleted(analytics, state);
+    const result = recompute();
+    scheduleComparisonCompleted(analytics, state, result);
   });
   hooks.loadExample.addEventListener("click", () => {
     hooks.listA.value = EXAMPLE_A;
@@ -211,8 +211,8 @@ function mountRoot(root: HTMLElement, analytics: Analytics): void {
       safeTrack(analytics, "tool_used", { inputMethod: "example" });
     }
     safeTrack(analytics, "example_loaded", undefined);
-    recompute();
-    scheduleComparisonCompleted(analytics, state);
+    const result = recompute();
+    scheduleComparisonCompleted(analytics, state, result);
   });
 
   setupTabs(hooks, state, recompute, analytics);
@@ -234,6 +234,7 @@ function mountRoot(root: HTMLElement, analytics: Analytics): void {
 function handleToolInput(
   analytics: Analytics,
   state: ToolState,
+  result: CompareResult | null,
   event: Event,
 ): void {
   if (!state.toolUsed) {
@@ -243,12 +244,13 @@ function handleToolInput(
       inputMethod: inputType === "insertFromPaste" ? "paste" : "typing",
     });
   }
-  scheduleComparisonCompleted(analytics, state);
+  scheduleComparisonCompleted(analytics, state, result);
 }
 
 function scheduleComparisonCompleted(
   analytics: Analytics,
   state: ToolState,
+  result: CompareResult | null,
 ): void {
   if (state.comparisonCompleted) {
     return;
@@ -257,8 +259,7 @@ function scheduleComparisonCompleted(
     window.clearTimeout(state.comparisonTimer);
     state.comparisonTimer = null;
   }
-  const result = compareLists(state.listA, state.listB, state.options);
-  if (result.stats.rowsA === 0 || result.stats.rowsB === 0) {
+  if (result === null || result.stats.rowsA === 0 || result.stats.rowsB === 0) {
     return;
   }
   state.comparisonTimer = window.setTimeout(() => {
@@ -363,7 +364,7 @@ function createRecompute(
   hooks: Hooks,
   labels: Labels,
   state: ToolState,
-): () => void {
+): () => CompareResult | null {
   return () => {
     if (state.listA === "" && state.listB === "") {
       hooks.results.hidden = false;
@@ -377,7 +378,7 @@ function createRecompute(
       hooks.resultCount.textContent = `0 ${labels.items}`;
       hooks.listACount.textContent = `0 ${labels.rows}`;
       hooks.listBCount.textContent = `0 ${labels.rows}`;
-      return;
+      return null;
     }
 
     const result = compareLists(state.listA, state.listB, state.options);
@@ -404,6 +405,8 @@ function createRecompute(
     hooks.summaryOnlyB.textContent = String(result.stats.onlyB);
 
     renderResult(hooks, labels, state, result);
+
+    return result;
   };
 }
 

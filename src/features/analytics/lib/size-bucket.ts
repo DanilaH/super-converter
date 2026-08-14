@@ -1,5 +1,4 @@
-export type SizeBucket =
-  "0" | "1-10" | "11-100" | "101-1000" | "1001-10000" | "10001+";
+import type { SizeBucket } from "../model/events";
 
 export function sizeBucketFor(count: number): SizeBucket {
   if (count <= 0) {

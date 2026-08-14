@@ -40,10 +40,7 @@ describe("analytics adapters", () => {
     analytics.track("example_loaded", undefined);
 
     expect(logger).toHaveBeenCalledTimes(1);
-    expect(logger).toHaveBeenCalledWith(
-      "[analytics] example_loaded",
-      undefined,
-    );
+    expect(logger).toHaveBeenCalledWith("[analytics] example_loaded");
   });
 
   it("DevelopmentAnalytics logs the prefixed event name with a safe payload", () => {
@@ -66,11 +63,14 @@ describe("analytics adapters", () => {
     });
   });
 
-  it("selects the default adapter by environment", () => {
-    vi.stubEnv("DEV", true);
+  it("selects the default adapter by mode", () => {
+    vi.stubEnv("MODE", "development");
     expect(defaultAnalytics()).toBeInstanceOf(DevelopmentAnalytics);
-    vi.stubEnv("DEV", false);
+    vi.stubEnv("MODE", "test");
     expect(defaultAnalytics()).toBeInstanceOf(NoopAnalytics);
+    vi.stubEnv("MODE", "production");
+    expect(defaultAnalytics()).toBeInstanceOf(NoopAnalytics);
+    vi.unstubAllEnvs();
   });
 
   it("keeps an adapter exception inside the safe boundary", () => {
