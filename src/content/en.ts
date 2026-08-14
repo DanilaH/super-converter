@@ -224,7 +224,7 @@ export const englishContent = {
       {
         question: "Are my lists uploaded to a server?",
         answer:
-          "No. The comparison runs locally in your browser. Your raw lists and results never leave the page.",
+          "No. The comparison runs locally in your browser. Your list content is not uploaded to a server, not sent in network requests and not saved by the site. Copy and Download export the result only after you click the button.",
       },
       {
         question: "What does “Only A” mean?",
@@ -238,7 +238,7 @@ export const englishContent = {
     paragraphs: [
       "Compare Lists is a small browser utility for finding differences, matches and unique values between two lists.",
       "Paste two lists, choose your comparison options, and review the result as Differences, Only A, Only B, Matches or All — then copy or download what you need.",
-      "The tool deliberately requires no account and processes all list content locally in your browser. Nothing you paste is uploaded, saved or shared.",
+      "The tool deliberately requires no account and processes all list content locally in your browser. Your lists are not uploaded to a server, not sent in network requests and not saved by the site. Results leave the page only when you copy or download them yourself.",
     ],
     toolLinkLabel: "Compare two lists",
   },
