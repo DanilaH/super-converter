@@ -1,6 +1,9 @@
 import { fireEvent, within } from "@testing-library/dom";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { mountCompareTool } from "../compare-tool";
+
+const COPIED_BUTTON_TEXT = "\u2713 Copied";
+const COPY_ERROR_TEXT = "Couldn’t copy. Select the result manually.";
 
 const TOOL_HTML = `
   <section
@@ -13,6 +16,9 @@ const TOOL_HTML = `
     data-label-no-differences="No differences found."
     data-label-same-values="Both lists contain the same values with the current comparison settings."
     data-label-no-matches="No matching values."
+    data-label-copy="Copy"
+    data-label-copied="Copied"
+    data-label-copy-error="Couldn’t copy. Select the result manually."
   >
     <div class="tool-heading">
       <h2 id="compare-tool-heading">Compare lists</h2>
@@ -90,8 +96,15 @@ const TOOL_HTML = `
       </div>
 
       <div role="tabpanel" id="result-panel" class="panel" aria-labelledby="tab-differences" data-result-panel hidden>
-        <h4 class="panel-heading" data-result-heading>Differences</h4>
-        <p class="panel-count" data-result-count>0 items</p>
+        <div class="result-toolbar">
+          <h4 class="panel-heading" data-result-heading>Differences</h4>
+          <p class="panel-count" data-result-count>0 items</p>
+          <div class="result-actions">
+            <button type="button" class="action" data-copy-result disabled>Copy</button>
+            <button type="button" class="action" data-download-result disabled>Download</button>
+          </div>
+          <p class="local-feedback" data-local-feedback role="status" aria-live="polite" aria-atomic="true"></p>
+        </div>
         <pre class="viewer" data-result-viewer tabindex="0"></pre>
       </div>
     </section>
@@ -150,6 +163,9 @@ const NO_DIFFERENCES_TEXT =
 describe("compare-tool", () => {
   afterEach(() => {
     document.body.innerHTML = "";
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+    Reflect.deleteProperty(navigator, "clipboard");
   });
 
   it("shows the both-empty state: results and empty copy visible, summary/tabs/panel hidden, zero counters", () => {
@@ -623,5 +639,354 @@ describe("compare-tool", () => {
       "<img src=x onerror=alert(1)>",
     );
     expect(container.querySelector("img")).toBeNull();
+  });
+});
+
+function mockClipboard(rejects = false): ReturnType<typeof vi.fn> {
+  const writeText = rejects
+    ? vi.fn().mockRejectedValue(new Error("clipboard denied"))
+    : vi.fn().mockResolvedValue(undefined);
+  Object.defineProperty(navigator, "clipboard", {
+    configurable: true,
+    value: { writeText },
+  });
+  return writeText;
+}
+
+function mockUrls(): {
+  create: ReturnType<typeof vi.fn>;
+  revoke: ReturnType<typeof vi.fn>;
+} {
+  const create = vi
+    .spyOn(URL, "createObjectURL")
+    .mockReturnValue("blob:mock-1");
+  const revoke = vi.spyOn(URL, "revokeObjectURL").mockImplementation(() => {});
+  return { create, revoke };
+}
+
+function mockAnchorClick(): ReturnType<typeof vi.spyOn> {
+  return vi
+    .spyOn(HTMLAnchorElement.prototype, "click")
+    .mockImplementation(() => {});
+}
+
+async function flushPromises(): Promise<void> {
+  await Promise.resolve();
+  await Promise.resolve();
+  await Promise.resolve();
+}
+
+describe("copy and download", () => {
+  afterEach(() => {
+    document.body.innerHTML = "";
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+    Reflect.deleteProperty(navigator, "clipboard");
+  });
+
+  function mountCanvas(): HTMLElement {
+    const container = mountTool();
+    typeCanonical(container);
+    return container;
+  }
+
+  it("keeps Copy and Download disabled in the both-empty state and enables them after input", () => {
+    const container = mountTool();
+    const copy = hook<HTMLButtonElement>(container, "[data-copy-result]");
+    const download = hook<HTMLButtonElement>(
+      container,
+      "[data-download-result]",
+    );
+
+    expect(copy.disabled).toBe(true);
+    expect(download.disabled).toBe(true);
+
+    fireEvent.input(textarea(container, "[data-list-a]"), {
+      target: { value: "a" },
+    });
+
+    expect(copy.disabled).toBe(false);
+    expect(download.disabled).toBe(false);
+
+    fireEvent.click(hook(container, "[data-clear-list-a]"));
+
+    expect(copy.disabled).toBe(true);
+    expect(download.disabled).toBe(true);
+  });
+
+  it("copies the exact Differences formatted text", async () => {
+    const writeText = mockClipboard();
+    const container = mountCanvas();
+
+    fireEvent.click(hook(container, "[data-copy-result]"));
+    await flushPromises();
+
+    expect(writeText).toHaveBeenCalledTimes(1);
+    expect(writeText).toHaveBeenCalledWith(
+      "ONLY IN LIST A\nc\n\nONLY IN LIST B\nd\ne",
+    );
+  });
+
+  it("copies the active formatted text after switching tabs", async () => {
+    const writeText = mockClipboard();
+    const container = mountCanvas();
+
+    const expected: Array<{ tab: string; text: string }> = [
+      { tab: "differences", text: "ONLY IN LIST A\nc\n\nONLY IN LIST B\nd\ne" },
+      { tab: "onlyA", text: "c" },
+      { tab: "onlyB", text: "d\ne" },
+      { tab: "matches", text: "b\na" },
+      { tab: "all", text: "b\na\nc\nd\ne" },
+    ];
+
+    for (const view of expected) {
+      clickTab(container, view.tab);
+      fireEvent.click(hook(container, "[data-copy-result]"));
+      await flushPromises();
+      expect(writeText).toHaveBeenLastCalledWith(view.text);
+    }
+    expect(writeText).toHaveBeenCalledTimes(expected.length);
+  });
+
+  it("never puts the empty-state UI copy into the clipboard", async () => {
+    const writeText = mockClipboard();
+    const container = mountTool();
+
+    fireEvent.input(textarea(container, "[data-list-a]"), {
+      target: { value: "A\nb" },
+    });
+    fireEvent.input(textarea(container, "[data-list-b]"), {
+      target: { value: "a\nB" },
+    });
+    fireEvent.click(hook(container, "[data-option-ignore-case]"));
+
+    expect(hook(container, "[data-result-viewer]").textContent).toBe(
+      NO_DIFFERENCES_TEXT,
+    );
+
+    fireEvent.click(hook(container, "[data-copy-result]"));
+    await flushPromises();
+
+    expect(writeText).toHaveBeenCalledWith("ONLY IN LIST A\n\nONLY IN LIST B");
+  });
+
+  it("copies an empty string for an empty active result", async () => {
+    const writeText = mockClipboard();
+    const container = mountTool();
+
+    fireEvent.input(textarea(container, "[data-list-a]"), {
+      target: { value: "a" },
+    });
+    fireEvent.input(textarea(container, "[data-list-b]"), {
+      target: { value: "a\nb" },
+    });
+    clickTab(container, "onlyA");
+
+    fireEvent.click(hook(container, "[data-copy-result]"));
+    await flushPromises();
+
+    expect(writeText).toHaveBeenCalledWith("");
+  });
+
+  it("shows ✓ Copied feedback and resets after 2000 ms", async () => {
+    vi.useFakeTimers();
+    mockClipboard();
+    const container = mountCanvas();
+    const copy = hook<HTMLButtonElement>(container, "[data-copy-result]");
+    const feedback = hook(container, "[data-local-feedback]");
+
+    fireEvent.click(copy);
+    await flushPromises();
+
+    expect(copy.textContent).toBe(COPIED_BUTTON_TEXT);
+    expect(feedback.textContent).toBe("Copied");
+
+    vi.advanceTimersByTime(2000);
+
+    expect(copy.textContent).toBe("Copy");
+    expect(feedback.textContent).toBe("");
+    expect(copy.disabled).toBe(false);
+  });
+
+  it("shows the exact local error on a rejected promise and resets after 4000 ms", async () => {
+    vi.useFakeTimers();
+    mockClipboard(true);
+    const container = mountCanvas();
+    const copy = hook<HTMLButtonElement>(container, "[data-copy-result]");
+    const feedback = hook(container, "[data-local-feedback]");
+
+    fireEvent.click(copy);
+    await flushPromises();
+
+    expect(feedback.textContent).toBe(COPY_ERROR_TEXT);
+    expect(copy.textContent).toBe("Copy");
+    expect(copy.disabled).toBe(false);
+
+    vi.advanceTimersByTime(4000);
+
+    expect(feedback.textContent).toBe("");
+  });
+
+  it("shows the exact local error when the Clipboard API is missing", () => {
+    vi.useFakeTimers();
+    const container = mountCanvas();
+    const copy = hook<HTMLButtonElement>(container, "[data-copy-result]");
+    const feedback = hook(container, "[data-local-feedback]");
+
+    fireEvent.click(copy);
+
+    expect(feedback.textContent).toBe(COPY_ERROR_TEXT);
+    expect(copy.textContent).toBe("Copy");
+
+    vi.advanceTimersByTime(4000);
+
+    expect(feedback.textContent).toBe("");
+  });
+
+  it("a new Copy click restarts its own feedback interval", async () => {
+    vi.useFakeTimers();
+    mockClipboard(true);
+    const container = mountCanvas();
+    const copy = hook<HTMLButtonElement>(container, "[data-copy-result]");
+    const feedback = hook(container, "[data-local-feedback]");
+
+    fireEvent.click(copy);
+    await flushPromises();
+    expect(feedback.textContent).toBe(COPY_ERROR_TEXT);
+
+    fireEvent.click(copy);
+    await flushPromises();
+
+    vi.advanceTimersByTime(2000);
+    expect(feedback.textContent).toBe(COPY_ERROR_TEXT);
+
+    vi.advanceTimersByTime(2000);
+    expect(feedback.textContent).toBe("");
+  });
+
+  it("downloads a Blob with the exact text and MIME type", async () => {
+    const { create } = mockUrls();
+    mockAnchorClick();
+    const container = mountCanvas();
+
+    fireEvent.click(hook(container, "[data-download-result]"));
+
+    const blob = create.mock.calls[0][0] as Blob;
+    expect(blob).toBeInstanceOf(Blob);
+    expect(blob.type).toBe("text/plain;charset=utf-8");
+    expect(await blob.text()).toBe("ONLY IN LIST A\nc\n\nONLY IN LIST B\nd\ne");
+  });
+
+  it("uses stable filenames for every result view", () => {
+    mockUrls();
+    mockAnchorClick();
+    const container = mountCanvas();
+
+    const filenames: Record<string, string> = {
+      differences: "compare-lists-differences.txt",
+      onlyA: "compare-lists-only-a.txt",
+      onlyB: "compare-lists-only-b.txt",
+      matches: "compare-lists-matches.txt",
+      all: "compare-lists-all.txt",
+    };
+
+    for (const [tab, filename] of Object.entries(filenames)) {
+      clickTab(container, tab);
+      fireEvent.click(hook(container, "[data-download-result]"));
+      const instances = vi.mocked(HTMLAnchorElement.prototype.click).mock
+        .instances;
+      const anchor = instances[instances.length - 1] as HTMLAnchorElement;
+      expect(anchor.download).toBe(filename);
+    }
+  });
+
+  it("creates a temporary anchor with href and download, clicks it and removes it", () => {
+    const { create } = mockUrls();
+    const clickSpy = mockAnchorClick();
+    const container = mountCanvas();
+
+    fireEvent.click(hook(container, "[data-download-result]"));
+
+    const anchor = clickSpy.mock.instances[0] as HTMLAnchorElement;
+    expect(anchor).toBeInstanceOf(HTMLAnchorElement);
+    expect(anchor.getAttribute("href")).toBe(create.mock.results[0].value);
+    expect(anchor.download).toBe("compare-lists-differences.txt");
+    expect(clickSpy).toHaveBeenCalledTimes(1);
+    expect(anchor.isConnected).toBe(false);
+  });
+
+  it("revokes each object URL exactly once, even when the anchor click throws", () => {
+    const { create, revoke } = mockUrls();
+    mockAnchorClick().mockImplementation(() => {
+      throw new Error("boom");
+    });
+    const container = mountCanvas();
+
+    fireEvent.click(hook(container, "[data-download-result]"));
+
+    expect(create).toHaveBeenCalledTimes(1);
+    expect(revoke).toHaveBeenCalledTimes(1);
+    expect(revoke).toHaveBeenCalledWith("blob:mock-1");
+  });
+
+  it("revokes the object URL exactly once on a normal download", () => {
+    const { revoke } = mockUrls();
+    mockAnchorClick();
+    const container = mountCanvas();
+
+    fireEvent.click(hook(container, "[data-download-result]"));
+    fireEvent.click(hook(container, "[data-download-result]"));
+
+    expect(revoke).toHaveBeenCalledTimes(2);
+    expect(revoke.mock.calls.map((call) => call[0])).toEqual([
+      "blob:mock-1",
+      "blob:mock-1",
+    ]);
+  });
+
+  it("supports the complete flow: input → summary → tab → copy → download", async () => {
+    const writeText = mockClipboard();
+    const { create } = mockUrls();
+    mockAnchorClick();
+    const container = mountTool();
+
+    typeCanonical(container);
+    expect(hook(container, "[data-summary-only-a]").textContent).toBe("1");
+
+    clickTab(container, "matches");
+    expect(hook(container, "[data-result-count]").textContent).toBe("2 items");
+
+    fireEvent.click(hook(container, "[data-copy-result]"));
+    await flushPromises();
+    expect(writeText).toHaveBeenCalledWith("b\na");
+
+    fireEvent.click(hook(container, "[data-download-result]"));
+
+    const blob = create.mock.calls[0][0] as Blob;
+    expect(await blob.text()).toBe("b\na");
+    const instances =
+      vi.mocked(HTMLAnchorElement.prototype.click).mock.instances;
+    expect((instances[instances.length - 1] as HTMLAnchorElement).download).toBe(
+      "compare-lists-matches.txt",
+    );
+  });
+
+  it("does not duplicate copy/download side effects on double mount", async () => {
+    const writeText = mockClipboard();
+    const { create, revoke } = mockUrls();
+    mockAnchorClick();
+    const container = mountCanvas();
+
+    mountCompareTool(container);
+    mountCompareTool(container);
+
+    fireEvent.click(hook(container, "[data-copy-result]"));
+    await flushPromises();
+    expect(writeText).toHaveBeenCalledTimes(1);
+
+    fireEvent.click(hook(container, "[data-download-result]"));
+    fireEvent.click(hook(container, "[data-download-result]"));
+    expect(create).toHaveBeenCalledTimes(2);
+    expect(revoke).toHaveBeenCalledTimes(2);
   });
 });

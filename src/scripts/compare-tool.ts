@@ -3,6 +3,7 @@ import { formatResult } from "../features/compare-lists/lib/format-result";
 import type {
   CompareOptions,
   CompareResult,
+  FormattedResult,
   ResultType,
 } from "../features/compare-lists/model/types";
 
@@ -11,6 +12,7 @@ type ToolState = {
   listB: string;
   options: CompareOptions;
   activeResult: ResultType;
+  copyTimer: number | null;
 };
 
 type Labels = {
@@ -21,6 +23,9 @@ type Labels = {
   noDifferences: string;
   sameValues: string;
   noMatches: string;
+  copy: string;
+  copied: string;
+  copyError: string;
 };
 
 type Hooks = {
@@ -47,6 +52,9 @@ type Hooks = {
   resultHeading: HTMLElement;
   resultCount: HTMLElement;
   resultViewer: HTMLElement;
+  copyResult: HTMLButtonElement;
+  downloadResult: HTMLButtonElement;
+  localFeedback: HTMLElement;
   tabs: HTMLButtonElement[];
 };
 
@@ -103,6 +111,7 @@ function mountRoot(root: HTMLElement): void {
       removeDuplicates: hooks.removeDuplicates.checked,
     },
     activeResult: readActiveResult(root),
+    copyTimer: null,
   };
 
   const recompute = createRecompute(hooks, labels, state);
@@ -158,7 +167,11 @@ function mountRoot(root: HTMLElement): void {
   });
 
   setupTabs(hooks, state, recompute);
+  setupCopy(hooks, labels, state);
+  setupDownload(hooks, state);
 
+  hooks.copyResult.disabled = false;
+  hooks.downloadResult.disabled = false;
   hooks.clearListA.disabled = false;
   hooks.clearListB.disabled = false;
   hooks.swap.disabled = false;
@@ -194,6 +207,9 @@ function findHooks(root: HTMLElement): Hooks {
     resultHeading: requireElement(root, "[data-result-heading]"),
     resultCount: requireElement(root, "[data-result-count]"),
     resultViewer: requireElement(root, "[data-result-viewer]"),
+    copyResult: requireElement(root, "[data-copy-result]"),
+    downloadResult: requireElement(root, "[data-download-result]"),
+    localFeedback: requireElement(root, "[data-local-feedback]"),
     tabs: Array.from(
       root.querySelectorAll<HTMLButtonElement>("[data-result-tab]"),
     ),
@@ -220,6 +236,9 @@ function readLabels(root: HTMLElement): Labels {
     noDifferences: root.dataset.labelNoDifferences ?? "",
     sameValues: root.dataset.labelSameValues ?? "",
     noMatches: root.dataset.labelNoMatches ?? "",
+    copy: root.dataset.labelCopy ?? "",
+    copied: root.dataset.labelCopied ?? "",
+    copyError: root.dataset.labelCopyError ?? "",
   };
   for (const [name, value] of Object.entries(labels)) {
     if (value === "") {
@@ -261,6 +280,8 @@ function createRecompute(
       hooks.summary.hidden = true;
       hooks.resultTabs.hidden = true;
       hooks.resultPanel.hidden = true;
+      hooks.copyResult.disabled = true;
+      hooks.downloadResult.disabled = true;
       hooks.resultViewer.textContent = "";
       hooks.resultCount.textContent = `0 ${labels.items}`;
       hooks.listACount.textContent = `0 ${labels.rows}`;
@@ -275,6 +296,8 @@ function createRecompute(
     hooks.summary.hidden = false;
     hooks.resultTabs.hidden = false;
     hooks.resultPanel.hidden = false;
+    hooks.copyResult.disabled = false;
+    hooks.downloadResult.disabled = false;
     hooks.listACount.textContent = pluralize(
       result.stats.rowsA,
       labels.row,
@@ -332,6 +355,92 @@ function resultCountFor(type: ResultType, result: CompareResult): number {
     case "all":
       return result.union.length;
   }
+}
+
+function getCurrentFormatted(state: ToolState): FormattedResult {
+  const result = compareLists(state.listA, state.listB, state.options);
+  return formatResult(result, state.activeResult);
+}
+
+function setupCopy(hooks: Hooks, labels: Labels, state: ToolState): void {
+  hooks.copyResult.addEventListener("click", () => {
+    if (state.listA === "" && state.listB === "") {
+      return;
+    }
+    const formatted = getCurrentFormatted(state);
+    clearCopyTimer(state);
+    hooks.copyResult.disabled = true;
+
+    const clipboard = navigator.clipboard;
+    const writeText = clipboard?.writeText;
+    if (!writeText) {
+      showCopyError(hooks, labels, state);
+      return;
+    }
+
+    writeText
+      .call(clipboard, formatted.text)
+      .then(() => {
+        hooks.copyResult.textContent = `\u2713 ${labels.copied}`;
+        hooks.localFeedback.textContent = labels.copied;
+        hooks.localFeedback.dataset.state = "success";
+        state.copyTimer = window.setTimeout(() => {
+          hooks.copyResult.textContent = labels.copy;
+          hooks.localFeedback.textContent = "";
+          delete hooks.localFeedback.dataset.state;
+          state.copyTimer = null;
+        }, 2000);
+      })
+      .catch(() => {
+        showCopyError(hooks, labels, state);
+      })
+      .finally(() => {
+        hooks.copyResult.disabled = state.listA === "" && state.listB === "";
+      });
+  });
+}
+
+function showCopyError(hooks: Hooks, labels: Labels, state: ToolState): void {
+  clearCopyTimer(state);
+  hooks.copyResult.textContent = labels.copy;
+  hooks.localFeedback.textContent = labels.copyError;
+  hooks.localFeedback.dataset.state = "error";
+  state.copyTimer = window.setTimeout(() => {
+    hooks.localFeedback.textContent = "";
+    delete hooks.localFeedback.dataset.state;
+    state.copyTimer = null;
+  }, 4000);
+}
+
+function clearCopyTimer(state: ToolState): void {
+  if (state.copyTimer !== null) {
+    window.clearTimeout(state.copyTimer);
+    state.copyTimer = null;
+  }
+}
+
+function setupDownload(hooks: Hooks, state: ToolState): void {
+  hooks.downloadResult.addEventListener("click", () => {
+    if (state.listA === "" && state.listB === "") {
+      return;
+    }
+    const formatted = getCurrentFormatted(state);
+    const blob = new Blob([formatted.text], {
+      type: "text/plain;charset=utf-8",
+    });
+    const url = URL.createObjectURL(blob);
+    const anchor = hooks.resultPanel.ownerDocument.createElement("a");
+    anchor.href = url;
+    anchor.download = formatted.filename;
+    try {
+      anchor.click();
+    } catch {
+      return;
+    } finally {
+      anchor.remove();
+      URL.revokeObjectURL(url);
+    }
+  });
 }
 
 function setupTabs(

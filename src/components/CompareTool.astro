@@ -34,6 +34,9 @@ const resultViews = [
   data-label-no-differences={compare.noDifferences}
   data-label-same-values={compare.sameValues}
   data-label-no-matches={compare.noMatches}
+  data-label-copy={compare.copy}
+  data-label-copied={compare.copied}
+  data-label-copy-error={compare.copyError}
 >
   <div class="tool-heading">
     <h2 id="compare-tool-heading">{compare.heading}</h2>
@@ -179,19 +182,30 @@ const resultViews = [
       data-result-panel
       hidden
     >
-      <h4 class="panel-heading" data-result-heading>{compare.differences}</h4>
-      <p class="panel-count" data-result-count>0 {compare.items}</p>
+      <div class="result-toolbar">
+        <h4 class="panel-heading" data-result-heading>
+          {compare.differences}
+        </h4>
+        <p class="panel-count" data-result-count>0 {compare.items}</p>
+        <div class="result-actions">
+          <button type="button" class="action" data-copy-result disabled>
+            {compare.copy}
+          </button>
+          <button type="button" class="action" data-download-result disabled>
+            {compare.download}
+          </button>
+        </div>
+        <p
+          class="local-feedback"
+          data-local-feedback
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+        >
+        </p>
+      </div>
       <pre class="viewer" data-result-viewer tabindex="0"></pre>
     </div>
-
-    <p
-      class="visually-hidden"
-      data-local-feedback
-      role="status"
-      aria-live="polite"
-      aria-atomic="true"
-    >
-    </p>
   </section>
 
   <noscript>
@@ -410,6 +424,62 @@ const resultViews = [
     line-height: var(--line-height-body-secondary);
   }
 
+  .result-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-2) var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: var(--border-default);
+  }
+
+  .result-actions {
+    display: flex;
+    gap: var(--space-2);
+    margin-left: auto;
+  }
+
+  .action {
+    min-height: 36px;
+    padding: var(--space-1) var(--space-3);
+    border: var(--border-default);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-size: var(--font-size-control);
+    line-height: var(--line-height-control);
+    font-weight: var(--font-weight-control);
+    cursor: pointer;
+  }
+
+  .action:hover:not(:disabled) {
+    background: var(--color-surface-muted);
+    border-color: var(--color-border-strong);
+  }
+
+  .action:focus-visible {
+    outline: var(--focus-outline);
+    outline-offset: var(--focus-outline-offset);
+  }
+
+  .action:disabled {
+    cursor: default;
+    opacity: 0.55;
+  }
+
+  .local-feedback {
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-body-secondary);
+    line-height: var(--line-height-body-secondary);
+  }
+
+  @media (pointer: coarse) {
+    .action {
+      min-height: 44px;
+    }
+  }
+
   .viewer {
     margin: 0;
     min-height: 120px;
@@ -442,18 +512,6 @@ const resultViews = [
     color: var(--color-text-secondary);
     font-size: var(--font-size-body-secondary);
     line-height: var(--line-height-body-secondary);
-  }
-
-  .visually-hidden {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-    white-space: nowrap;
-    border: 0;
   }
 
   @media (min-width: 760px) {
