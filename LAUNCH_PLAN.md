@@ -38,13 +38,13 @@ IMPLEMENTATION_PLAN and AGENTS.
 
 ## 3.1 Current delivery baseline
 
-`CL-001` through `CL-006` are merged. They established formatting/tests, CI,
-design tokens, a static shell, typed English content and pure comparison types
-and defaults on the former Next/React stack.
+`CL-001` through `CL-009` are merged. The repository now has a green Astro
+static foundation, preserved tokens/content, line parsing and normalization,
+and the accepted set-comparison path.
 
-Reusable work is preserved. The next delivery task is `CL-007`, a bounded
-Astro migration. Parsing and comparison work starts only after that migration
-is accepted.
+The next delivery package is `CL-010`, which completes the remaining pure
+domain work. The remaining roadmap is consolidated into bounded GitHub
+Issue-driven packages defined in `IMPLEMENTATION_PLAN.md`.
 
 ## 4. First release
 
@@ -144,16 +144,24 @@ build
 ## 18. Remaining delivery plan
 
 ```text
-CL-007 — Astro foundation migration
-CL-008…CL-012 — comparison core, tests and formatting
-CL-013…CL-017 — inputs, options and live DOM behavior
-CL-018…CL-023 — results, copy and download
-CL-024…CL-027 — SEO pages, content and static routes
-CL-028…CL-029 — analytics boundary
-CL-030…CL-036 — responsive/accessibility/performance and release gates
+CL-010 — complete pure comparison domain
+CL-013 — semantic CompareTool markup
+CL-014 — CompareTool interaction and actions
+CL-018 — summary and result browsing
+CL-021 — copy, download and result-flow tests
+CL-024 — editorial content and legal pages
+CL-026 — metadata and static SEO routes
+CL-028 — privacy-safe analytics boundary
+CL-030 — responsive and accessibility quality
+CL-032 — Playwright E2E smoke
+CL-033 — performance and privacy/security evidence
+CL-035 — documentation and protected preview
+CL-036 — final release audit
 ```
 
-The exact one-task-per-PR scopes are defined in `IMPLEMENTATION_PLAN.md`.
+Each line is one bounded delivery package, GitHub Issue, branch and PR. Exact
+scope and acceptance criteria live in `IMPLEMENTATION_PLAN.md` and the assigned
+Issue.
 
 ## 19. Existing implementation decision
 
@@ -249,9 +257,9 @@ production deployment
 ## 32. Immediate agent action
 
 ```text
-1. read STACK_CHANGE.md and IMPLEMENTATION_PLAN.md
-2. start from the latest accepted main
-3. implement only CL-007
-4. preserve the listed reusable work
+1. read the mandatory documents and assigned GitHub Issue
+2. start from the exact accepted main commit named in the Issue
+3. implement only that bounded delivery package
+4. run the full quality gate
 5. open a PR and stop for review
 ```

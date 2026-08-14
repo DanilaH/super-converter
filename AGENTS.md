@@ -27,6 +27,7 @@ Do not restore the previous Next.js/React architecture.
 8. LAUNCH_PLAN.md
 9. IMPLEMENTATION_PLAN.md
 10. AGENTS.md
+11. the assigned GitHub Issue
 ```
 
 ## 3. Source-of-truth hierarchy
@@ -217,17 +218,24 @@ build
 ## 31. Preferred remaining work sequence
 
 ```text
-CL-007 — Astro foundation migration
-CL-008…CL-012 — comparison domain
-CL-013…CL-017 — CompareTool markup and interaction
-CL-018…CL-023 — results, copy and download
-CL-024…CL-027 — SEO content and static routes
-CL-028…CL-029 — analytics boundary
-CL-030…CL-036 — release-quality gates
+CL-010 — complete pure comparison domain
+CL-013 — semantic CompareTool markup
+CL-014 — CompareTool interaction and actions
+CL-018 — summary and result browsing
+CL-021 — copy, download and result-flow tests
+CL-024 — editorial content and legal pages
+CL-026 — metadata and static SEO routes
+CL-028 — privacy-safe analytics boundary
+CL-030 — responsive and accessibility quality
+CL-032 — Playwright E2E smoke
+CL-033 — performance and privacy/security evidence
+CL-035 — documentation and protected preview
+CL-036 — final release audit
 ```
 
-These are task identifiers, not literal GitHub pull request numbers. The full
-scope and acceptance criteria live in `IMPLEMENTATION_PLAN.md`.
+Each identifier now represents one consolidated, bounded delivery package.
+The assigned GitHub Issue is the operational scope; `IMPLEMENTATION_PLAN.md`
+contains the package-level roadmap.
 
 ## 32. Scope discipline
 
@@ -250,13 +258,15 @@ If the repository already contains Next/React work:
 
 If implementation has not started, use Astro directly.
 
-The current repository assessment is already recorded in `STACK_CHANGE.md`:
-`CL-001` through `CL-006` are complete, the framework-specific surface is
-still small, and migration is approved through the dedicated `CL-007` task.
+The migration assessment is recorded in `STACK_CHANGE.md`. `CL-001` through
+`CL-009` are complete; the repository now uses Astro and has parsing,
+normalization and set comparison. Continue only from the assigned package.
 
 ## 35. Report format
 
-After work: what changed, why, checks run, unresolved issues. No claims of guaranteed SEO/rankings/security.
+After work, put the PR URL on the first line. Then report changed files and
+behavior, exact checks, dependencies, deviations and unresolved issues. No
+claims of guaranteed SEO/rankings/security.
 
 ## 36. Definition of done
 
