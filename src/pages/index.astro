@@ -1,4 +1,5 @@
 ---
+import CompareTool from "@/components/CompareTool.astro";
 import { englishContent } from "@/content/en";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 
@@ -11,10 +12,7 @@ const { home } = englishContent;
     <p class="description">{home.description}</p>
     <p class="privacy">{home.privacy}</p>
 
-    <section class="tool-placeholder">
-      <h2>{home.toolPlaceholder.heading}</h2>
-      <p>{home.toolPlaceholder.description}</p>
-    </section>
+    <CompareTool />
   </div>
 </BaseLayout>
 
@@ -50,26 +48,6 @@ const { home } = englishContent;
   .privacy {
     margin: 0;
     max-width: var(--container-editorial);
-    color: var(--color-text-secondary);
-    font-size: var(--font-size-body-secondary);
-    line-height: var(--line-height-body-secondary);
-  }
-
-  .tool-placeholder {
-    margin-top: var(--space-6);
-    padding-top: var(--space-5);
-    border-top: var(--border-default);
-  }
-
-  .tool-placeholder h2 {
-    margin: 0;
-    font-size: var(--font-size-h3);
-    line-height: var(--line-height-h3);
-    font-weight: var(--font-weight-h3);
-  }
-
-  .tool-placeholder p {
-    margin: var(--space-2) 0 0;
     color: var(--color-text-secondary);
     font-size: var(--font-size-body-secondary);
     line-height: var(--line-height-body-secondary);
