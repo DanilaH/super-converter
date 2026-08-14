@@ -165,7 +165,7 @@ const resultViews = [
       aria-labelledby="tab-differences"
       data-result-panel
     >
-      <h3 class="panel-heading" data-result-heading>{compare.differences}</h3>
+      <h4 class="panel-heading" data-result-heading>{compare.differences}</h4>
       <p class="panel-count" data-result-count>0 {compare.items}</p>
       <pre class="viewer" data-result-viewer tabindex="0"></pre>
     </div>
@@ -234,7 +234,7 @@ const resultViews = [
 
   .list textarea {
     width: 100%;
-    min-height: 180px;
+    min-height: 220px;
     padding: var(--space-3);
     border: var(--border-default);
     border-radius: var(--radius-md);
@@ -438,6 +438,10 @@ const resultViews = [
       grid-template-columns: 1fr auto 1fr;
       gap: var(--space-3);
       align-items: center;
+    }
+
+    .list textarea {
+      min-height: 280px;
     }
   }
 </style>
