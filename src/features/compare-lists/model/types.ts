@@ -29,3 +29,10 @@ export type CompareResult = {
   differences: string[];
   stats: CompareStats;
 };
+
+export type ResultType = "differences" | "onlyA" | "onlyB" | "matches" | "all";
+
+export type FormattedResult = {
+  text: string;
+  filename: string;
+};
