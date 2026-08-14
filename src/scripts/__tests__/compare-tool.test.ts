@@ -1,5 +1,10 @@
 import { fireEvent, within } from "@testing-library/dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import type { Analytics } from "../../features/analytics/lib/analytics";
+import type {
+  AnalyticsEventMap,
+  AnalyticsEventName,
+} from "../../features/analytics/model/events";
 import { mountCompareTool } from "../compare-tool";
 
 const COPIED_BUTTON_TEXT = "\u2713 Copied";
@@ -111,12 +116,28 @@ const TOOL_HTML = `
   </section>
 `;
 
-function mountTool(): HTMLElement {
+function mountTool(analytics?: Analytics): HTMLElement {
   const container = document.createElement("div");
   container.innerHTML = TOOL_HTML;
   document.body.appendChild(container);
-  mountCompareTool(container);
+  mountCompareTool(container, analytics);
   return container;
+}
+
+function recordingAnalytics(): {
+  analytics: Analytics;
+  events: Array<{ name: string; payload: unknown }>;
+} {
+  const events: Array<{ name: string; payload: unknown }> = [];
+  const analytics: Analytics = {
+    track<Name extends AnalyticsEventName>(
+      name: Name,
+      payload: AnalyticsEventMap[Name],
+    ): void {
+      events.push({ name, payload });
+    },
+  };
+  return { analytics, events };
 }
 
 function textarea(
@@ -1041,5 +1062,395 @@ describe("copy and download", () => {
     fireEvent.click(hook(container, "[data-download-result]"));
     expect(create).toHaveBeenCalledTimes(2);
     expect(revoke).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe("analytics integration", () => {
+  afterEach(() => {
+    document.body.innerHTML = "";
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+    Reflect.deleteProperty(navigator, "clipboard");
+  });
+
+  it("sends no events on mount", () => {
+    const { analytics, events } = recordingAnalytics();
+
+    mountTool(analytics);
+
+    expect(events).toHaveLength(0);
+  });
+
+  it("sends tool_used: typing exactly once across both inputs", () => {
+    const { analytics, events } = recordingAnalytics();
+    const container = mountTool(analytics);
+
+    fireEvent.input(textarea(container, "[data-list-a]"), {
+      target: { value: "a" },
+    });
+    fireEvent.input(textarea(container, "[data-list-b]"), {
+      target: { value: "b" },
+    });
+
+    expect(events.filter((event) => event.name === "tool_used")).toEqual([
+      { name: "tool_used", payload: { inputMethod: "typing" } },
+    ]);
+  });
+
+  it("sends tool_used: paste for an insertFromPaste input", () => {
+    const { analytics, events } = recordingAnalytics();
+    const container = mountTool(analytics);
+
+    fireEvent.input(textarea(container, "[data-list-a]"), {
+      target: { value: "a\nb" },
+      inputType: "insertFromPaste",
+    });
+
+    expect(events).toContainEqual({
+      name: "tool_used",
+      payload: { inputMethod: "paste" },
+    });
+  });
+
+  it("sends tool_used: example once and example_loaded per click", () => {
+    const { analytics, events } = recordingAnalytics();
+    const container = mountTool(analytics);
+
+    fireEvent.click(hook(container, "[data-load-example]"));
+    fireEvent.click(hook(container, "[data-load-example]"));
+
+    expect(events.filter((event) => event.name === "tool_used")).toEqual([
+      { name: "tool_used", payload: { inputMethod: "example" } },
+    ]);
+    expect(events.filter((event) => event.name === "example_loaded")).toEqual([
+      { name: "example_loaded", payload: undefined },
+      { name: "example_loaded", payload: undefined },
+    ]);
+  });
+
+  it("sends comparison_completed only after the 1500 ms debounce", () => {
+    vi.useFakeTimers();
+    const { analytics, events } = recordingAnalytics();
+    const container = mountTool(analytics);
+
+    typeCanonical(container);
+
+    vi.advanceTimersByTime(1499);
+    expect(events.some((event) => event.name === "comparison_completed")).toBe(
+      false,
+    );
+
+    vi.advanceTimersByTime(1);
+    expect(
+      events.filter((event) => event.name === "comparison_completed"),
+    ).toHaveLength(1);
+  });
+
+  it("restarts the comparison debounce on a later dataset change", () => {
+    vi.useFakeTimers();
+    const { analytics, events } = recordingAnalytics();
+    const container = mountTool(analytics);
+
+    typeCanonical(container);
+    vi.advanceTimersByTime(1000);
+    fireEvent.input(textarea(container, "[data-list-a]"), {
+      target: { value: "b\na\nb\nc\nx" },
+    });
+
+    vi.advanceTimersByTime(500);
+    expect(events.some((event) => event.name === "comparison_completed")).toBe(
+      false,
+    );
+
+    vi.advanceTimersByTime(1000);
+    expect(
+      events.filter((event) => event.name === "comparison_completed"),
+    ).toHaveLength(1);
+  });
+
+  it("cancels a pending comparison when a parsed list becomes empty", () => {
+    vi.useFakeTimers();
+    const { analytics, events } = recordingAnalytics();
+    const container = mountTool(analytics);
+
+    typeCanonical(container);
+    vi.advanceTimersByTime(1000);
+    fireEvent.click(hook(container, "[data-clear-list-a]"));
+
+    vi.advanceTimersByTime(2000);
+    expect(events.some((event) => event.name === "comparison_completed")).toBe(
+      false,
+    );
+  });
+
+  it("sends comparison_completed exactly once across many dataset changes", () => {
+    vi.useFakeTimers();
+    const { analytics, events } = recordingAnalytics();
+    const container = mountTool(analytics);
+
+    typeCanonical(container);
+    vi.advanceTimersByTime(1500);
+    fireEvent.input(textarea(container, "[data-list-a]"), {
+      target: { value: "b\na\nb\nc\nx" },
+    });
+    vi.advanceTimersByTime(1500);
+    fireEvent.click(hook(container, "[data-load-example]"));
+    vi.advanceTimersByTime(1500);
+
+    expect(
+      events.filter((event) => event.name === "comparison_completed"),
+    ).toHaveLength(1);
+  });
+
+  it("sends bucketed sizes and flags without raw counts", () => {
+    vi.useFakeTimers();
+    const { analytics, events } = recordingAnalytics();
+    const container = mountTool(analytics);
+
+    const listA = Array.from({ length: 12 }, (_, index) => `a${index}`).join(
+      "\n",
+    );
+    const listB = Array.from({ length: 1500 }, (_, index) => `b${index}`).join(
+      "\n",
+    );
+    fireEvent.input(textarea(container, "[data-list-a]"), {
+      target: { value: listA },
+    });
+    fireEvent.input(textarea(container, "[data-list-b]"), {
+      target: { value: listB },
+    });
+
+    vi.advanceTimersByTime(1500);
+
+    const completed = events.find(
+      (event) => event.name === "comparison_completed",
+    );
+    expect(completed?.payload).toEqual({
+      sizeA: "11-100",
+      sizeB: "1001-10000",
+      hasDifferences: true,
+      hasMatches: false,
+    });
+    expect(JSON.stringify(events)).not.toContain("1500");
+    expect(JSON.stringify(events)).not.toContain("12");
+  });
+
+  it("sends option_changed with the safe enum and the enabled flag", () => {
+    vi.useFakeTimers();
+    const { analytics, events } = recordingAnalytics();
+    const container = mountTool(analytics);
+
+    fireEvent.click(hook(container, "[data-option-ignore-case]"));
+    fireEvent.click(hook(container, "[data-option-ignore-case]"));
+
+    expect(events.filter((event) => event.name === "option_changed")).toEqual([
+      {
+        name: "option_changed",
+        payload: { option: "ignoreCase", enabled: true },
+      },
+      {
+        name: "option_changed",
+        payload: { option: "ignoreCase", enabled: false },
+      },
+    ]);
+  });
+
+  it("tracks a real tab change, ignores the initial tab and repeat clicks", () => {
+    vi.useFakeTimers();
+    const { analytics, events } = recordingAnalytics();
+    const container = mountTool(analytics);
+
+    typeCanonical(container);
+    expect(events.some((event) => event.name === "result_tab_changed")).toBe(
+      false,
+    );
+
+    clickTab(container, "matches");
+    clickTab(container, "matches");
+    clickTab(container, "all");
+
+    expect(
+      events.filter((event) => event.name === "result_tab_changed"),
+    ).toEqual([
+      { name: "result_tab_changed", payload: { resultType: "matches" } },
+      { name: "result_tab_changed", payload: { resultType: "all" } },
+    ]);
+  });
+
+  it("tracks copy_result with the resultType captured at the start of the action", async () => {
+    vi.useFakeTimers();
+    mockClipboard();
+    const { analytics, events } = recordingAnalytics();
+    const container = mountTool(analytics);
+
+    typeCanonical(container);
+    clickTab(container, "matches");
+
+    fireEvent.click(hook(container, "[data-copy-result]"));
+    clickTab(container, "all");
+    await flushPromises();
+
+    expect(events.filter((event) => event.name === "copy_result")).toEqual([
+      { name: "copy_result", payload: { resultType: "matches" } },
+    ]);
+  });
+
+  it("does not track copy_result when the clipboard promise rejects", async () => {
+    mockClipboard(true);
+    const { analytics, events } = recordingAnalytics();
+    const container = mountTool(analytics);
+
+    typeCanonical(container);
+    fireEvent.click(hook(container, "[data-copy-result]"));
+    await flushPromises();
+
+    expect(events.some((event) => event.name === "copy_result")).toBe(false);
+  });
+
+  it("does not track copy_result when the Clipboard API is missing", async () => {
+    const { analytics, events } = recordingAnalytics();
+    const container = mountTool(analytics);
+
+    typeCanonical(container);
+    fireEvent.click(hook(container, "[data-copy-result]"));
+    await flushPromises();
+
+    expect(events.some((event) => event.name === "copy_result")).toBe(false);
+  });
+
+  it("tracks download_result after a successful anchor click", () => {
+    mockUrls();
+    mockAnchorClick();
+    const { analytics, events } = recordingAnalytics();
+    const container = mountTool(analytics);
+
+    typeCanonical(container);
+    clickTab(container, "onlyB");
+    fireEvent.click(hook(container, "[data-download-result]"));
+
+    expect(events).toContainEqual({
+      name: "download_result",
+      payload: { resultType: "onlyB" },
+    });
+  });
+
+  it("does not track download_result when the anchor click throws", () => {
+    mockUrls();
+    mockAnchorClick().mockImplementation(() => {
+      throw new Error("boom");
+    });
+    const { analytics, events } = recordingAnalytics();
+    const container = mountTool(analytics);
+
+    typeCanonical(container);
+    fireEvent.click(hook(container, "[data-download-result]"));
+
+    expect(events.some((event) => event.name === "download_result")).toBe(
+      false,
+    );
+  });
+
+  it("keeps the tool functional when the analytics adapter throws", async () => {
+    const throwing: Analytics = {
+      track() {
+        throw new Error("provider failure");
+      },
+    };
+    const writeText = mockClipboard();
+    mockUrls();
+    mockAnchorClick();
+    const container = mountTool(throwing);
+
+    fireEvent.input(textarea(container, "[data-list-a]"), {
+      target: { value: "a\nb" },
+    });
+    fireEvent.input(textarea(container, "[data-list-b]"), {
+      target: { value: "b\nc" },
+    });
+    fireEvent.click(hook(container, "[data-copy-result]"));
+    await flushPromises();
+    fireEvent.click(hook(container, "[data-download-result]"));
+
+    expect(writeText).toHaveBeenCalledTimes(1);
+    expect(hook(container, "[data-result-viewer]").textContent).toContain("a");
+  });
+
+  it("does not duplicate analytics events on double mount", async () => {
+    mockClipboard();
+    mockUrls();
+    mockAnchorClick();
+    const { analytics, events } = recordingAnalytics();
+    const container = document.createElement("div");
+    container.innerHTML = TOOL_HTML;
+    document.body.appendChild(container);
+    mountCompareTool(container, analytics);
+    mountCompareTool(container, analytics);
+
+    fireEvent.input(textarea(container, "[data-list-a]"), {
+      target: { value: "a" },
+    });
+    fireEvent.input(textarea(container, "[data-list-b]"), {
+      target: { value: "b" },
+    });
+    fireEvent.click(hook(container, "[data-copy-result]"));
+    await flushPromises();
+    fireEvent.click(hook(container, "[data-download-result]"));
+
+    expect(events.filter((event) => event.name === "tool_used")).toHaveLength(
+      1,
+    );
+    expect(events.filter((event) => event.name === "copy_result")).toHaveLength(
+      1,
+    );
+    expect(
+      events.filter((event) => event.name === "download_result"),
+    ).toHaveLength(1);
+  });
+
+  it("never serializes raw content or forbidden fields into any event", async () => {
+    vi.useFakeTimers();
+    mockClipboard();
+    mockUrls();
+    mockAnchorClick();
+    const { analytics, events } = recordingAnalytics();
+    const container = mountTool(analytics);
+
+    const markerA = "PRIVACY-MARKER-7f3a";
+    const markerB = "SENSITIVE-4b2e";
+    fireEvent.input(textarea(container, "[data-list-a]"), {
+      target: { value: `${markerA}\nshared` },
+      inputType: "insertFromPaste",
+    });
+    fireEvent.input(textarea(container, "[data-list-b]"), {
+      target: { value: `${markerB}\nshared` },
+    });
+    vi.advanceTimersByTime(1500);
+    fireEvent.click(hook(container, "[data-option-ignore-case]"));
+    clickTab(container, "matches");
+    fireEvent.click(hook(container, "[data-copy-result]"));
+    await flushPromises();
+    fireEvent.click(hook(container, "[data-download-result]"));
+
+    const serialized = JSON.stringify(events);
+    expect(serialized).not.toContain(markerA);
+    expect(serialized).not.toContain(markerB);
+
+    const forbiddenFields = [
+      "listA",
+      "listB",
+      "rawInput",
+      "clipboardText",
+      "downloadContent",
+      "sampleItem",
+      "firstItem",
+      "lastItem",
+      "email",
+      "url",
+      "id",
+      "keyword",
+    ];
+    for (const field of forbiddenFields) {
+      expect(serialized).not.toContain(`"${field}"`);
+    }
   });
 });

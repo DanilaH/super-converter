@@ -6,6 +6,14 @@ import type {
   FormattedResult,
   ResultType,
 } from "../features/compare-lists/model/types";
+import {
+  defaultAnalytics,
+  safeTrack,
+  type Analytics,
+} from "../features/analytics/lib/analytics";
+import { sizeBucketFor } from "../features/analytics/lib/size-bucket";
+
+const COMPARISON_DEBOUNCE_MS = 1500;
 
 type ToolState = {
   listA: string;
@@ -13,6 +21,9 @@ type ToolState = {
   options: CompareOptions;
   activeResult: ResultType;
   copyTimer: number | null;
+  comparisonTimer: number | null;
+  toolUsed: boolean;
+  comparisonCompleted: boolean;
 };
 
 type Labels = {
@@ -80,9 +91,13 @@ const EXAMPLE_B = [
 
 const mountedRoots = new WeakSet<HTMLElement>();
 
-export function mountCompareTool(scope: ParentNode = document): void {
+export function mountCompareTool(
+  scope: ParentNode = document,
+  analytics?: Analytics,
+): void {
+  const adapter = analytics ?? defaultAnalytics();
   for (const root of findRoots(scope)) {
-    mountRoot(root);
+    mountRoot(root, adapter);
   }
 }
 
@@ -93,7 +108,7 @@ function findRoots(scope: ParentNode): HTMLElement[] {
   return Array.from(scope.querySelectorAll<HTMLElement>("[data-compare-tool]"));
 }
 
-function mountRoot(root: HTMLElement): void {
+function mountRoot(root: HTMLElement, analytics: Analytics): void {
   if (mountedRoots.has(root)) {
     return;
   }
@@ -112,43 +127,70 @@ function mountRoot(root: HTMLElement): void {
     },
     activeResult: readActiveResult(root),
     copyTimer: null,
+    comparisonTimer: null,
+    toolUsed: false,
+    comparisonCompleted: false,
   };
 
   const recompute = createRecompute(hooks, labels, state);
 
-  hooks.listA.addEventListener("input", () => {
+  hooks.listA.addEventListener("input", (event) => {
     state.listA = hooks.listA.value;
-    recompute();
+    const result = recompute();
+    handleToolInput(analytics, state, result, event);
   });
-  hooks.listB.addEventListener("input", () => {
+  hooks.listB.addEventListener("input", (event) => {
     state.listB = hooks.listB.value;
-    recompute();
+    const result = recompute();
+    handleToolInput(analytics, state, result, event);
   });
   hooks.trimWhitespace.addEventListener("change", () => {
     state.options.trimWhitespace = hooks.trimWhitespace.checked;
-    recompute();
+    const result = recompute();
+    safeTrack(analytics, "option_changed", {
+      option: "trimWhitespace",
+      enabled: hooks.trimWhitespace.checked,
+    });
+    scheduleComparisonCompleted(analytics, state, result);
   });
   hooks.ignoreEmptyLines.addEventListener("change", () => {
     state.options.ignoreEmptyLines = hooks.ignoreEmptyLines.checked;
-    recompute();
+    const result = recompute();
+    safeTrack(analytics, "option_changed", {
+      option: "ignoreEmptyLines",
+      enabled: hooks.ignoreEmptyLines.checked,
+    });
+    scheduleComparisonCompleted(analytics, state, result);
   });
   hooks.ignoreCase.addEventListener("change", () => {
     state.options.ignoreCase = hooks.ignoreCase.checked;
-    recompute();
+    const result = recompute();
+    safeTrack(analytics, "option_changed", {
+      option: "ignoreCase",
+      enabled: hooks.ignoreCase.checked,
+    });
+    scheduleComparisonCompleted(analytics, state, result);
   });
   hooks.removeDuplicates.addEventListener("change", () => {
     state.options.removeDuplicates = hooks.removeDuplicates.checked;
-    recompute();
+    const result = recompute();
+    safeTrack(analytics, "option_changed", {
+      option: "removeDuplicates",
+      enabled: hooks.removeDuplicates.checked,
+    });
+    scheduleComparisonCompleted(analytics, state, result);
   });
   hooks.clearListA.addEventListener("click", () => {
     hooks.listA.value = "";
     state.listA = "";
-    recompute();
+    const result = recompute();
+    scheduleComparisonCompleted(analytics, state, result);
   });
   hooks.clearListB.addEventListener("click", () => {
     hooks.listB.value = "";
     state.listB = "";
-    recompute();
+    const result = recompute();
+    scheduleComparisonCompleted(analytics, state, result);
   });
   hooks.swap.addEventListener("click", () => {
     const previousA = hooks.listA.value;
@@ -156,19 +198,26 @@ function mountRoot(root: HTMLElement): void {
     hooks.listB.value = previousA;
     state.listA = hooks.listA.value;
     state.listB = hooks.listB.value;
-    recompute();
+    const result = recompute();
+    scheduleComparisonCompleted(analytics, state, result);
   });
   hooks.loadExample.addEventListener("click", () => {
     hooks.listA.value = EXAMPLE_A;
     hooks.listB.value = EXAMPLE_B;
     state.listA = EXAMPLE_A;
     state.listB = EXAMPLE_B;
-    recompute();
+    if (!state.toolUsed) {
+      state.toolUsed = true;
+      safeTrack(analytics, "tool_used", { inputMethod: "example" });
+    }
+    safeTrack(analytics, "example_loaded", undefined);
+    const result = recompute();
+    scheduleComparisonCompleted(analytics, state, result);
   });
 
-  setupTabs(hooks, state, recompute);
-  setupCopy(hooks, labels, state);
-  setupDownload(hooks, state);
+  setupTabs(hooks, state, recompute, analytics);
+  setupCopy(hooks, labels, state, analytics);
+  setupDownload(hooks, state, analytics);
 
   hooks.copyResult.disabled = false;
   hooks.downloadResult.disabled = false;
@@ -180,6 +229,49 @@ function mountRoot(root: HTMLElement): void {
   mountedRoots.add(root);
 
   recompute();
+}
+
+function handleToolInput(
+  analytics: Analytics,
+  state: ToolState,
+  result: CompareResult | null,
+  event: Event,
+): void {
+  if (!state.toolUsed) {
+    state.toolUsed = true;
+    const inputType = event instanceof InputEvent ? event.inputType : "";
+    safeTrack(analytics, "tool_used", {
+      inputMethod: inputType === "insertFromPaste" ? "paste" : "typing",
+    });
+  }
+  scheduleComparisonCompleted(analytics, state, result);
+}
+
+function scheduleComparisonCompleted(
+  analytics: Analytics,
+  state: ToolState,
+  result: CompareResult | null,
+): void {
+  if (state.comparisonCompleted) {
+    return;
+  }
+  if (state.comparisonTimer !== null) {
+    window.clearTimeout(state.comparisonTimer);
+    state.comparisonTimer = null;
+  }
+  if (result === null || result.stats.rowsA === 0 || result.stats.rowsB === 0) {
+    return;
+  }
+  state.comparisonTimer = window.setTimeout(() => {
+    state.comparisonTimer = null;
+    state.comparisonCompleted = true;
+    safeTrack(analytics, "comparison_completed", {
+      sizeA: sizeBucketFor(result.stats.rowsA),
+      sizeB: sizeBucketFor(result.stats.rowsB),
+      hasDifferences: result.differences.length > 0,
+      hasMatches: result.matches.length > 0,
+    });
+  }, COMPARISON_DEBOUNCE_MS);
 }
 
 function findHooks(root: HTMLElement): Hooks {
@@ -272,7 +364,7 @@ function createRecompute(
   hooks: Hooks,
   labels: Labels,
   state: ToolState,
-): () => void {
+): () => CompareResult | null {
   return () => {
     if (state.listA === "" && state.listB === "") {
       hooks.results.hidden = false;
@@ -286,7 +378,7 @@ function createRecompute(
       hooks.resultCount.textContent = `0 ${labels.items}`;
       hooks.listACount.textContent = `0 ${labels.rows}`;
       hooks.listBCount.textContent = `0 ${labels.rows}`;
-      return;
+      return null;
     }
 
     const result = compareLists(state.listA, state.listB, state.options);
@@ -313,6 +405,8 @@ function createRecompute(
     hooks.summaryOnlyB.textContent = String(result.stats.onlyB);
 
     renderResult(hooks, labels, state, result);
+
+    return result;
   };
 }
 
@@ -362,12 +456,18 @@ function getCurrentFormatted(state: ToolState): FormattedResult {
   return formatResult(result, state.activeResult);
 }
 
-function setupCopy(hooks: Hooks, labels: Labels, state: ToolState): void {
+function setupCopy(
+  hooks: Hooks,
+  labels: Labels,
+  state: ToolState,
+  analytics: Analytics,
+): void {
   hooks.copyResult.addEventListener("click", () => {
     if (state.listA === "" && state.listB === "") {
       return;
     }
     const formatted = getCurrentFormatted(state);
+    const resultType = state.activeResult;
     clearCopyTimer(state);
     hooks.copyResult.disabled = true;
 
@@ -391,6 +491,7 @@ function setupCopy(hooks: Hooks, labels: Labels, state: ToolState): void {
           delete hooks.localFeedback.dataset.state;
           state.copyTimer = null;
         }, 2000);
+        safeTrack(analytics, "copy_result", { resultType });
       })
       .catch(() => {
         showCopyError(hooks, labels, state);
@@ -420,12 +521,17 @@ function clearCopyTimer(state: ToolState): void {
   }
 }
 
-function setupDownload(hooks: Hooks, state: ToolState): void {
+function setupDownload(
+  hooks: Hooks,
+  state: ToolState,
+  analytics: Analytics,
+): void {
   hooks.downloadResult.addEventListener("click", () => {
     if (state.listA === "" && state.listB === "") {
       return;
     }
     const formatted = getCurrentFormatted(state);
+    const resultType = state.activeResult;
     const blob = new Blob([formatted.text], {
       type: "text/plain;charset=utf-8",
     });
@@ -435,6 +541,7 @@ function setupDownload(hooks: Hooks, state: ToolState): void {
     anchor.download = formatted.filename;
     try {
       anchor.click();
+      safeTrack(analytics, "download_result", { resultType });
     } catch {
       return;
     } finally {
@@ -448,6 +555,7 @@ function setupTabs(
   hooks: Hooks,
   state: ToolState,
   recompute: () => void,
+  analytics: Analytics,
 ): void {
   const tabs = hooks.tabs;
 
@@ -456,6 +564,7 @@ function setupTabs(
     if (!isResultType(value)) {
       return;
     }
+    const changed = value !== state.activeResult;
     state.activeResult = value;
     for (const candidate of tabs) {
       const selected = candidate === tab;
@@ -465,6 +574,9 @@ function setupTabs(
     hooks.resultPanel.setAttribute("aria-labelledby", tab.id);
     hooks.resultHeading.textContent = tab.textContent;
     recompute();
+    if (changed) {
+      safeTrack(analytics, "result_tab_changed", { resultType: value });
+    }
   };
 
   for (const [index, tab] of tabs.entries()) {
