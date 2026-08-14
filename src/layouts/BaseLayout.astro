@@ -1,8 +1,27 @@
 ---
 import { englishContent } from "@/content/en";
+import {
+  canonicalPathFor,
+  isPlaceholderSite,
+  resolveSiteOrigin,
+  type SiteMetadataKey,
+} from "@/config/site";
 import SiteFooter from "@/components/SiteFooter.astro";
 import SiteHeader from "@/components/SiteHeader.astro";
 import "../styles/global.css";
+
+interface Props {
+  metadataKey: SiteMetadataKey;
+}
+
+const { metadataKey } = Astro.props;
+const metadata = englishContent.metadata[metadataKey];
+const site = resolveSiteOrigin(Astro.site);
+const noIndex = metadataKey === "notFound" || isPlaceholderSite(site);
+const canonicalUrl =
+  metadataKey === "notFound"
+    ? null
+    : new URL(canonicalPathFor(metadataKey), site).href;
 ---
 
 <!doctype html>
@@ -10,7 +29,16 @@ import "../styles/global.css";
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{englishContent.siteName}</title>
+    <title>{metadata.title}</title>
+    <meta name="description" content={metadata.description} />
+    {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+    <meta property="og:title" content={metadata.title} />
+    <meta property="og:description" content={metadata.description} />
+    <meta property="og:type" content="website" />
+    {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
+    <meta property="og:site_name" content={englishContent.siteName} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    {noIndex && <meta name="robots" content="noindex,nofollow" />}
   </head>
   <body class="shell">
     <SiteHeader />

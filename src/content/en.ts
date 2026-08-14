@@ -87,6 +87,24 @@ export type FooterContent = {
   privacy: string;
 };
 
+export type PageMetadata = {
+  title: string;
+  description: string;
+};
+
+export type MetadataContent = {
+  home: PageMetadata;
+  about: PageMetadata;
+  privacy: PageMetadata;
+  notFound: PageMetadata;
+};
+
+export type NotFoundPageContent = {
+  heading: string;
+  explanation: string;
+  toolLinkLabel: string;
+};
+
 export type EnglishContent = {
   siteName: string;
   home: {
@@ -99,6 +117,8 @@ export type EnglishContent = {
   about: AboutContent;
   privacy: PrivacyContent;
   footer: FooterContent;
+  metadata: MetadataContent;
+  notFoundPage: NotFoundPageContent;
 };
 
 export const englishContent = {
@@ -280,5 +300,33 @@ export const englishContent = {
     tool: "Tool",
     about: "About",
     privacy: "Privacy",
+  },
+  metadata: {
+    home: {
+      title: "Compare Two Lists Online — Find Differences & Matches",
+      description:
+        "Compare two lists online to find differences, matches and unique items. Fast, free and processed locally in your browser.",
+    },
+    about: {
+      title: "About Compare Lists",
+      description:
+        "Learn how Compare Lists finds differences, matches and unique values locally in your browser.",
+    },
+    privacy: {
+      title: "Privacy — Compare Lists",
+      description:
+        "Learn how Compare Lists processes list content locally in your browser and handles ordinary website requests.",
+    },
+    notFound: {
+      title: "Page Not Found — Compare Lists",
+      description:
+        "The requested page could not be found. Return to Compare Lists to compare two lists online.",
+    },
+  },
+  notFoundPage: {
+    heading: "Page not found",
+    explanation:
+      "The page you are looking for does not exist or has been moved.",
+    toolLinkLabel: "Return to Compare Lists",
   },
 } satisfies EnglishContent;
