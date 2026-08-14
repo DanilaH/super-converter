@@ -188,10 +188,127 @@ describe("compareLists", () => {
     expect(result.union).toEqual(["5", "1", "4", "2", "3", "9", "7", "8"]);
   });
 
-  it("throws the exact error when removeDuplicates is off", () => {
-    expect(() =>
-      compareLists("a", "a", { ...baseOptions, removeDuplicates: false }),
-    ).toThrow("Multiset comparison is not implemented yet");
+  it("pairs occurrences from the start in multiset mode", () => {
+    const result = compareLists("x\nx\ny", "x\nz", {
+      ...baseOptions,
+      removeDuplicates: false,
+    });
+
+    expect(result.matches).toEqual(["x"]);
+    expect(result.onlyA).toEqual(["x", "y"]);
+    expect(result.onlyB).toEqual(["z"]);
+    expect(result.differences).toEqual(["x", "y", "z"]);
+    expect(result.union).toEqual(["x", "x", "y", "z"]);
+  });
+
+  it("pairs unequal repeat counts on both sides", () => {
+    const result = compareLists("a\na\na\na", "a\na", {
+      ...baseOptions,
+      removeDuplicates: false,
+    });
+
+    expect(result.matches).toEqual(["a", "a"]);
+    expect(result.onlyA).toEqual(["a", "a"]);
+    expect(result.onlyB).toEqual([]);
+    expect(result.union).toEqual(["a", "a", "a", "a"]);
+  });
+
+  it("uses extra B occurrences in union when B has more repeats", () => {
+    const result = compareLists("x", "x\nx", {
+      ...baseOptions,
+      removeDuplicates: false,
+    });
+
+    expect(result.matches).toEqual(["x"]);
+    expect(result.onlyA).toEqual([]);
+    expect(result.onlyB).toEqual(["x"]);
+    expect(result.union).toEqual(["x", "x"]);
+  });
+
+  it("matches keys unified by trim and case while keeping raw representations stable", () => {
+    const result = compareLists(" A \nb", "a\nb\nb", {
+      ...baseOptions,
+      removeDuplicates: false,
+      ignoreCase: true,
+    });
+
+    expect(result.matches).toEqual([" A ", "b"]);
+    expect(result.onlyA).toEqual([]);
+    expect(result.onlyB).toEqual(["b"]);
+    expect(result.union).toEqual([" A ", "b", "b"]);
+  });
+
+  it("keeps stable A representations in matches and B representations in onlyB", () => {
+    const result = compareLists("a\na", " a \na\n a ", {
+      ...baseOptions,
+      removeDuplicates: false,
+      ignoreCase: true,
+    });
+
+    expect(result.matches).toEqual(["a", "a"]);
+    expect(result.onlyB).toEqual([" a "]);
+    expect(result.union).toEqual(["a", "a", " a "]);
+  });
+
+  it("handles empty and one-sided inputs in multiset mode", () => {
+    const empty = compareLists("", "", {
+      ...baseOptions,
+      removeDuplicates: false,
+    });
+
+    expect(empty.onlyA).toEqual([]);
+    expect(empty.onlyB).toEqual([]);
+    expect(empty.matches).toEqual([]);
+    expect(empty.union).toEqual([]);
+
+    const onlyB = compareLists("", "x\nx", {
+      ...baseOptions,
+      removeDuplicates: false,
+    });
+
+    expect(onlyB.onlyB).toEqual(["x", "x"]);
+    expect(onlyB.union).toEqual(["x", "x"]);
+    expect(onlyB.stats.rowsB).toBe(2);
+    expect(onlyB.stats.uniqueB).toBe(1);
+    expect(onlyB.stats.matches).toBe(0);
+  });
+
+  it("reports all stats fields in multiset mode", () => {
+    const result = compareLists("a\nb\na\na", "a\nb\nb\nc", {
+      ...baseOptions,
+      removeDuplicates: false,
+    });
+
+    expect(result.stats).toEqual({
+      rowsA: 4,
+      rowsB: 4,
+      uniqueA: 2,
+      uniqueB: 3,
+      onlyA: 2,
+      onlyB: 2,
+      matches: 2,
+    });
+  });
+
+  it("preserves the exact set-mode behavior", () => {
+    const result = compareLists("b\na\nb\nc", "a\nd\nb\ne\nd", baseOptions);
+
+    expect(result).toEqual({
+      onlyA: ["c"],
+      onlyB: ["d", "e"],
+      matches: ["b", "a"],
+      union: ["b", "a", "c", "d", "e"],
+      differences: ["c", "d", "e"],
+      stats: {
+        rowsA: 4,
+        rowsB: 5,
+        uniqueA: 3,
+        uniqueB: 4,
+        onlyA: 1,
+        onlyB: 2,
+        matches: 2,
+      },
+    });
   });
 
   it("does not mutate the raw strings or the options object", () => {
@@ -204,5 +321,25 @@ describe("compareLists", () => {
     expect(rawA).toBe(" A \nB");
     expect(rawB).toBe("b\n C ");
     expect(options).toEqual({ ...baseOptions, ignoreCase: true });
+  });
+
+  it("does not mutate the raw strings or the options object in multiset mode", () => {
+    const rawA = " A \nA";
+    const rawB = "a\na";
+    const options = {
+      ...baseOptions,
+      removeDuplicates: false,
+      ignoreCase: true,
+    };
+
+    compareLists(rawA, rawB, options);
+
+    expect(rawA).toBe(" A \nA");
+    expect(rawB).toBe("a\na");
+    expect(options).toEqual({
+      ...baseOptions,
+      removeDuplicates: false,
+      ignoreCase: true,
+    });
   });
 });
