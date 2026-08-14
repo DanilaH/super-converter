@@ -1,0 +1,84 @@
+---
+import { englishContent } from "@/content/en";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+
+const { privacy } = englishContent;
+---
+
+<BaseLayout>
+  <div class="privacy">
+    <h1>{privacy.heading}</h1>
+    <p class="intro">{privacy.intro}</p>
+
+    {
+      privacy.sections.map((section) => (
+        <section class="privacy-section">
+          <h2>{section.heading}</h2>
+          {section.paragraphs.map((paragraph) => (
+            <p>{paragraph}</p>
+          ))}
+        </section>
+      ))
+    }
+
+    <p class="tool-link">
+      <a href="/#compare-tool-heading">{privacy.toolLinkLabel}</a>
+    </p>
+  </div>
+</BaseLayout>
+
+<style>
+  .privacy {
+    max-width: var(--container-editorial);
+    padding-block: var(--space-6) var(--space-7);
+  }
+
+  .privacy h1 {
+    margin-block: 0 var(--space-5);
+    font-size: var(--font-size-h1-mobile);
+    line-height: var(--line-height-h1-mobile);
+    font-weight: var(--font-weight-h1);
+  }
+
+  @media (min-width: 760px) {
+    .privacy h1 {
+      font-size: var(--font-size-h1);
+      line-height: var(--line-height-h1);
+    }
+  }
+
+  .privacy h2 {
+    margin-block: 0 var(--space-3);
+    font-size: var(--font-size-h2-mobile);
+    line-height: var(--line-height-h2-mobile);
+    font-weight: var(--font-weight-h2);
+  }
+
+  @media (min-width: 760px) {
+    .privacy h2 {
+      font-size: var(--font-size-h2);
+      line-height: var(--line-height-h2);
+    }
+  }
+
+  .intro {
+    color: var(--color-text-secondary);
+  }
+
+  .privacy p {
+    margin-block: 0 var(--space-3);
+  }
+
+  .privacy-section + .privacy-section {
+    margin-block-start: var(--space-6);
+  }
+
+  .privacy-section > :last-child {
+    margin-block-end: 0;
+  }
+
+  .tool-link {
+    margin-block-start: var(--space-6);
+    font-weight: var(--font-weight-control);
+  }
+</style>
