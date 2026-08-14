@@ -1295,7 +1295,7 @@ EditorialSection
 Footer
 ```
 
-Это не означает обязательную React-компонентизацию 1:1.
+Это не означает обязательное разбиение реализации на компоненты 1:1.
 
 Архитектурное решение принимается отдельно.
 
@@ -1393,7 +1393,7 @@ Compare Lists · Privacy · About
 - [ ] No required external font.
 - [ ] No decorative image assets required.
 - [ ] No animation library required.
-- [ ] Visual design works with server-rendered HTML before hydration.
+- [ ] Visual design works with generated static HTML before the client script runs.
 
 ---
 
