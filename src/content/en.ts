@@ -32,6 +32,7 @@ export type CompareMessages = {
   copy: string;
   copied: string;
   download: string;
+  copyError: string;
 };
 
 export type EnglishContent = {
@@ -89,5 +90,6 @@ export const englishContent = {
     copy: "Copy",
     copied: "Copied",
     download: "Download",
+    copyError: "Couldn’t copy. Select the result manually.",
   },
 } satisfies EnglishContent;
