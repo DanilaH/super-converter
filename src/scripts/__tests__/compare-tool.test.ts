@@ -964,11 +964,11 @@ describe("copy and download", () => {
 
     const blob = create.mock.calls[0][0] as Blob;
     expect(await blob.text()).toBe("b\na");
-    const instances =
-      vi.mocked(HTMLAnchorElement.prototype.click).mock.instances;
-    expect((instances[instances.length - 1] as HTMLAnchorElement).download).toBe(
-      "compare-lists-matches.txt",
-    );
+    const instances = vi.mocked(HTMLAnchorElement.prototype.click).mock
+      .instances;
+    expect(
+      (instances[instances.length - 1] as HTMLAnchorElement).download,
+    ).toBe("compare-lists-matches.txt");
   });
 
   it("does not duplicate copy/download side effects on double mount", async () => {
