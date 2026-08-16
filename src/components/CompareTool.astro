@@ -40,7 +40,7 @@ const resultViews = [
 >
   <div class="tool-heading">
     <h2 id="compare-tool-heading">{compare.heading}</h2>
-    <button type="button" data-load-example disabled>
+    <button type="button" class="secondary" data-load-example disabled>
       {compare.loadExample}
     </button>
   </div>
@@ -57,13 +57,13 @@ const resultViews = [
         spellcheck="false"></textarea>
       <div class="list-footer">
         <output for="list-a" data-list-a-count>0 {compare.rows}</output>
-        <button type="button" data-clear-list-a disabled>
+        <button type="button" class="text-button" data-clear-list-a disabled>
           {compare.clear}
         </button>
       </div>
     </div>
 
-    <button type="button" class="swap" data-swap-lists disabled>
+    <button type="button" class="secondary swap" data-swap-lists disabled>
       {compare.swap}
     </button>
 
@@ -78,7 +78,7 @@ const resultViews = [
         spellcheck="false"></textarea>
       <div class="list-footer">
         <output for="list-b" data-list-b-count>0 {compare.rows}</output>
-        <button type="button" data-clear-list-b disabled>
+        <button type="button" class="text-button" data-clear-list-b disabled>
           {compare.clear}
         </button>
       </div>
@@ -302,6 +302,26 @@ const resultViews = [
     justify-self: center;
   }
 
+  .text-button {
+    padding: var(--space-1) 0;
+    border: none;
+    background: transparent;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-body-secondary);
+    line-height: var(--line-height-body-secondary);
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  .text-button:hover:not(:disabled) {
+    color: var(--color-accent);
+  }
+
+  .text-button:disabled {
+    cursor: default;
+    opacity: 0.55;
+  }
+
   .options {
     display: flex;
     flex-wrap: wrap;
@@ -390,25 +410,34 @@ const resultViews = [
 
   .tabs {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: var(--space-2);
+    overflow-x: auto;
+    padding-block: var(--space-1);
+    padding-inline: var(--space-2);
   }
 
   .tab {
+    min-height: 36px;
     padding: var(--space-1) var(--space-3);
-    border: var(--border-default);
-    border-radius: var(--radius-sm);
-    background: var(--color-surface);
-    color: var(--color-text);
+    border: none;
+    border-bottom: 2px solid transparent;
+    background: transparent;
+    color: var(--color-text-secondary);
     font-size: var(--font-size-control);
     line-height: var(--line-height-control);
     font-weight: var(--font-weight-control);
+    white-space: nowrap;
     cursor: pointer;
   }
 
+  .tab:hover {
+    color: var(--color-text);
+  }
+
   .tab[aria-selected="true"] {
-    border-color: var(--color-border-strong);
-    background: var(--color-surface-muted);
+    color: var(--color-text);
+    border-bottom-color: var(--color-accent);
   }
 
   .panel {
@@ -439,7 +468,8 @@ const resultViews = [
     margin-left: auto;
   }
 
-  .action {
+  .action,
+  .secondary {
     min-height: 36px;
     padding: var(--space-1) var(--space-3);
     border: var(--border-default);
@@ -452,17 +482,20 @@ const resultViews = [
     cursor: pointer;
   }
 
-  .action:hover:not(:disabled) {
+  .action:hover:not(:disabled),
+  .secondary:hover:not(:disabled) {
     background: var(--color-surface-muted);
     border-color: var(--color-border-strong);
   }
 
-  .action:focus-visible {
+  .action:focus-visible,
+  .secondary:focus-visible {
     outline: var(--focus-outline);
     outline-offset: var(--focus-outline-offset);
   }
 
-  .action:disabled {
+  .action:disabled,
+  .secondary:disabled {
     cursor: default;
     opacity: 0.55;
   }
@@ -475,7 +508,14 @@ const resultViews = [
   }
 
   @media (pointer: coarse) {
-    .action {
+    .action,
+    .secondary,
+    .tab,
+    .text-button {
+      min-height: 44px;
+    }
+
+    .option {
       min-height: 44px;
     }
   }

@@ -1,4 +1,5 @@
 import { fireEvent, within } from "@testing-library/dom";
+import axe from "axe-core";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Analytics } from "../../features/analytics/lib/analytics";
 import type {
@@ -1452,5 +1453,36 @@ describe("analytics integration", () => {
     for (const field of forbiddenFields) {
       expect(serialized).not.toContain(`"${field}"`);
     }
+  });
+});
+
+describe("accessibility", () => {
+  afterEach(() => {
+    document.body.innerHTML = "";
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+    Reflect.deleteProperty(navigator, "clipboard");
+  });
+
+  it("reports no axe violations for JSDOM-supported semantic and ARIA rules", async () => {
+    const container = mountTool();
+
+    // With both inputs empty the tablist and tabpanel stay hidden, and axe
+    // skips hidden subtrees — typing one value into List A only opens them
+    // without starting the completion timer (List B stays empty).
+    fireEvent.input(textarea(container, "[data-list-a]"), {
+      target: { value: "a\nb" },
+    });
+    expect(hook(container, "[data-result-tabs]").hidden).toBe(false);
+    expect(hook(container, "[data-result-panel]").hidden).toBe(false);
+
+    const results = await axe.run(container, {
+      rules: {
+        // Needs real browser rendering to compute contrast ratios.
+        "color-contrast": { enabled: false },
+      },
+    });
+
+    expect(results.violations).toEqual([]);
   });
 });
