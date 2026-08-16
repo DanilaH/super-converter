@@ -1467,6 +1467,15 @@ describe("accessibility", () => {
   it("reports no axe violations for JSDOM-supported semantic and ARIA rules", async () => {
     const container = mountTool();
 
+    // With both inputs empty the tablist and tabpanel stay hidden, and axe
+    // skips hidden subtrees — typing one value into List A only opens them
+    // without starting the completion timer (List B stays empty).
+    fireEvent.input(textarea(container, "[data-list-a]"), {
+      target: { value: "a\nb" },
+    });
+    expect(hook(container, "[data-result-tabs]").hidden).toBe(false);
+    expect(hook(container, "[data-result-panel]").hidden).toBe(false);
+
     const results = await axe.run(container, {
       rules: {
         // Needs real browser rendering to compute contrast ratios.
