@@ -74,6 +74,14 @@ a:hover {
   text-decoration: none;
 }
 
+@media (pointer: coarse) {
+  .wordmark {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+}
+
 .main {
   flex: 1;
   padding-inline: var(--container-padding-mobile);

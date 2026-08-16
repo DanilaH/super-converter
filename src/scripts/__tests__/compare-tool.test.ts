@@ -1,4 +1,5 @@
 import { fireEvent, within } from "@testing-library/dom";
+import axe from "axe-core";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Analytics } from "../../features/analytics/lib/analytics";
 import type {
@@ -1452,5 +1453,27 @@ describe("analytics integration", () => {
     for (const field of forbiddenFields) {
       expect(serialized).not.toContain(`"${field}"`);
     }
+  });
+});
+
+describe("accessibility", () => {
+  afterEach(() => {
+    document.body.innerHTML = "";
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+    Reflect.deleteProperty(navigator, "clipboard");
+  });
+
+  it("reports no axe violations for JSDOM-supported semantic and ARIA rules", async () => {
+    const container = mountTool();
+
+    const results = await axe.run(container, {
+      rules: {
+        // Needs real browser rendering to compute contrast ratios.
+        "color-contrast": { enabled: false },
+      },
+    });
+
+    expect(results.violations).toEqual([]);
   });
 });
