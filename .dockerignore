@@ -19,8 +19,7 @@ e2e
 evidence
 
 # local env and secrets
-.env
-.env*.local
+.env*
 *.pem
 
 # editor / OS artifacts
