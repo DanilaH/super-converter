@@ -67,7 +67,7 @@ test("privacy: list content stays in memory only", async ({ page }) => {
     "session storage": storageBefore.session,
     "cookies (document)": storageBefore.cookie,
     "cookies (context)": JSON.stringify(await page.context().cookies()),
-    "console": JSON.stringify(consoleText),
+    console: JSON.stringify(consoleText),
     "page errors": JSON.stringify(pageErrors),
   });
 
@@ -96,7 +96,7 @@ test("privacy: list content stays in memory only", async ({ page }) => {
     "session storage": storageAfter.session,
     "cookies (document)": storageAfter.cookie,
     "cookies (context)": JSON.stringify(await page.context().cookies()),
-    "console": JSON.stringify(consoleText),
+    console: JSON.stringify(consoleText),
     "page errors": JSON.stringify(pageErrors),
   });
 });

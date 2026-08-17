@@ -216,11 +216,12 @@ test("performance evidence: 1k, 10k and 100k rows against the production build",
     let blobSize = 0;
     const downloadMs = median(
       await sampleAsync(async () => {
-        const node = timedCall(() =>
-          formatResult(
-            compareLists(rawA, rawB, DEFAULT_COMPARE_OPTIONS),
-            RESULT_TYPE,
-          ).text,
+        const node = timedCall(
+          () =>
+            formatResult(
+              compareLists(rawA, rawB, DEFAULT_COMPARE_OPTIONS),
+              RESULT_TYPE,
+            ).text,
         );
         expect(node.value).toBe(expectedText);
         const blob = await page.evaluate((text) => {
