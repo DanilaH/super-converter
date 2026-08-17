@@ -142,8 +142,15 @@ function mountRoot(root: HTMLElement, analytics: Analytics): void {
 
   const recompute = createRecompute(hooks, labels, state);
   const recomputeImmediately = (): CompareResult | null => {
-    cancelPendingInput(state);
-    return recompute();
+    const hadPendingInput = cancelPendingInput(state);
+    const result = recompute();
+    if (hadPendingInput) {
+      // Flushing pending large-input work must schedule completion from the
+      // exact fresh result; ordinary immediate actions with no pending
+      // large-input recompute keep their existing call sites.
+      scheduleComparisonCompleted(analytics, state, result);
+    }
+    return result;
   };
 
   hooks.listA.addEventListener("input", (event) => {
@@ -280,11 +287,13 @@ function markToolUsed(
   });
 }
 
-function cancelPendingInput(state: ToolState): void {
-  if (state.inputTimer !== null) {
-    window.clearTimeout(state.inputTimer);
-    state.inputTimer = null;
+function cancelPendingInput(state: ToolState): boolean {
+  if (state.inputTimer === null) {
+    return false;
   }
+  window.clearTimeout(state.inputTimer);
+  state.inputTimer = null;
+  return true;
 }
 
 function cancelComparisonTimer(state: ToolState): void {

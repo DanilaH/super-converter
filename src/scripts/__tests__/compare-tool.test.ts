@@ -1511,8 +1511,11 @@ describe("large-input debounce", () => {
       target: { value: second },
     });
     vi.advanceTimersByTime(199);
-    expect(hook(container, "[data-result-viewer]").textContent).not.toContain(
-      first,
+    // Neither the first nor the second value may be rendered before the
+    // window resets: the exact pre-debounce viewer text proves the first
+    // timer (due at t=200) never fired.
+    expect(hook(container, "[data-result-viewer]").textContent).toBe(
+      `ONLY IN LIST A\n\nONLY IN LIST B\n${b}`,
     );
     vi.advanceTimersByTime(1);
     expect(hook(container, "[data-result-viewer]").textContent).toBe(
@@ -1595,29 +1598,41 @@ describe("large-input debounce", () => {
     const { analytics, events } = recordingAnalytics();
     const container = mountTool(analytics);
 
+    // Seed a valid comparison first, so a real 1500 ms completion timer
+    // exists before the large-input edit starts.
+    typeCanonical(container);
+    expect(events.filter((event) => event.name === "tool_used")).toHaveLength(
+      1,
+    );
+    vi.advanceTimersByTime(1000);
+
+    // A large-input edit before the seeded deadline must cancel that pending
+    // completion timer and defer the recompute by 200 ms.
     fireEvent.input(textarea(container, "[data-list-a]"), {
       target: { value: "a".repeat(500_000) },
     });
-    vi.advanceTimersByTime(200);
-    vi.advanceTimersByTime(1499);
     fireEvent.input(textarea(container, "[data-list-b]"), {
       target: { value: "z".repeat(100_000) },
     });
+    vi.advanceTimersByTime(500);
+    // The old deadline (t=1500) passes with no event; the fresh large
+    // recompute ran at t=1200, exactly 200 ms after the last input.
+    expect(events.some((event) => event.name === "comparison_completed")).toBe(
+      false,
+    );
+    expect(hook(container, "[data-result-viewer]").textContent).toContain(
+      "a".repeat(500_000),
+    );
+    expect(events.filter((event) => event.name === "tool_used")).toHaveLength(
+      1,
+    );
+
+    // Exactly one completion appears only 1500 ms after that fresh result.
+    vi.advanceTimersByTime(1199);
+    expect(events.some((event) => event.name === "comparison_completed")).toBe(
+      false,
+    );
     vi.advanceTimersByTime(1);
-    expect(events.some((event) => event.name === "comparison_completed")).toBe(
-      false,
-    );
-    expect(events.filter((event) => event.name === "tool_used")).toHaveLength(
-      1,
-    );
-    vi.advanceTimersByTime(200);
-    expect(events.some((event) => event.name === "comparison_completed")).toBe(
-      false,
-    );
-    vi.advanceTimersByTime(1500);
-    expect(events.filter((event) => event.name === "tool_used")).toHaveLength(
-      1,
-    );
     const completed = events.filter(
       (event) => event.name === "comparison_completed",
     );
@@ -1628,6 +1643,55 @@ describe("large-input debounce", () => {
       hasDifferences: true,
       hasMatches: false,
     });
+    expect(events.filter((event) => event.name === "tool_used")).toHaveLength(
+      1,
+    );
+  });
+
+  it("flushing pending large-input work on a tab change schedules completion from the fresh result", () => {
+    vi.useFakeTimers();
+    const { analytics, events } = recordingAnalytics();
+    const container = mountTool(analytics);
+
+    // Seed a valid comparison so a real 1500 ms completion timer exists.
+    typeCanonical(container);
+    vi.advanceTimersByTime(1000);
+
+    // A large-input edit before the deadline cancels the completion timer
+    // and defers the recompute; a tab selection inside the 200 ms window
+    // flushes the pending work and must schedule completion from the fresh
+    // result through the shared selection path.
+    fireEvent.input(textarea(container, "[data-list-a]"), {
+      target: { value: "a".repeat(500_000) },
+    });
+    fireEvent.input(textarea(container, "[data-list-b]"), {
+      target: { value: "z".repeat(100_000) },
+    });
+    vi.advanceTimersByTime(100);
+    clickTab(container, "onlyA");
+    expect(hook(container, "[data-result-viewer]").textContent).toBe(
+      "a".repeat(500_000),
+    );
+
+    vi.advanceTimersByTime(1500);
+    const completed = events.filter(
+      (event) => event.name === "comparison_completed",
+    );
+    expect(completed).toHaveLength(1);
+    expect(completed[0].payload).toEqual({
+      sizeA: "1-10",
+      sizeB: "1-10",
+      hasDifferences: true,
+      hasMatches: false,
+    });
+
+    // An ordinary tab change with no pending input work schedules no extra
+    // completion.
+    clickTab(container, "matches");
+    vi.advanceTimersByTime(2000);
+    expect(
+      events.filter((event) => event.name === "comparison_completed"),
+    ).toHaveLength(1);
   });
 
   it("does not duplicate listeners or scheduled work on double mount", () => {

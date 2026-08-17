@@ -147,13 +147,17 @@ events for the large-input class.
   boundary.
 - Immediate actions (option changes, Clear, Swap, Load example, result-tab
   changes) cancel or flush the pending large-input timer before their
-  synchronous recompute, so no stale output can apply afterward.
-- Automated coverage: 8 new fake-timer tests in
+  synchronous recompute, so no stale output can apply afterward; when a
+  pending large-input recompute is flushed (for example by a result-tab
+  selection), `comparison_completed` is scheduled from that exact fresh
+  result, and an ordinary action with no pending input schedules no extra
+  completion.
+- Automated coverage: 9 new fake-timer tests in
   `src/scripts/__tests__/compare-tool.test.ts` (synchronous normal input,
   no render before 200 ms, window reset with only the final value rendered,
-  crossing back below the threshold, immediate-action cancellation, once-only
-  `tool_used` plus a single `comparison_completed` from the final result,
-  double-mount safety).
+  crossing back below the threshold, immediate-action cancellation, tab-flush
+  completion from the fresh result, once-only `tool_used` plus a single
+  `comparison_completed` from the final result, double-mount safety).
 
 Remaining limitation: one final 100k recompute/render can still be a noticeable
 main-thread task (the debounce only reduces how often it runs).
