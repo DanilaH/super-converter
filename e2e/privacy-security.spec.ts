@@ -1,10 +1,32 @@
 import { expect, test } from "@playwright/test";
+import type { Page } from "@playwright/test";
 
 // Unique synthetic marker with an HTML payload: if it were ever parsed as
 // HTML, an element with data-cl033-probe would appear and the onerror flag
-// would be set.
+// would be set. TOKEN is a stable distinctive substring that survives URL or
+// JSON encoding of the marker.
 const MARKER =
   '<img src="https://cl033-probe.invalid/1.png" data-cl033-probe onerror="window.__cl033Probe = 1">';
+const TOKEN = "cl033-probe";
+
+function assertNoLeak(sources: Record<string, string>): void {
+  for (const [label, value] of Object.entries(sources)) {
+    expect(value, label).not.toContain(TOKEN);
+    expect(value, label).not.toContain(MARKER);
+  }
+}
+
+async function collectStorage(page: Page): Promise<{
+  local: string;
+  session: string;
+  cookie: string;
+}> {
+  return page.evaluate(() => ({
+    local: JSON.stringify({ ...localStorage }),
+    session: JSON.stringify({ ...sessionStorage }),
+    cookie: document.cookie,
+  }));
+}
 
 test("privacy: list content stays in memory only", async ({ page }) => {
   const requests: string[] = [];
@@ -36,22 +58,18 @@ test("privacy: list content stays in memory only", async ({ page }) => {
     ),
   ).toBeUndefined();
 
-  const serializedRequests = JSON.stringify([...requests, ...requestBodies]);
-  expect(serializedRequests).not.toContain("cl033-probe");
-  expect(serializedRequests).not.toContain(MARKER);
-
-  expect(page.url()).not.toContain(MARKER);
-
-  const stored = await page.evaluate(() => ({
-    local: { ...localStorage },
-    session: { ...sessionStorage },
-    cookie: document.cookie,
-  }));
-  expect(JSON.stringify(stored)).not.toContain(MARKER);
-  expect(JSON.stringify(await page.context().cookies())).not.toContain(MARKER);
-
-  expect(JSON.stringify(consoleText)).not.toContain(MARKER);
-  expect(JSON.stringify(pageErrors)).not.toContain(MARKER);
+  const storageBefore = await collectStorage(page);
+  assertNoLeak({
+    "request urls": JSON.stringify(requests),
+    "request bodies": JSON.stringify(requestBodies),
+    "page url": page.url(),
+    "local storage": storageBefore.local,
+    "session storage": storageBefore.session,
+    "cookies (document)": storageBefore.cookie,
+    "cookies (context)": JSON.stringify(await page.context().cookies()),
+    "console": JSON.stringify(consoleText),
+    "page errors": JSON.stringify(pageErrors),
+  });
 
   await page.getByRole("tab", { name: "Only B" }).click();
   await expect(page.getByRole("tab", { name: "Only B" })).toHaveAttribute(
@@ -68,4 +86,17 @@ test("privacy: list content stays in memory only", async ({ page }) => {
     "aria-selected",
     "true",
   );
+
+  const storageAfter = await collectStorage(page);
+  assertNoLeak({
+    "request urls": JSON.stringify(requests),
+    "request bodies": JSON.stringify(requestBodies),
+    "page url": page.url(),
+    "local storage": storageAfter.local,
+    "session storage": storageAfter.session,
+    "cookies (document)": storageAfter.cookie,
+    "cookies (context)": JSON.stringify(await page.context().cookies()),
+    "console": JSON.stringify(consoleText),
+    "page errors": JSON.stringify(pageErrors),
+  });
 });

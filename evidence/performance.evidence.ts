@@ -7,6 +7,10 @@ import { DEFAULT_COMPARE_OPTIONS } from "../src/features/compare-lists/model/def
 // Fixed, documented methodology: deterministic datasets with a 50% overlap,
 // current default comparison options, 2 warm-up runs and 5 measured
 // iterations, median of the measured iterations in milliseconds.
+//
+// Every timed call returns its value; the clock stops before the value is
+// consumed by a checksum assertion, so the assertions always derive from the
+// outputs of the actual measured calls.
 const ROW_SIZES = [1_000, 10_000, 100_000] as const;
 const OVERLAP = 0.5;
 const WARM_UP = 2;
@@ -34,17 +38,23 @@ function median(samples: number[]): number {
   return sorted[Math.floor(sorted.length / 2)];
 }
 
-function timed(fn: () => void): number {
+function timedCall<T>(fn: () => T): { ms: number; value: T } {
   const start = performance.now();
-  fn();
-  return performance.now() - start;
+  const value = fn();
+  return { ms: performance.now() - start, value };
 }
 
-function sample(fn: () => void): number[] {
+function measure<T>(fn: () => T, check: (value: T) => void): number[] {
   for (let i = 0; i < WARM_UP; i += 1) {
-    fn();
+    check(timedCall(fn).value);
   }
-  return Array.from({ length: ITERATIONS }, () => timed(fn));
+  const samples: number[] = [];
+  for (let i = 0; i < ITERATIONS; i += 1) {
+    const { ms, value } = timedCall(fn);
+    check(value);
+    samples.push(ms);
+  }
+  return samples;
 }
 
 async function sampleAsync(fn: () => Promise<number>): Promise<number[]> {
@@ -69,18 +79,19 @@ test("performance evidence: 1k, 10k and 100k rows against the production build",
   for (const rows of ROW_SIZES) {
     const { rawA, rawB } = buildDatasets(rows);
 
-    // Correctness checks/checksums: the measured work cannot be optimized away.
     const expected = compareLists(rawA, rawB, DEFAULT_COMPARE_OPTIONS);
-    expect(expected.stats.rowsA).toBe(rows);
-    expect(expected.stats.rowsB).toBe(rows);
-    expect(expected.stats.uniqueA).toBe(rows);
-    expect(expected.stats.uniqueB).toBe(rows);
-    expect(expected.stats.onlyA).toBe(rows * OVERLAP);
-    expect(expected.stats.onlyB).toBe(rows * OVERLAP);
-    expect(expected.stats.matches).toBe(rows * OVERLAP);
+    const expectedText = formatResult(expected, RESULT_TYPE).text;
+    expect(expected.stats).toEqual({
+      rowsA: rows,
+      rowsB: rows,
+      uniqueA: rows,
+      uniqueB: rows,
+      onlyA: rows * OVERLAP,
+      onlyB: rows * OVERLAP,
+      matches: rows * OVERLAP,
+    });
     expect(expected.union.length).toBe(rows * (2 - OVERLAP));
     expect(expected.differences.length).toBe(rows);
-    const expectedText = formatResult(expected, RESULT_TYPE).text;
     expect(expectedText.startsWith("ONLY IN LIST A")).toBe(true);
     expect(expectedText).toContain("ONLY IN LIST B");
 
@@ -90,31 +101,50 @@ test("performance evidence: 1k, 10k and 100k rows against the production build",
       ignoreCase: DEFAULT_COMPARE_OPTIONS.ignoreCase,
     };
 
-    // Phase 1: parse both lists.
+    // Phase 1: parse both lists. Each measured call returns the parsed items;
+    // their lengths are asserted after the clock stops.
     const parseMs = median(
-      sample(() => {
-        parseList(rawA, parseOptions);
-        parseList(rawB, parseOptions);
-      }),
+      measure(
+        () => {
+          const a = parseList(rawA, parseOptions);
+          const b = parseList(rawB, parseOptions);
+          return { aLen: a.length, bLen: b.length };
+        },
+        (parsed) => {
+          expect(parsed.aLen).toBe(rows);
+          expect(parsed.bLen).toBe(rows);
+        },
+      ),
     );
 
     // Phase 2: public compareLists. The public API includes parsing, so the
-    // parse and compare measurements overlap by design.
+    // parse and compare measurements overlap by design. The measured result
+    // must match the separately computed expectation exactly.
     const compareMs = median(
-      sample(() => {
-        compareLists(rawA, rawB, DEFAULT_COMPARE_OPTIONS);
-      }),
+      measure(
+        () => compareLists(rawA, rawB, DEFAULT_COMPARE_OPTIONS),
+        (result) => {
+          expect(result.stats).toEqual(expected.stats);
+          expect(result.union.length).toBe(expected.union.length);
+          expect(result.differences.length).toBe(expected.differences.length);
+        },
+      ),
     );
 
-    // Phase 3: format a precomputed result.
+    // Phase 3: format a precomputed result. The measured text must equal the
+    // expected formatted text exactly.
     const formatMs = median(
-      sample(() => {
-        formatResult(expected, RESULT_TYPE);
-      }),
+      measure(
+        () => formatResult(expected, RESULT_TYPE).text,
+        (text) => {
+          expect(text).toBe(expectedText);
+        },
+      ),
     );
 
     // Phase 4: render the formatted text into the real result viewer through
-    // textContent, then force a layout read (scrollHeight).
+    // textContent, then force a layout read (scrollHeight). The length check
+    // runs outside the page timer.
     let renderLength = 0;
     for (let i = 0; i < WARM_UP; i += 1) {
       await page.evaluate((text) => {
@@ -152,49 +182,57 @@ test("performance evidence: 1k, 10k and 100k rows against the production build",
     );
 
     // Phase 5: prepare copy output (compare + format, no OS clipboard write).
+    // The measured text must equal the expected formatted text exactly.
     const copyMs = median(
-      sample(() => {
-        formatResult(
-          compareLists(rawA, rawB, DEFAULT_COMPARE_OPTIONS),
-          RESULT_TYPE,
-        );
-      }),
+      measure(
+        () =>
+          formatResult(
+            compareLists(rawA, rawB, DEFAULT_COMPARE_OPTIONS),
+            RESULT_TYPE,
+          ).text,
+        (text) => {
+          expect(text).toBe(expectedText);
+        },
+      ),
     );
 
     // Phase 6: prepare download output (compare + format + Blob +
     // createObjectURL/revokeObjectURL), excluding the save dialog and
     // filesystem write. The pure compare/format part runs in Node (V8, same
-    // engine family as Chromium); Blob and URL.createObjectURL are browser
-    // APIs and run in the real page. Per-iteration sums form the sample.
+    // engine family as Chromium); the Blob step receives the exact formatted
+    // text produced by the same measured iteration, and Playwright transport
+    // stays outside the page timer. Per-iteration sums form the sample.
     for (let i = 0; i < WARM_UP; i += 1) {
-      formatResult(
+      const text = formatResult(
         compareLists(rawA, rawB, DEFAULT_COMPARE_OPTIONS),
         RESULT_TYPE,
-      );
-      await page.evaluate((text) => {
-        const blob = new Blob([text], { type: "text/plain" });
+      ).text;
+      expect(text).toBe(expectedText);
+      await page.evaluate((t) => {
+        const blob = new Blob([t], { type: "text/plain" });
         URL.revokeObjectURL(URL.createObjectURL(blob));
-      }, expectedText);
+      }, text);
     }
     let blobSize = 0;
     const downloadMs = median(
       await sampleAsync(async () => {
-        const nodeMs = timed(() => {
+        const node = timedCall(() =>
           formatResult(
             compareLists(rawA, rawB, DEFAULT_COMPARE_OPTIONS),
             RESULT_TYPE,
-          );
-        });
-        const blobResult = await page.evaluate((text) => {
+          ).text,
+        );
+        expect(node.value).toBe(expectedText);
+        const blob = await page.evaluate((text) => {
           const start = performance.now();
-          const blob = new Blob([text], { type: "text/plain" });
-          const url = URL.createObjectURL(blob);
+          const created = new Blob([text], { type: "text/plain" });
+          const url = URL.createObjectURL(created);
           URL.revokeObjectURL(url);
-          return { size: blob.size, ms: performance.now() - start };
-        }, expectedText);
-        expect(blobResult.size).toBe(expectedText.length);
-        blobSize = blobResult.size;
-        return nodeMs + blobResult.ms;
+          return { size: created.size, ms: performance.now() - start };
+        }, node.value);
+        expect(blob.size).toBe(node.value.length);
+        blobSize = blob.size;
+        return node.ms + blob.ms;
       }),
     );
 
