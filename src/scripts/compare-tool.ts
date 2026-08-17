@@ -15,12 +15,19 @@ import { sizeBucketFor } from "../features/analytics/lib/size-bucket";
 
 const COMPARISON_DEBOUNCE_MS = 1500;
 
+// Large-input class measured in CL-033: combined raw length of both lists of
+// 500,000 characters or more. The check is allocation-free; it only compares
+// string lengths and never splits, parses or scans the lists.
+const LARGE_INPUT_THRESHOLD_CHARS = 500_000;
+const LARGE_INPUT_DEBOUNCE_MS = 200;
+
 type ToolState = {
   listA: string;
   listB: string;
   options: CompareOptions;
   activeResult: ResultType;
   copyTimer: number | null;
+  inputTimer: number | null;
   comparisonTimer: number | null;
   toolUsed: boolean;
   comparisonCompleted: boolean;
@@ -127,26 +134,29 @@ function mountRoot(root: HTMLElement, analytics: Analytics): void {
     },
     activeResult: readActiveResult(root),
     copyTimer: null,
+    inputTimer: null,
     comparisonTimer: null,
     toolUsed: false,
     comparisonCompleted: false,
   };
 
   const recompute = createRecompute(hooks, labels, state);
+  const recomputeImmediately = (): CompareResult | null => {
+    cancelPendingInput(state);
+    return recompute();
+  };
 
   hooks.listA.addEventListener("input", (event) => {
     state.listA = hooks.listA.value;
-    const result = recompute();
-    handleToolInput(analytics, state, result, event);
+    handleInput(analytics, state, recompute, event);
   });
   hooks.listB.addEventListener("input", (event) => {
     state.listB = hooks.listB.value;
-    const result = recompute();
-    handleToolInput(analytics, state, result, event);
+    handleInput(analytics, state, recompute, event);
   });
   hooks.trimWhitespace.addEventListener("change", () => {
     state.options.trimWhitespace = hooks.trimWhitespace.checked;
-    const result = recompute();
+    const result = recomputeImmediately();
     safeTrack(analytics, "option_changed", {
       option: "trimWhitespace",
       enabled: hooks.trimWhitespace.checked,
@@ -155,7 +165,7 @@ function mountRoot(root: HTMLElement, analytics: Analytics): void {
   });
   hooks.ignoreEmptyLines.addEventListener("change", () => {
     state.options.ignoreEmptyLines = hooks.ignoreEmptyLines.checked;
-    const result = recompute();
+    const result = recomputeImmediately();
     safeTrack(analytics, "option_changed", {
       option: "ignoreEmptyLines",
       enabled: hooks.ignoreEmptyLines.checked,
@@ -164,7 +174,7 @@ function mountRoot(root: HTMLElement, analytics: Analytics): void {
   });
   hooks.ignoreCase.addEventListener("change", () => {
     state.options.ignoreCase = hooks.ignoreCase.checked;
-    const result = recompute();
+    const result = recomputeImmediately();
     safeTrack(analytics, "option_changed", {
       option: "ignoreCase",
       enabled: hooks.ignoreCase.checked,
@@ -173,7 +183,7 @@ function mountRoot(root: HTMLElement, analytics: Analytics): void {
   });
   hooks.removeDuplicates.addEventListener("change", () => {
     state.options.removeDuplicates = hooks.removeDuplicates.checked;
-    const result = recompute();
+    const result = recomputeImmediately();
     safeTrack(analytics, "option_changed", {
       option: "removeDuplicates",
       enabled: hooks.removeDuplicates.checked,
@@ -183,13 +193,13 @@ function mountRoot(root: HTMLElement, analytics: Analytics): void {
   hooks.clearListA.addEventListener("click", () => {
     hooks.listA.value = "";
     state.listA = "";
-    const result = recompute();
+    const result = recomputeImmediately();
     scheduleComparisonCompleted(analytics, state, result);
   });
   hooks.clearListB.addEventListener("click", () => {
     hooks.listB.value = "";
     state.listB = "";
-    const result = recompute();
+    const result = recomputeImmediately();
     scheduleComparisonCompleted(analytics, state, result);
   });
   hooks.swap.addEventListener("click", () => {
@@ -198,7 +208,7 @@ function mountRoot(root: HTMLElement, analytics: Analytics): void {
     hooks.listB.value = previousA;
     state.listA = hooks.listA.value;
     state.listB = hooks.listB.value;
-    const result = recompute();
+    const result = recomputeImmediately();
     scheduleComparisonCompleted(analytics, state, result);
   });
   hooks.loadExample.addEventListener("click", () => {
@@ -211,11 +221,11 @@ function mountRoot(root: HTMLElement, analytics: Analytics): void {
       safeTrack(analytics, "tool_used", { inputMethod: "example" });
     }
     safeTrack(analytics, "example_loaded", undefined);
-    const result = recompute();
+    const result = recomputeImmediately();
     scheduleComparisonCompleted(analytics, state, result);
   });
 
-  setupTabs(hooks, state, recompute, analytics);
+  setupTabs(hooks, state, recomputeImmediately, analytics);
   setupCopy(hooks, labels, state, analytics);
   setupDownload(hooks, state, analytics);
 
@@ -231,20 +241,61 @@ function mountRoot(root: HTMLElement, analytics: Analytics): void {
   recompute();
 }
 
-function handleToolInput(
+function handleInput(
   analytics: Analytics,
   state: ToolState,
-  result: CompareResult | null,
+  recompute: () => CompareResult | null,
   event: Event,
 ): void {
-  if (!state.toolUsed) {
-    state.toolUsed = true;
-    const inputType = event instanceof InputEvent ? event.inputType : "";
-    safeTrack(analytics, "tool_used", {
-      inputMethod: inputType === "insertFromPaste" ? "paste" : "typing",
-    });
+  markToolUsed(analytics, state, event);
+  cancelPendingInput(state);
+  if (isLargeInput(state)) {
+    // Every new large-input event immediately cancels any already scheduled
+    // comparison_completed timer so a stale result cannot emit completion
+    // while a newer large-input recompute is pending.
+    cancelComparisonTimer(state);
+    state.inputTimer = window.setTimeout(() => {
+      state.inputTimer = null;
+      const result = recompute();
+      scheduleComparisonCompleted(analytics, state, result);
+    }, LARGE_INPUT_DEBOUNCE_MS);
+    return;
   }
+  const result = recompute();
   scheduleComparisonCompleted(analytics, state, result);
+}
+
+function markToolUsed(
+  analytics: Analytics,
+  state: ToolState,
+  event: Event,
+): void {
+  if (state.toolUsed) {
+    return;
+  }
+  state.toolUsed = true;
+  const inputType = event instanceof InputEvent ? event.inputType : "";
+  safeTrack(analytics, "tool_used", {
+    inputMethod: inputType === "insertFromPaste" ? "paste" : "typing",
+  });
+}
+
+function cancelPendingInput(state: ToolState): void {
+  if (state.inputTimer !== null) {
+    window.clearTimeout(state.inputTimer);
+    state.inputTimer = null;
+  }
+}
+
+function cancelComparisonTimer(state: ToolState): void {
+  if (state.comparisonTimer !== null) {
+    window.clearTimeout(state.comparisonTimer);
+    state.comparisonTimer = null;
+  }
+}
+
+function isLargeInput(state: ToolState): boolean {
+  return state.listA.length + state.listB.length >= LARGE_INPUT_THRESHOLD_CHARS;
 }
 
 function scheduleComparisonCompleted(
@@ -255,10 +306,7 @@ function scheduleComparisonCompleted(
   if (state.comparisonCompleted) {
     return;
   }
-  if (state.comparisonTimer !== null) {
-    window.clearTimeout(state.comparisonTimer);
-    state.comparisonTimer = null;
-  }
+  cancelComparisonTimer(state);
   if (result === null || result.stats.rowsA === 0 || result.stats.rowsB === 0) {
     return;
   }
