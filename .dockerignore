@@ -1,0 +1,33 @@
+# version control
+.git
+.gitattributes
+.gitignore
+
+# dependencies
+node_modules
+
+# build output
+dist
+.astro
+
+# testing / evidence output and sources
+coverage
+test-results
+playwright-report
+.evidence
+e2e
+evidence
+
+# local env and secrets
+.env
+.env*.local
+*.pem
+
+# editor / OS artifacts
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+
+# typescript
+*.tsbuildinfo
