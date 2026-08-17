@@ -6,7 +6,7 @@ code, options or dependencies were changed in this task.
 ## Measurement date and tested commit
 
 - Date: 2026-08-16
-- Tested commit: `2610692` on `main`-based
+- Tested commit: `5cb1986` on `main`-based
   `task/cl-033-performance-privacy-evidence`, built from base `fa82c40`
 - Build: `pnpm build` (4 pages, ~0.8s)
 
