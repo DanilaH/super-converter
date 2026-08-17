@@ -130,9 +130,39 @@ projects, and no leakage channel was found.
 
 ## Follow-up recommendation
 
-A separate, approved profiling/mitigation follow-up is warranted for the 100k
-interactive path (editing an already-large input), because the measured ~545 ms
-combined median suggests main-thread blocking; options such as a Worker or
-input debounce must be evaluated in that follow-up and are not implemented
-here. No additional issue was opened in this PR. A re-run on a second, slower
-machine would strengthen the evidence before release.
+Implemented in CL-033F as an evidence-driven decision based on the measured
+~545 ms 100k compare+render median sum: the tool now coalesces rapid input
+events for the large-input class.
+
+- Fixed threshold: combined raw length of List A and List B of 500,000
+  characters or more (allocation-free length check, no splitting, parsing or
+  scanning to decide).
+- Fixed delay: 200 ms after the latest input event.
+- Normal inputs (below the threshold) remain fully synchronous with no added
+  delay.
+- Bursts of large inputs are coalesced: raw state updates immediately on every
+  input event, the previous pending recompute timer is cancelled, and exactly
+  one recompute runs 200 ms after the last event, emitting
+  `comparison_completed` from that fresh result through the existing analytics
+  boundary.
+- Immediate actions (option changes, Clear, Swap, Load example, result-tab
+  changes) cancel or flush the pending large-input timer before their
+  synchronous recompute, so no stale output can apply afterward; when a
+  pending large-input recompute is flushed (for example by a result-tab
+  selection), `comparison_completed` is scheduled from that exact fresh
+  result, and an ordinary action with no pending input schedules no extra
+  completion.
+- Automated coverage: 9 new fake-timer tests in
+  `src/scripts/__tests__/compare-tool.test.ts` (synchronous normal input,
+  no render before 200 ms, window reset with only the final value rendered,
+  crossing back below the threshold, immediate-action cancellation, tab-flush
+  completion from the fresh result, once-only `tool_used` plus a single
+  `comparison_completed` from the final result, double-mount safety).
+
+Remaining limitation: one final 100k recompute/render can still be a noticeable
+main-thread task (the debounce only reduces how often it runs).
+
+Worker, manual Compare mode and viewer virtualization remain out of scope
+unless protected-preview validation proves another change is necessary. A
+re-run on a second, slower machine would strengthen the evidence before
+release.

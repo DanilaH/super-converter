@@ -1456,6 +1456,273 @@ describe("analytics integration", () => {
   });
 });
 
+describe("large-input debounce", () => {
+  afterEach(() => {
+    document.body.innerHTML = "";
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+    Reflect.deleteProperty(navigator, "clipboard");
+  });
+
+  it("updates a normal small input synchronously", () => {
+    vi.useFakeTimers();
+    const container = mountTool();
+
+    typeCanonical(container);
+
+    expect(hook(container, "[data-result-viewer]").textContent).toBe(
+      "ONLY IN LIST A\nc\n\nONLY IN LIST B\nd\ne",
+    );
+  });
+
+  it("does not render a large input before the 200 ms debounce elapses", () => {
+    vi.useFakeTimers();
+    const container = mountTool();
+    const large = "a".repeat(500_000);
+
+    fireEvent.input(textarea(container, "[data-list-a]"), {
+      target: { value: large },
+    });
+
+    expect(hook(container, "[data-result-viewer]").textContent).toBe("");
+    vi.advanceTimersByTime(199);
+    expect(hook(container, "[data-result-viewer]").textContent).toBe("");
+    vi.advanceTimersByTime(1);
+    expect(hook(container, "[data-result-viewer]").textContent).toBe(
+      `ONLY IN LIST A\n${large}\n\nONLY IN LIST B`,
+    );
+  });
+
+  it("resets the 200 ms window on every event and renders only the final value", () => {
+    vi.useFakeTimers();
+    const container = mountTool();
+    const b = "b".repeat(100_000);
+    const first = "a".repeat(400_000);
+    const second = "c".repeat(400_000);
+
+    fireEvent.input(textarea(container, "[data-list-b]"), {
+      target: { value: b },
+    });
+    fireEvent.input(textarea(container, "[data-list-a]"), {
+      target: { value: first },
+    });
+    vi.advanceTimersByTime(150);
+    fireEvent.input(textarea(container, "[data-list-a]"), {
+      target: { value: second },
+    });
+    vi.advanceTimersByTime(199);
+    // Neither the first nor the second value may be rendered before the
+    // window resets: the exact pre-debounce viewer text proves the first
+    // timer (due at t=200) never fired.
+    expect(hook(container, "[data-result-viewer]").textContent).toBe(
+      `ONLY IN LIST A\n\nONLY IN LIST B\n${b}`,
+    );
+    vi.advanceTimersByTime(1);
+    expect(hook(container, "[data-result-viewer]").textContent).toBe(
+      `ONLY IN LIST A\n${second}\n\nONLY IN LIST B\n${b}`,
+    );
+  });
+
+  it("crossing back below the threshold cancels the pending timer and updates immediately", () => {
+    vi.useFakeTimers();
+    const container = mountTool();
+    const a = "a".repeat(400_000);
+    const b = "b".repeat(100_000);
+
+    fireEvent.input(textarea(container, "[data-list-a]"), {
+      target: { value: a },
+    });
+    fireEvent.input(textarea(container, "[data-list-b]"), {
+      target: { value: b },
+    });
+    expect(hook(container, "[data-result-viewer]").textContent).toContain(a);
+
+    fireEvent.input(textarea(container, "[data-list-a]"), {
+      target: { value: "short" },
+    });
+
+    expect(hook(container, "[data-result-viewer]").textContent).toBe(
+      `ONLY IN LIST A\nshort\n\nONLY IN LIST B\n${b}`,
+    );
+    vi.advanceTimersByTime(500);
+    expect(hook(container, "[data-result-viewer]").textContent).toBe(
+      `ONLY IN LIST A\nshort\n\nONLY IN LIST B\n${b}`,
+    );
+  });
+
+  it("cancels the pending timer on Load example and no stale recompute follows", () => {
+    vi.useFakeTimers();
+    const container = mountTool();
+
+    fireEvent.input(textarea(container, "[data-list-a]"), {
+      target: { value: "a".repeat(400_000) },
+    });
+    fireEvent.input(textarea(container, "[data-list-b]"), {
+      target: { value: "b".repeat(100_000) },
+    });
+    fireEvent.click(hook(container, "[data-load-example]"));
+
+    expect(hook(container, "[data-result-viewer]").textContent).toBe(
+      "ONLY IN LIST A\nalice@example.com\n\nONLY IN LIST B\ndave@example.com",
+    );
+    vi.advanceTimersByTime(500);
+    expect(hook(container, "[data-result-viewer]").textContent).toBe(
+      "ONLY IN LIST A\nalice@example.com\n\nONLY IN LIST B\ndave@example.com",
+    );
+  });
+
+  it("option and tab changes cancel the pending timer and use the latest raw state", () => {
+    vi.useFakeTimers();
+    const container = mountTool();
+    const a = "a".repeat(400_000);
+
+    fireEvent.input(textarea(container, "[data-list-a]"), {
+      target: { value: a },
+    });
+    fireEvent.input(textarea(container, "[data-list-b]"), {
+      target: { value: "b\nb" },
+    });
+    fireEvent.click(hook(container, "[data-option-remove-duplicates]"));
+
+    expect(hook(container, "[data-result-viewer]").textContent).toBe(
+      `ONLY IN LIST A\n${a}\n\nONLY IN LIST B\nb\nb`,
+    );
+    clickTab(container, "onlyA");
+    expect(hook(container, "[data-result-viewer]").textContent).toBe(a);
+    vi.advanceTimersByTime(500);
+    expect(hook(container, "[data-result-viewer]").textContent).toBe(a);
+  });
+
+  it("keeps tool_used once-only and emits comparison_completed once from the final large-input result", () => {
+    vi.useFakeTimers();
+    const { analytics, events } = recordingAnalytics();
+    const container = mountTool(analytics);
+
+    // Seed a valid comparison first, so a real 1500 ms completion timer
+    // exists before the large-input edit starts.
+    typeCanonical(container);
+    expect(events.filter((event) => event.name === "tool_used")).toHaveLength(
+      1,
+    );
+    vi.advanceTimersByTime(1000);
+
+    // A large-input edit before the seeded deadline must cancel that pending
+    // completion timer and defer the recompute by 200 ms.
+    fireEvent.input(textarea(container, "[data-list-a]"), {
+      target: { value: "a".repeat(500_000) },
+    });
+    fireEvent.input(textarea(container, "[data-list-b]"), {
+      target: { value: "z".repeat(100_000) },
+    });
+    vi.advanceTimersByTime(500);
+    // The old deadline (t=1500) passes with no event; the fresh large
+    // recompute ran at t=1200, exactly 200 ms after the last input.
+    expect(events.some((event) => event.name === "comparison_completed")).toBe(
+      false,
+    );
+    expect(hook(container, "[data-result-viewer]").textContent).toContain(
+      "a".repeat(500_000),
+    );
+    expect(events.filter((event) => event.name === "tool_used")).toHaveLength(
+      1,
+    );
+
+    // Exactly one completion appears only 1500 ms after that fresh result.
+    vi.advanceTimersByTime(1199);
+    expect(events.some((event) => event.name === "comparison_completed")).toBe(
+      false,
+    );
+    vi.advanceTimersByTime(1);
+    const completed = events.filter(
+      (event) => event.name === "comparison_completed",
+    );
+    expect(completed).toHaveLength(1);
+    expect(completed[0].payload).toEqual({
+      sizeA: "1-10",
+      sizeB: "1-10",
+      hasDifferences: true,
+      hasMatches: false,
+    });
+    expect(events.filter((event) => event.name === "tool_used")).toHaveLength(
+      1,
+    );
+  });
+
+  it("flushing pending large-input work on a tab change schedules completion from the fresh result", () => {
+    vi.useFakeTimers();
+    const { analytics, events } = recordingAnalytics();
+    const container = mountTool(analytics);
+
+    // Seed a valid comparison so a real 1500 ms completion timer exists.
+    typeCanonical(container);
+    vi.advanceTimersByTime(1000);
+
+    // A large-input edit before the deadline cancels the completion timer
+    // and defers the recompute; a tab selection inside the 200 ms window
+    // flushes the pending work and must schedule completion from the fresh
+    // result through the shared selection path.
+    fireEvent.input(textarea(container, "[data-list-a]"), {
+      target: { value: "a".repeat(500_000) },
+    });
+    fireEvent.input(textarea(container, "[data-list-b]"), {
+      target: { value: "z".repeat(100_000) },
+    });
+    vi.advanceTimersByTime(100);
+    clickTab(container, "onlyA");
+    expect(hook(container, "[data-result-viewer]").textContent).toBe(
+      "a".repeat(500_000),
+    );
+
+    vi.advanceTimersByTime(1500);
+    const completed = events.filter(
+      (event) => event.name === "comparison_completed",
+    );
+    expect(completed).toHaveLength(1);
+    expect(completed[0].payload).toEqual({
+      sizeA: "1-10",
+      sizeB: "1-10",
+      hasDifferences: true,
+      hasMatches: false,
+    });
+
+    // An ordinary tab change with no pending input work schedules no extra
+    // completion.
+    clickTab(container, "matches");
+    vi.advanceTimersByTime(2000);
+    expect(
+      events.filter((event) => event.name === "comparison_completed"),
+    ).toHaveLength(1);
+  });
+
+  it("does not duplicate listeners or scheduled work on double mount", () => {
+    vi.useFakeTimers();
+    const { analytics, events } = recordingAnalytics();
+    const container = document.createElement("div");
+    container.innerHTML = TOOL_HTML;
+    document.body.appendChild(container);
+    mountCompareTool(container, analytics);
+    mountCompareTool(container, analytics);
+
+    fireEvent.input(textarea(container, "[data-list-a]"), {
+      target: { value: "a".repeat(500_000) },
+    });
+    fireEvent.input(textarea(container, "[data-list-b]"), {
+      target: { value: "z".repeat(100_000) },
+    });
+    vi.advanceTimersByTime(200);
+    expect(hook(container, "[data-result-viewer]").textContent).toBe(
+      `ONLY IN LIST A\n${"a".repeat(500_000)}\n\nONLY IN LIST B\n${"z".repeat(100_000)}`,
+    );
+    vi.advanceTimersByTime(1500);
+    expect(
+      events.filter((event) => event.name === "comparison_completed"),
+    ).toHaveLength(1);
+    expect(events.filter((event) => event.name === "tool_used")).toHaveLength(
+      1,
+    );
+  });
+});
+
 describe("accessibility", () => {
   afterEach(() => {
     document.body.innerHTML = "";
