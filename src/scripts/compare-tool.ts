@@ -26,6 +26,7 @@ type ToolState = {
   listB: string;
   options: CompareOptions;
   activeResult: ResultType;
+  activeResultCount: number;
   copyTimer: number | null;
   inputTimer: number | null;
   comparisonTimer: number | null;
@@ -44,6 +45,7 @@ type Labels = {
   copy: string;
   copied: string;
   copyError: string;
+  replaceExampleConfirmation: string;
 };
 
 type Hooks = {
@@ -133,6 +135,7 @@ function mountRoot(root: HTMLElement, analytics: Analytics): void {
       removeDuplicates: hooks.removeDuplicates.checked,
     },
     activeResult: readActiveResult(root),
+    activeResultCount: 0,
     copyTimer: null,
     inputTimer: null,
     comparisonTimer: null,
@@ -219,6 +222,14 @@ function mountRoot(root: HTMLElement, analytics: Analytics): void {
     scheduleComparisonCompleted(analytics, state, result);
   });
   hooks.loadExample.addEventListener("click", () => {
+    const hasCurrentInput = state.listA !== "" || state.listB !== "";
+    if (
+      hasCurrentInput &&
+      !window.confirm(labels.replaceExampleConfirmation)
+    ) {
+      return;
+    }
+
     hooks.listA.value = EXAMPLE_A;
     hooks.listB.value = EXAMPLE_B;
     state.listA = EXAMPLE_A;
@@ -236,11 +247,6 @@ function mountRoot(root: HTMLElement, analytics: Analytics): void {
   setupCopy(hooks, labels, state, analytics);
   setupDownload(hooks, state, analytics);
 
-  hooks.copyResult.disabled = false;
-  hooks.downloadResult.disabled = false;
-  hooks.clearListA.disabled = false;
-  hooks.clearListB.disabled = false;
-  hooks.swap.disabled = false;
   hooks.loadExample.disabled = false;
 
   mountedRoots.add(root);
@@ -388,6 +394,8 @@ function readLabels(root: HTMLElement): Labels {
     copy: root.dataset.labelCopy ?? "",
     copied: root.dataset.labelCopied ?? "",
     copyError: root.dataset.labelCopyError ?? "",
+    replaceExampleConfirmation:
+      root.dataset.labelReplaceExampleConfirmation ?? "",
   };
   for (const [name, value] of Object.entries(labels)) {
     if (value === "") {
@@ -423,12 +431,17 @@ function createRecompute(
   state: ToolState,
 ): () => CompareResult | null {
   return () => {
+    hooks.clearListA.disabled = state.listA === "";
+    hooks.clearListB.disabled = state.listB === "";
+    hooks.swap.disabled = state.listA === "" && state.listB === "";
+
     if (state.listA === "" && state.listB === "") {
       hooks.results.hidden = false;
       hooks.emptyResults.hidden = false;
       hooks.summary.hidden = true;
       hooks.resultTabs.hidden = true;
       hooks.resultPanel.hidden = true;
+      state.activeResultCount = 0;
       hooks.copyResult.disabled = true;
       hooks.downloadResult.disabled = true;
       hooks.resultViewer.textContent = "";
@@ -445,8 +458,6 @@ function createRecompute(
     hooks.summary.hidden = false;
     hooks.resultTabs.hidden = false;
     hooks.resultPanel.hidden = false;
-    hooks.copyResult.disabled = false;
-    hooks.downloadResult.disabled = false;
     hooks.listACount.textContent = pluralize(
       result.stats.rowsA,
       labels.row,
@@ -474,6 +485,9 @@ function renderResult(
   result: CompareResult,
 ): void {
   const count = resultCountFor(state.activeResult, result);
+  state.activeResultCount = count;
+  hooks.copyResult.disabled = count === 0;
+  hooks.downloadResult.disabled = count === 0;
   hooks.resultCount.textContent = pluralize(count, labels.item, labels.items);
 
   if (count === 0) {
@@ -531,7 +545,7 @@ function setupCopy(
     const clipboard = navigator.clipboard;
     const writeText = clipboard?.writeText;
     if (!writeText) {
-      hooks.copyResult.disabled = state.listA === "" && state.listB === "";
+      hooks.copyResult.disabled = state.activeResultCount === 0;
       showCopyError(hooks, labels, state);
       return;
     }
@@ -554,7 +568,7 @@ function setupCopy(
         showCopyError(hooks, labels, state);
       })
       .finally(() => {
-        hooks.copyResult.disabled = state.listA === "" && state.listB === "";
+        hooks.copyResult.disabled = state.activeResultCount === 0;
       });
   });
 }

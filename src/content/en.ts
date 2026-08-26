@@ -6,6 +6,7 @@ export type CompareMessages = {
   clear: string;
   swap: string;
   loadExample: string;
+  replaceExampleConfirmation: string;
   comparisonOptions: string;
   trimWhitespace: string;
   ignoreEmptyLines: string;
@@ -80,6 +81,12 @@ export type PrivacyContent = {
   toolLinkLabel: string;
 };
 
+export type HeaderContent = {
+  ariaLabel: string;
+  tool: string;
+  about: string;
+};
+
 export type FooterContent = {
   ariaLabel: string;
   tool: string;
@@ -113,6 +120,7 @@ export type EnglishContent = {
     privacy: string;
   };
   compare: CompareMessages;
+  header: HeaderContent;
   editorial: EditorialContent;
   about: AboutContent;
   privacy: PrivacyContent;
@@ -122,7 +130,7 @@ export type EnglishContent = {
 };
 
 export const englishContent = {
-  siteName: "Compare Lists",
+  siteName: "ListContrast",
   home: {
     heading: "Compare Two Lists Online",
     description:
@@ -138,6 +146,8 @@ export const englishContent = {
     clear: "Clear",
     swap: "Swap",
     loadExample: "Load example",
+    replaceExampleConfirmation:
+      "Load the example and replace both current lists? Your current input will be lost.",
     comparisonOptions: "Comparison options",
     trimWhitespace: "Trim whitespace",
     ignoreEmptyLines: "Ignore empty lines",
@@ -167,6 +177,11 @@ export const englishContent = {
     copied: "Copied",
     download: "Download",
     copyError: "Couldn’t copy. Select the result manually.",
+  },
+  header: {
+    ariaLabel: "Primary",
+    tool: "Tool",
+    about: "About",
   },
   editorial: {
     howToHeading: "How to compare two lists",
@@ -293,7 +308,7 @@ export const englishContent = {
         ],
       },
     ],
-    toolLinkLabel: "Return to Compare Lists",
+    toolLinkLabel: "Back to comparison tool",
   },
   footer: {
     ariaLabel: "Footer",

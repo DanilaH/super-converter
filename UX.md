@@ -976,3 +976,25 @@ DOWNLOAD
 - explicit anti-AI-slop constraints.
 
 Только после UX + Design следует переходить к реализации интерфейса.
+
+
+---
+
+# Accepted post-launch UX follow-up — CL-037
+
+The production observation changes the workspace density without changing the
+comparison flow:
+
+- the first working viewport should present the inputs, options and as much of
+  the Results summary/navigation as practical;
+- Results is the next part of the same workspace, not a visually detached page
+  section;
+- Load example loads immediately when both inputs are empty;
+- when either input contains text, Load example asks for confirmation before
+  replacing both raw inputs;
+- cancelling that confirmation preserves inputs, options, active result and
+  rendered output, and does not record an example-loaded action;
+- per-list Clear remains an explicit direct action without confirmation;
+- About exposes a clear Compare two lists action and Privacy exposes a quieter
+  Back to comparison tool action;
+- no automatic scroll to Results is introduced.

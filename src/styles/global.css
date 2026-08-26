@@ -39,6 +39,46 @@ a:hover {
   color: var(--color-accent-hover);
 }
 
+.button-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: var(--space-2) var(--space-4);
+  border: var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: var(--font-size-control);
+  line-height: var(--line-height-control);
+  font-weight: var(--font-weight-control);
+  text-decoration: none;
+}
+
+.button-link:hover {
+  border-color: var(--color-border-strong);
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+}
+
+.button-link--primary {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-surface);
+}
+
+.button-link--primary:hover {
+  border-color: var(--color-accent-hover);
+  background: var(--color-accent-hover);
+  color: var(--color-surface);
+}
+
+@media (pointer: coarse) {
+  .button-link {
+    min-height: 44px;
+  }
+}
+
 :focus-visible {
   outline: var(--focus-outline);
   outline-offset: var(--focus-outline-offset);
@@ -63,7 +103,9 @@ a:hover {
 .header {
   display: flex;
   align-items: center;
-  min-height: 64px;
+  justify-content: space-between;
+  gap: var(--space-4);
+  min-height: 56px;
   padding-inline: var(--container-padding-mobile);
 }
 

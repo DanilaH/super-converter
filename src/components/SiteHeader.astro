@@ -1,7 +1,43 @@
 ---
 import { englishContent } from "@/content/en";
+
+const { header } = englishContent;
 ---
 
 <header class="header">
   <a href="/" class="wordmark">{englishContent.siteName}</a>
+  <nav class="header-nav" aria-label={header.ariaLabel}>
+    <a href="/#compare-tool-heading">{header.tool}</a>
+    <a href="/about">{header.about}</a>
+  </nav>
 </header>
+
+<style>
+  .header-nav {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  .header-nav a {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-body-secondary);
+    line-height: var(--line-height-body-secondary);
+    font-weight: var(--font-weight-control);
+    text-decoration: none;
+  }
+
+  .header-nav a:hover {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  @media (pointer: coarse) {
+    .header-nav a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+    }
+  }
+</style>
