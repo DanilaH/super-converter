@@ -26,7 +26,6 @@ type ToolState = {
   listB: string;
   options: CompareOptions;
   activeResult: ResultType;
-  activeResultCount: number;
   copyTimer: number | null;
   inputTimer: number | null;
   comparisonTimer: number | null;
@@ -135,7 +134,6 @@ function mountRoot(root: HTMLElement, analytics: Analytics): void {
       removeDuplicates: hooks.removeDuplicates.checked,
     },
     activeResult: readActiveResult(root),
-    activeResultCount: 0,
     copyTimer: null,
     inputTimer: null,
     comparisonTimer: null,
@@ -438,12 +436,13 @@ function createRecompute(
       hooks.summary.hidden = true;
       hooks.resultTabs.hidden = true;
       hooks.resultPanel.hidden = true;
-      state.activeResultCount = 0;
       hooks.copyResult.disabled = true;
       hooks.downloadResult.disabled = true;
       hooks.resultViewer.textContent = "";
       hooks.resultCount.textContent = `0 ${labels.items}`;
-      hooks.listACount.textContent = `0 ${labels.rows}`;
+      hooks.copyResult.disabled = false;
+    hooks.downloadResult.disabled = false;
+    hooks.listACount.textContent = `0 ${labels.rows}`;
       hooks.listBCount.textContent = `0 ${labels.rows}`;
       return null;
     }
@@ -482,9 +481,6 @@ function renderResult(
   result: CompareResult,
 ): void {
   const count = resultCountFor(state.activeResult, result);
-  state.activeResultCount = count;
-  hooks.copyResult.disabled = count === 0;
-  hooks.downloadResult.disabled = count === 0;
   hooks.resultCount.textContent = pluralize(count, labels.item, labels.items);
 
   if (count === 0) {
@@ -542,7 +538,7 @@ function setupCopy(
     const clipboard = navigator.clipboard;
     const writeText = clipboard?.writeText;
     if (!writeText) {
-      hooks.copyResult.disabled = state.activeResultCount === 0;
+      hooks.copyResult.disabled = state.listA === "" && state.listB === "";
       showCopyError(hooks, labels, state);
       return;
     }
@@ -565,7 +561,7 @@ function setupCopy(
         showCopyError(hooks, labels, state);
       })
       .finally(() => {
-        hooks.copyResult.disabled = state.activeResultCount === 0;
+        hooks.copyResult.disabled = state.listA === "" && state.listB === "";
       });
   });
 }

@@ -25,6 +25,7 @@ const TOOL_HTML = `
     data-label-copy="Copy"
     data-label-copied="Copied"
     data-label-copy-error="Couldn’t copy. Select the result manually."
+    data-label-replace-example-confirmation="Load the example and replace both current lists? Your current input will be lost."
   >
     <div class="tool-heading">
       <h2 id="compare-tool-heading">Compare lists</h2>
@@ -121,6 +122,9 @@ function mountTool(analytics?: Analytics): HTMLElement {
   const container = document.createElement("div");
   container.innerHTML = TOOL_HTML;
   document.body.appendChild(container);
+  if (!vi.isMockFunction(window.confirm)) {
+    vi.spyOn(window, "confirm").mockReturnValue(true);
+  }
   mountCompareTool(container, analytics);
   return container;
 }
@@ -203,13 +207,13 @@ describe("compare-tool", () => {
     expect(within(container).getAllByText("0 rows")).toHaveLength(2);
     expect(
       hook<HTMLButtonElement>(container, "[data-clear-list-a]").disabled,
-    ).toBe(false);
+    ).toBe(true);
     expect(
       hook<HTMLButtonElement>(container, "[data-clear-list-b]").disabled,
-    ).toBe(false);
+    ).toBe(true);
     expect(
       hook<HTMLButtonElement>(container, "[data-swap-lists]").disabled,
-    ).toBe(false);
+    ).toBe(true);
     expect(
       hook<HTMLButtonElement>(container, "[data-load-example]").disabled,
     ).toBe(false);
