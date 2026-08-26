@@ -2,7 +2,7 @@
 
 Plan revision: 2026-08-26  
 Repository: DanilaH/super-converter  
-Documentation baseline main commit: 37f8771d034904a679cc7a2490a36e1657242c25
+Audited main baseline: 2cebb564fe8d3bef19099b4a55250c273b98d359
 
 ## 1. Approved direction
 
@@ -21,17 +21,18 @@ concrete unmet requirement.
 
 ## 2. Current state
 
-Implementation and quality packages through CL-033 are accepted. The current
-product includes the complete local comparison flow, static SEO/editorial
-routes, privacy-safe analytics boundary, accessibility coverage, E2E smoke and
-recorded performance/privacy evidence.
+Implementation and quality packages through CL-033 are accepted. CL-035A and
+CL-035B delivered and documented the isolated protected preview, which the
+owner manually verified.
 
-CL-035A added the isolated nginx preview container. The owner has manually
-verified protected HTTPS access, Basic Auth, noindex protection, route status
-behavior and the client-side comparison/copy/download flow.
+CL-036A recorded a conditional production GO in `RELEASE_AUDIT.md`; no
+application-level blocker was found. CL-036B configures the repository for
+`https://listcontrast.com`, adds an isolated production Compose service and
+documents the reversible public cutover.
 
-CL-035B records the deployment runbook and synchronizes release documentation.
-After it is accepted, CL-036 is the only remaining delivery package.
+After CL-036B acceptance, the remaining work is operational: deploy the
+accepted commit, configure/verify DNS and external Caddy, run live smoke, then
+verify Search Console and submit the sitemap.
 
 ## 3. Consolidated delivery model
 
@@ -303,19 +304,20 @@ The real password/hash, VPS address and unrelated host configuration are not
 repository artifacts. The preview hostname must never become the production
 canonical origin.
 
-### CL-036 — Run the final release audit
+### CL-036 — Audit and production cutover
 
-Retains former CL-036.
+Delivered as two bounded packages:
 
-Scope:
+- CL-036A recorded pass/fail evidence for functional, SEO, privacy,
+  accessibility, performance, visual, CI, static-build and preview-deployment
+  gates. It produced a conditional GO with no application-level blocker;
+- CL-036B sets the audited production origin, adds a production service
+  isolated from preview and documents DNS/Caddy/deploy/live-verification and
+  rollback operations.
 
-- record pass/fail evidence for functional, SEO, privacy, accessibility,
-  performance, visual, CI and static-build gates;
-- create a small follow-up Issue for every blocker;
-- do not hide implementation fixes inside the audit.
-
-Only an accepted CL-036 permits production domain/redirect configuration,
-Search Console verification and sitemap submission.
+CL-036B does not mutate the VPS or external services from the repository PR.
+Search Console verification and sitemap submission occur only after live
+functional and SEO checks pass.
 
 ## 9. Review gates
 
@@ -336,13 +338,13 @@ Search Console verification and sitemap submission.
 | Package manager | resolved | pnpm |
 | Branch protection | deferred | revisit before release |
 | Hosting | resolved | isolated static container behind existing VPS Caddy |
-| Production origin | CL-036 | selected; application remains on `https://example.com` until audit acceptance |
+| Production origin | resolved in CL-036B | `https://listcontrast.com`; live after accepted cutover deployment |
 | Analytics provider | optional | must not delay launch |
 | Ads | after recurring traffic | off for MVP |
 
 ## 11. Next action
 
-Review and merge CL-035B. Then create the bounded CL-036 final release-audit
-Issue from the accepted main commit. Do not configure the production origin,
-redirects, Search Console property or sitemap submission before that audit
-passes.
+Review and merge CL-036B. Then execute `deploy/vps/PRODUCTION.md` in order:
+deploy and internally verify production, configure external Caddy and DNS, run
+public functional/SEO smoke, verify Search Console, submit the sitemap and
+record the deployed commit plus rollback target.

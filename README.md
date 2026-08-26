@@ -17,6 +17,7 @@ Everything runs client-side. List data never leaves the browser.
 - [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) — small task roadmap
 - [AGENTS.md](AGENTS.md) — operational contract for coding agents
 - [deploy/vps/README.md](deploy/vps/README.md) — protected preview deployment runbook
+- [deploy/vps/PRODUCTION.md](deploy/vps/PRODUCTION.md) — production cutover and rollback runbook
 
 ## Stack
 

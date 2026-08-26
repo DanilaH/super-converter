@@ -38,17 +38,15 @@ IMPLEMENTATION_PLAN and AGENTS.
 
 ## 3.1 Current delivery baseline
 
-Implementation and quality packages through `CL-033` are accepted. `CL-035A`
-added the isolated nginx preview container on the shared VPS Docker network.
+Implementation, quality and protected-preview packages through `CL-035B` are
+accepted. The owner has manually verified protected DNS/HTTPS, authentication,
+noindex protection, route statuses and the browser comparison actions.
 
-The owner has manually verified the protected preview: DNS and HTTPS work,
-unauthenticated access returns `401`, authenticated access returns `200`,
-the noindex header is present, expected routes return `200`, an unknown route
-returns `404`, and the client-side comparison, options, copy and download
-flows work.
-
-`CL-035B` records the deployment runbook and closes the documentation portion
-of the preview gate. The next and final delivery package is `CL-036`.
+`CL-036A` recorded a conditional GO in `RELEASE_AUDIT.md`: no
+application-level release blocker was found. `CL-036B` prepares the real
+production origin, an isolated production Compose service and the reversible
+cutover runbook. Public DNS/Caddy deployment and live verification remain
+manual release operations after the cutover PR is accepted.
 
 ## 4. First release
 
@@ -148,13 +146,11 @@ build
 ## 18. Remaining delivery plan
 
 ```text
-CL-035B — record the protected preview deployment runbook
-CL-036  — run the final release audit and production-origin cutover
+CL-036B — prepare and execute the reversible production cutover
 ```
 
-CL-035A already delivered the isolated preview container. Earlier implementation
-and quality packages are retained in `IMPLEMENTATION_PLAN.md` for traceability.
-Each remaining package keeps one bounded GitHub Issue, branch and PR.
+CL-035B and the CL-036A pre-production audit are accepted. Earlier packages are
+retained in `IMPLEMENTATION_PLAN.md` for traceability.
 
 ## 19. Existing implementation decision
 
@@ -173,19 +169,22 @@ operations and rollback.
 
 ## 21. Domain
 
-The production domain has been selected. It is configured in application SEO
-output only during CL-036 after the final audit passes.
+The canonical production origin is `https://listcontrast.com`. The `www`
+hostname redirects permanently to the apex origin. The protected preview keeps
+its own hostname and must never appear in canonical or sitemap output.
 
 ## 22. Hosting
 
-The selected VPS hosts an nginx static preview container behind the existing
-Caddy ingress. No Node runtime, backend or database is required.
+The selected VPS uses two isolated static nginx Compose services behind the
+existing Caddy ingress: protected preview and public production. Neither
+publishes a host port. No Node runtime, backend or database is required.
 
 ## 23. Production origin
 
-The configured origin remains the reserved placeholder `https://example.com`
-until CL-036. The accepted audit must switch canonical, Open Graph, robots and
-sitemap output to one real HTTPS origin without preview-hostname leakage.
+The repository is configured for `https://listcontrast.com`. Canonical, Open
+Graph, robots and sitemap output derive from that single origin. Live acceptance
+still requires the DNS/Caddy/deployment checks in
+`deploy/vps/PRODUCTION.md`.
 
 ## 24. Analytics
 
@@ -258,15 +257,19 @@ privacy
 production deployment
 ```
 
-## 32. Immediate agent action
+## 32. Immediate release action
 
-After CL-035B is reviewed and merged:
+After CL-036B is reviewed and merged:
 
 ```text
-1. create the bounded CL-036 final-audit Issue
-2. start from the accepted CL-035B main commit
-3. collect pass/fail evidence without hiding implementation fixes in the audit
-4. create separate blocker Issues where required
-5. configure the production origin only if the audit passes
-6. open a PR and stop for review
+1. update the VPS checkout to the accepted main commit
+2. start and internally verify the separate production Compose service
+3. append, validate and gracefully reload the public Caddy blocks
+4. configure/confirm apex and www DNS without changing preview
+5. run public functional, redirect, 404 and SEO smoke checks
+6. verify Search Console and submit the production sitemap
+7. record the deployed commit and rollback target
 ```
+
+Follow `deploy/vps/PRODUCTION.md`; stop and roll back on any listed release
+stop condition.
