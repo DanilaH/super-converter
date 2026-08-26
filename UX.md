@@ -997,3 +997,23 @@ comparison flow:
 - About exposes a clear Compare two lists action and Privacy exposes a quieter
   Back to comparison tool action;
 - no automatic scroll to Results is introduced.
+
+
+---
+
+# Accepted compact-workspace follow-up — CL-038
+
+The tool keeps the existing comparison flow while removing vertical repetition:
+
+- the home introduction uses one compact descriptive line and retains the
+  local-processing promise;
+- the example action stays available without occupying a dedicated workspace
+  row;
+- desktop input height adapts to the viewport and remains manually resizable;
+- comparison options appear as a flat toolbar with a clear accessible group
+  label, not a cut-out fieldset card;
+- Results places its heading and summary on one line where space permits;
+- result tabs, the selected item count and export actions share one control row;
+- the active result heading is not repeated visually above the viewer;
+- no automatic scrolling, collapsed controls or side-by-side result pane is
+  introduced.
