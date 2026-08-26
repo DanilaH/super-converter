@@ -10,8 +10,9 @@ const { home } = englishContent;
 <BaseLayout metadataKey="home">
   <div class="intro">
     <h1>{home.heading}</h1>
-    <p class="description">{home.description}</p>
-    <p class="privacy">{home.privacy}</p>
+    <p class="description">
+      {home.description} <span class="privacy">{home.privacy}</span>
+    </p>
 
     <CompareTool />
   </div>
@@ -24,7 +25,7 @@ const { home } = englishContent;
     display: flex;
     flex-direction: column;
     gap: var(--space-2);
-    padding-block: var(--space-4) var(--space-6);
+    padding-block: var(--space-3) var(--space-5);
   }
 
   .intro h1 {
@@ -49,10 +50,6 @@ const { home } = englishContent;
   }
 
   .privacy {
-    margin: 0;
-    max-width: var(--container-editorial);
     color: var(--color-text-secondary);
-    font-size: var(--font-size-body-secondary);
-    line-height: var(--line-height-body-secondary);
   }
 </style>
