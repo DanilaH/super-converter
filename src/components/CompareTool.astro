@@ -41,7 +41,7 @@ const resultViews = [
 >
   <div class="tool-heading">
     <h2 id="compare-tool-heading" class="visually-hidden">{compare.heading}</h2>
-    <button type="button" class="secondary" data-load-example disabled>
+    <button type="button" class="example-button" data-load-example disabled>
       {compare.loadExample}
     </button>
   </div>
@@ -72,7 +72,7 @@ const resultViews = [
       aria-label={compare.swap}
     >
       <span class="swap-mark" aria-hidden="true">⇄</span>
-      <span>{compare.swap}</span>
+      <span class="swap-label">{compare.swap}</span>
     </button>
 
     <div class="list">
@@ -94,7 +94,10 @@ const resultViews = [
   </div>
 
   <fieldset data-compare-options class="options">
-    <legend>{compare.comparisonOptions}</legend>
+    <legend class="visually-hidden">{compare.comparisonOptions}</legend>
+    <span class="options-label" aria-hidden="true">
+      {compare.comparisonOptions}
+    </span>
     <label class="option">
       <input
         type="checkbox"
@@ -138,48 +141,75 @@ const resultViews = [
   </fieldset>
 
   <section data-results hidden class="results">
-    <h3>{compare.results}</h3>
+    <div class="results-heading">
+      <h3>{compare.results}</h3>
+
+      <dl data-summary class="summary" hidden>
+        <div class="summary-item">
+          <dt>{compare.onlyInA}</dt>
+          <dd data-summary-only-a>0</dd>
+        </div>
+        <div class="summary-item">
+          <dt>{compare.inBoth}</dt>
+          <dd data-summary-matches>0</dd>
+        </div>
+        <div class="summary-item">
+          <dt>{compare.onlyInB}</dt>
+          <dd data-summary-only-b>0</dd>
+        </div>
+      </dl>
+    </div>
 
     <p data-empty-results>{compare.emptyResults}</p>
 
-    <dl data-summary class="summary" hidden>
-      <div class="summary-item">
-        <dt>{compare.onlyInA}</dt>
-        <dd data-summary-only-a>0</dd>
+    <div class="results-controls">
+      <div
+        role="tablist"
+        data-result-tabs
+        class="tabs"
+        aria-label={compare.results}
+        hidden
+      >
+        {
+          resultViews.map((view) => (
+            <button
+              type="button"
+              role="tab"
+              id={view.id}
+              class="tab"
+              aria-controls="result-panel"
+              aria-selected={view.selected}
+              tabindex={view.selected ? 0 : -1}
+              data-result-tab={view.value}
+            >
+              {view.label}
+            </button>
+          ))
+        }
       </div>
-      <div class="summary-item">
-        <dt>{compare.inBoth}</dt>
-        <dd data-summary-matches>0</dd>
-      </div>
-      <div class="summary-item">
-        <dt>{compare.onlyInB}</dt>
-        <dd data-summary-only-b>0</dd>
-      </div>
-    </dl>
 
-    <div
-      role="tablist"
-      data-result-tabs
-      class="tabs"
-      aria-label={compare.results}
-      hidden
-    >
-      {
-        resultViews.map((view) => (
-          <button
-            type="button"
-            role="tab"
-            id={view.id}
-            class="tab"
-            aria-controls="result-panel"
-            aria-selected={view.selected}
-            tabindex={view.selected ? 0 : -1}
-            data-result-tab={view.value}
-          >
-            {view.label}
+      <div class="result-toolbar">
+        <h4 class="visually-hidden" data-result-heading>
+          {compare.differences}
+        </h4>
+        <p class="panel-count" data-result-count>0 {compare.items}</p>
+        <p
+          class="local-feedback"
+          data-local-feedback
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+        >
+        </p>
+        <div class="result-actions">
+          <button type="button" class="action" data-copy-result disabled>
+            {compare.copy}
           </button>
-        ))
-      }
+          <button type="button" class="action" data-download-result disabled>
+            {compare.download}
+          </button>
+        </div>
+      </div>
     </div>
 
     <div
@@ -190,28 +220,6 @@ const resultViews = [
       data-result-panel
       hidden
     >
-      <div class="result-toolbar">
-        <h4 class="panel-heading" data-result-heading>
-          {compare.differences}
-        </h4>
-        <p class="panel-count" data-result-count>0 {compare.items}</p>
-        <div class="result-actions">
-          <button type="button" class="action" data-copy-result disabled>
-            {compare.copy}
-          </button>
-          <button type="button" class="action" data-download-result disabled>
-            {compare.download}
-          </button>
-        </div>
-        <p
-          class="local-feedback"
-          data-local-feedback
-          role="status"
-          aria-live="polite"
-          aria-atomic="true"
-        >
-        </p>
-      </div>
       <pre class="viewer" data-result-viewer tabindex="0"></pre>
     </div>
   </section>
@@ -232,8 +240,8 @@ const resultViews = [
     position: relative;
     display: flex;
     flex-direction: column;
-    gap: var(--space-4);
-    margin-top: var(--space-3);
+    gap: var(--space-3);
+    margin-top: var(--space-2);
     padding: var(--space-4);
     border: var(--border-default);
     border-radius: var(--radius-lg);
@@ -253,8 +261,34 @@ const resultViews = [
   }
 
   .tool-heading {
-    display: flex;
-    justify-content: flex-end;
+    position: absolute;
+    top: var(--space-4);
+    right: var(--space-4);
+    z-index: 1;
+  }
+
+  .example-button {
+    min-height: 28px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--color-text-secondary);
+    font: inherit;
+    font-size: var(--font-size-body-secondary);
+    line-height: var(--line-height-body-secondary);
+    font-weight: var(--font-weight-control);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+
+  .example-button:hover:not(:disabled) {
+    color: var(--color-accent);
+  }
+
+  .example-button:disabled {
+    cursor: default;
+    opacity: 0.55;
   }
 
   .lists {
@@ -270,6 +304,10 @@ const resultViews = [
     gap: var(--space-2);
   }
 
+  .list:last-child > label {
+    padding-right: 88px;
+  }
+
   .list label {
     font-size: var(--font-size-ui-label);
     line-height: var(--line-height-ui-label);
@@ -281,7 +319,7 @@ const resultViews = [
 
   .list textarea {
     width: 100%;
-    min-height: 200px;
+    min-height: 180px;
     padding: var(--space-3);
     border: var(--border-default);
     border-radius: var(--radius-md);
@@ -319,6 +357,7 @@ const resultViews = [
     justify-self: center;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: var(--space-2);
   }
 
@@ -351,23 +390,21 @@ const resultViews = [
 
   .options {
     display: flex;
+    align-items: center;
     flex-wrap: wrap;
     gap: var(--space-2) var(--space-4);
     margin: 0;
-    padding: var(--space-3) var(--space-4);
-    border: var(--border-default);
+    padding: var(--space-2) var(--space-3);
+    border: 0;
     border-radius: var(--radius-md);
     background: var(--color-surface-muted);
   }
 
-  .options legend {
-    padding-inline: var(--space-1);
-    font-size: var(--font-size-ui-label);
-    line-height: var(--line-height-ui-label);
-    font-weight: var(--font-weight-ui-label);
-    letter-spacing: var(--letter-spacing-ui-label);
-    text-transform: uppercase;
+  .options-label {
     color: var(--color-text-secondary);
+    font-size: var(--font-size-body-secondary);
+    line-height: var(--line-height-body-secondary);
+    font-weight: var(--font-weight-control);
   }
 
   .option {
@@ -390,9 +427,16 @@ const resultViews = [
   .results {
     display: flex;
     flex-direction: column;
-    gap: var(--space-3);
-    padding-top: var(--space-4);
+    gap: var(--space-2);
+    padding-top: var(--space-3);
     border-top: var(--border-default);
+  }
+
+  .results-heading {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-6);
   }
 
   .results[hidden],
@@ -407,8 +451,7 @@ const resultViews = [
     color: var(--color-text-secondary);
   }
 
-  .results h3,
-  .panel-heading {
+  .results h3 {
     margin: 0;
     font-size: var(--font-size-h3);
     line-height: var(--line-height-h3);
@@ -445,10 +488,20 @@ const resultViews = [
     font-weight: var(--font-weight-summary-number);
   }
 
+  .results-controls {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-width: 0;
+    border-bottom: var(--border-default);
+  }
+
   .tabs {
     display: flex;
+    flex: 1 1 auto;
     flex-wrap: nowrap;
-    gap: var(--space-2);
+    gap: var(--space-1);
+    min-width: 0;
     overflow-x: auto;
     padding-block: var(--space-1);
   }
@@ -479,7 +532,6 @@ const resultViews = [
   .panel {
     display: flex;
     flex-direction: column;
-    gap: var(--space-2);
   }
 
   .panel-count {
@@ -491,17 +543,18 @@ const resultViews = [
 
   .result-toolbar {
     display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: var(--space-2) var(--space-4);
-    padding-bottom: var(--space-2);
-    border-bottom: var(--border-default);
+    flex: 0 0 auto;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .tabs[hidden] + .result-toolbar {
+    display: none;
   }
 
   .result-actions {
     display: flex;
     gap: var(--space-2);
-    margin-left: auto;
   }
 
   .action,
@@ -526,7 +579,8 @@ const resultViews = [
 
   .action:focus-visible,
   .secondary:focus-visible,
-  .text-button:focus-visible {
+  .text-button:focus-visible,
+  .example-button:focus-visible {
     outline: var(--focus-outline);
     outline-offset: var(--focus-outline-offset);
   }
@@ -583,20 +637,42 @@ const resultViews = [
     .secondary,
     .tab,
     .text-button,
+    .example-button,
     .option {
       min-height: 44px;
     }
   }
 
   @media (max-width: 759px) {
+    .tool-heading {
+      position: static;
+      align-self: flex-end;
+      height: 28px;
+    }
+
+    .list:last-child > label {
+      padding-right: 0;
+    }
+
     .swap-mark {
       transform: rotate(90deg);
+    }
+
+    .results-controls {
+      align-items: stretch;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .result-toolbar {
+      justify-content: flex-end;
+      padding-block: var(--space-1) var(--space-2);
     }
   }
 
   @media (min-width: 760px) {
     section[data-compare-tool] {
-      padding: var(--space-5);
+      padding: var(--space-4) var(--space-5);
     }
 
     .lists {
@@ -605,7 +681,23 @@ const resultViews = [
     }
 
     .list textarea {
-      min-height: 224px;
+      height: clamp(176px, 21vh, 224px);
+      min-height: 176px;
+    }
+
+    .swap {
+      width: 36px;
+      padding-inline: 0;
+    }
+
+    .swap-label {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
     }
 
     .viewer {
