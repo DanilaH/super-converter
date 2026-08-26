@@ -1,8 +1,8 @@
 # Compare Lists — implementation plan
 
-Plan revision: 2026-08-14  
+Plan revision: 2026-08-26  
 Repository: DanilaH/super-converter  
-Baseline main commit: c82c48b71c257b0cdf0a9fd0c4e3642c1e926f56
+Documentation baseline main commit: 37f8771d034904a679cc7a2490a36e1657242c25
 
 ## 1. Approved direction
 
@@ -21,17 +21,17 @@ concrete unmet requirement.
 
 ## 2. Current state
 
-CL-001 through CL-009 are merged.
+Implementation and quality packages through CL-033 are accepted. The current
+product includes the complete local comparison flow, static SEO/editorial
+routes, privacy-safe analytics boundary, accessibility coverage, E2E smoke and
+recorded performance/privacy evidence.
 
-Completed foundations:
+CL-035A added the isolated nginx preview container. The owner has manually
+verified protected HTTPS access, Basic Auth, noindex protection, route status
+behavior and the client-side comparison/copy/download flow.
 
-- Astro static shell, strict TypeScript, formatting, tests and CI;
-- design tokens, global styles and typed English content;
-- comparison types and defaults;
-- line parsing and normalization;
-- set comparison for `Remove duplicates = ON`.
-
-The next delivery package is CL-010.
+CL-035B records the deployment runbook and synchronizes release documentation.
+After it is accepted, CL-036 is the only remaining delivery package.
 
 ## 3. Consolidated delivery model
 
@@ -282,15 +282,26 @@ separate approved follow-up.
 
 ### CL-035 — Finalize documentation and protected preview
 
-Retains former CL-035.
+Delivered as two bounded packages:
 
-Scope:
+- CL-035A added the multi-stage static image, nginx runtime configuration and
+  isolated preview Compose service on the external Docker network;
+- CL-035B records setup, verification, update, rollback, shared-Caddy ownership
+  and the final pre-release state.
 
-- document verified setup, scripts, architecture, privacy and deployment;
-- configure a protected preview on the selected static host;
-- prevent preview indexing and hostname leakage.
+Owner-provided manual evidence confirms:
 
-Owner decision required before work: hosting provider.
+- DNS and HTTPS are operational;
+- unauthenticated access returns `401`;
+- authenticated access returns `200`;
+- `X-Robots-Tag` prevents indexing;
+- `/`, `/about` and `/privacy` return `200`;
+- an unknown route returns `404`;
+- browser comparison, options, copy and download work.
+
+The real password/hash, VPS address and unrelated host configuration are not
+repository artifacts. The preview hostname must never become the production
+canonical origin.
 
 ### CL-036 — Run the final release audit
 
@@ -324,12 +335,14 @@ Search Console verification and sitemap submission.
 | Stack | resolved | Astro + strict TS + vanilla browser APIs |
 | Package manager | resolved | pnpm |
 | Branch protection | deferred | revisit before release |
-| Hosting | before CL-035 | static host with preview protection |
-| Production origin | before CL-026 acceptance | one HTTPS origin |
+| Hosting | resolved | isolated static container behind existing VPS Caddy |
+| Production origin | CL-036 | selected; application remains on `https://example.com` until audit acceptance |
 | Analytics provider | optional | must not delay launch |
 | Ads | after recurring traffic | off for MVP |
 
 ## 11. Next action
 
-Create and assign the GitHub Issue for CL-010. Do not begin CL-013 until the
-domain package is reviewed and merged.
+Review and merge CL-035B. Then create the bounded CL-036 final release-audit
+Issue from the accepted main commit. Do not configure the production origin,
+redirects, Search Console property or sitemap submission before that audit
+passes.
