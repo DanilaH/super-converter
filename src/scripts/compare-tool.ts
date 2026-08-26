@@ -440,9 +440,7 @@ function createRecompute(
       hooks.downloadResult.disabled = true;
       hooks.resultViewer.textContent = "";
       hooks.resultCount.textContent = `0 ${labels.items}`;
-      hooks.copyResult.disabled = false;
-    hooks.downloadResult.disabled = false;
-    hooks.listACount.textContent = `0 ${labels.rows}`;
+      hooks.listACount.textContent = `0 ${labels.rows}`;
       hooks.listBCount.textContent = `0 ${labels.rows}`;
       return null;
     }
@@ -454,6 +452,8 @@ function createRecompute(
     hooks.summary.hidden = false;
     hooks.resultTabs.hidden = false;
     hooks.resultPanel.hidden = false;
+    hooks.copyResult.disabled = false;
+    hooks.downloadResult.disabled = false;
     hooks.listACount.textContent = pluralize(
       result.stats.rowsA,
       labels.row,
