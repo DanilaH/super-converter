@@ -998,7 +998,6 @@ comparison flow:
   Back to comparison tool action;
 - no automatic scroll to Results is introduced.
 
-
 ---
 
 # Accepted compact-workspace follow-up — CL-038
