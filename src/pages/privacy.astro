@@ -22,7 +22,9 @@ const { privacy } = englishContent;
     }
 
     <p class="tool-link">
-      <a href="/#compare-tool-heading">{privacy.toolLinkLabel}</a>
+      <a class="button-link" href="/#compare-tool-heading">
+        {privacy.toolLinkLabel}
+      </a>
     </p>
   </div>
 </BaseLayout>
@@ -30,11 +32,11 @@ const { privacy } = englishContent;
 <style>
   .privacy {
     max-width: var(--container-editorial);
-    padding-block: var(--space-6) var(--space-7);
+    padding-block: var(--space-4) var(--space-7);
   }
 
   .privacy h1 {
-    margin-block: 0 var(--space-5);
+    margin-block: 0 var(--space-4);
     font-size: var(--font-size-h1-mobile);
     line-height: var(--line-height-h1-mobile);
     font-weight: var(--font-weight-h1);
@@ -78,7 +80,7 @@ const { privacy } = englishContent;
   }
 
   .privacy .tool-link {
-    margin-block-start: var(--space-6);
+    margin-block-start: var(--space-5);
     font-weight: var(--font-weight-control);
   }
 </style>

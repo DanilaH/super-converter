@@ -44,6 +44,7 @@ type Labels = {
   copy: string;
   copied: string;
   copyError: string;
+  replaceExampleConfirmation: string;
 };
 
 type Hooks = {
@@ -219,6 +220,11 @@ function mountRoot(root: HTMLElement, analytics: Analytics): void {
     scheduleComparisonCompleted(analytics, state, result);
   });
   hooks.loadExample.addEventListener("click", () => {
+    const hasCurrentInput = state.listA !== "" || state.listB !== "";
+    if (hasCurrentInput && !window.confirm(labels.replaceExampleConfirmation)) {
+      return;
+    }
+
     hooks.listA.value = EXAMPLE_A;
     hooks.listB.value = EXAMPLE_B;
     state.listA = EXAMPLE_A;
@@ -236,11 +242,6 @@ function mountRoot(root: HTMLElement, analytics: Analytics): void {
   setupCopy(hooks, labels, state, analytics);
   setupDownload(hooks, state, analytics);
 
-  hooks.copyResult.disabled = false;
-  hooks.downloadResult.disabled = false;
-  hooks.clearListA.disabled = false;
-  hooks.clearListB.disabled = false;
-  hooks.swap.disabled = false;
   hooks.loadExample.disabled = false;
 
   mountedRoots.add(root);
@@ -388,6 +389,8 @@ function readLabels(root: HTMLElement): Labels {
     copy: root.dataset.labelCopy ?? "",
     copied: root.dataset.labelCopied ?? "",
     copyError: root.dataset.labelCopyError ?? "",
+    replaceExampleConfirmation:
+      root.dataset.labelReplaceExampleConfirmation ?? "",
   };
   for (const [name, value] of Object.entries(labels)) {
     if (value === "") {
@@ -423,6 +426,10 @@ function createRecompute(
   state: ToolState,
 ): () => CompareResult | null {
   return () => {
+    hooks.clearListA.disabled = state.listA === "";
+    hooks.clearListB.disabled = state.listB === "";
+    hooks.swap.disabled = state.listA === "" && state.listB === "";
+
     if (state.listA === "" && state.listB === "") {
       hooks.results.hidden = false;
       hooks.emptyResults.hidden = false;

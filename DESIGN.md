@@ -1448,3 +1448,26 @@ The interface should feel intentionally designed because of **discipline and det
 - rules against doorway/scaled thin pages;
 - future Spanish localization;
 - future Instagram acquisition page.
+
+---
+
+# Accepted post-launch polish — CL-037
+
+This bounded follow-up keeps the neutral precision utility direction and records
+the accepted production observations:
+
+- the main workspace may grow to a maximum width of 1200px while editorial
+  content remains capped at 720px;
+- the home introduction and header use compact vertical spacing so the tool
+  starts earlier;
+- inputs, comparison options, summary, tabs and result viewer form one
+  restrained functional surface;
+- that surface may use one border and one neutral background because it
+  communicates a real interaction boundary; nested decorative cards remain
+  prohibited;
+- desktop textareas target roughly 220–240px minimum height and remain
+  vertically resizable;
+- a small primary navigation or return action may use the accent color, but
+  large accent surfaces remain prohibited;
+- the visible product wordmark is ListContrast. Descriptive Compare Lists
+  wording remains in page headings and SEO copy.
