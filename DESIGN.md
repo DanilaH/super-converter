@@ -1472,7 +1472,6 @@ the accepted production observations:
 - the visible product wordmark is ListContrast. Descriptive Compare Lists
   wording remains in page headings and SEO copy.
 
-
 ---
 
 # Accepted compact-workspace polish — CL-038
