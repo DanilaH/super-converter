@@ -38,13 +38,17 @@ IMPLEMENTATION_PLAN and AGENTS.
 
 ## 3.1 Current delivery baseline
 
-`CL-001` through `CL-009` are merged. The repository now has a green Astro
-static foundation, preserved tokens/content, line parsing and normalization,
-and the accepted set-comparison path.
+Implementation and quality packages through `CL-033` are accepted. `CL-035A`
+added the isolated nginx preview container on the shared VPS Docker network.
 
-The next delivery package is `CL-010`, which completes the remaining pure
-domain work. The remaining roadmap is consolidated into bounded GitHub
-Issue-driven packages defined in `IMPLEMENTATION_PLAN.md`.
+The owner has manually verified the protected preview: DNS and HTTPS work,
+unauthenticated access returns `401`, authenticated access returns `200`,
+the noindex header is present, expected routes return `200`, an unknown route
+returns `404`, and the client-side comparison, options, copy and download
+flows work.
+
+`CL-035B` records the deployment runbook and closes the documentation portion
+of the preview gate. The next and final delivery package is `CL-036`.
 
 ## 4. First release
 
@@ -144,44 +148,44 @@ build
 ## 18. Remaining delivery plan
 
 ```text
-CL-010 — complete pure comparison domain
-CL-013 — semantic CompareTool markup
-CL-014 — CompareTool interaction and actions
-CL-018 — summary and result browsing
-CL-021 — copy, download and result-flow tests
-CL-024 — editorial content and legal pages
-CL-026 — metadata and static SEO routes
-CL-028 — privacy-safe analytics boundary
-CL-030 — responsive and accessibility quality
-CL-032 — Playwright E2E smoke
-CL-033 — performance and privacy/security evidence
-CL-035 — documentation and protected preview
-CL-036 — final release audit
+CL-035B — record the protected preview deployment runbook
+CL-036  — run the final release audit and production-origin cutover
 ```
 
-Each line is one bounded delivery package, GitHub Issue, branch and PR. Exact
-scope and acceptance criteria live in `IMPLEMENTATION_PLAN.md` and the assigned
-Issue.
+CL-035A already delivered the isolated preview container. Earlier implementation
+and quality packages are retained in `IMPLEMENTATION_PLAN.md` for traceability.
+Each remaining package keeps one bounded GitHub Issue, branch and PR.
 
 ## 19. Existing implementation decision
 
 If Next/React implementation already exists: inspect first, report reusable work and migration cost, do not blindly rewrite. Minimal scaffold → migrate to Astro. Substantial tested implementation → ask before costly migration.
 
-## 20. Staging
+## 20. Protected preview
 
-Use protected preview when possible. Validate real build, mobile, metadata, privacy, large datasets and copy/download. Prevent preview indexing.
+The protected preview is operational. Existing Caddy terminates HTTPS, requires
+Basic Auth and adds `X-Robots-Tag: noindex, nofollow, noarchive`. The isolated
+application container serves only the static build on the shared Docker network
+and publishes no host port.
+
+Owner verification covers the real build, desktop interaction, routing,
+copy/download and indexing protection. See `deploy/vps/README.md` for
+operations and rollback.
 
 ## 21. Domain
 
-Needed before final production SEO config, not before implementation.
+The production domain has been selected. It is configured in application SEO
+output only during CL-036 after the final audit passes.
 
 ## 22. Hosting
 
-Static hosting only needs HTTPS, custom domain, CDN/static files, redirects, 404, headers and preferably preview deploys. No Node runtime required.
+The selected VPS hosts an nginx static preview container behind the existing
+Caddy ingress. No Node runtime, backend or database is required.
 
 ## 23. Production origin
 
-One canonical origin for canonical, OG, robots and sitemap. No preview hostname leakage.
+The configured origin remains the reserved placeholder `https://example.com`
+until CL-036. The accepted audit must switch canonical, Open Graph, robots and
+sitemap output to one real HTTPS origin without preview-hostname leakage.
 
 ## 24. Analytics
 
@@ -256,10 +260,13 @@ production deployment
 
 ## 32. Immediate agent action
 
+After CL-035B is reviewed and merged:
+
 ```text
-1. read the mandatory documents and assigned GitHub Issue
-2. start from the exact accepted main commit named in the Issue
-3. implement only that bounded delivery package
-4. run the full quality gate
-5. open a PR and stop for review
+1. create the bounded CL-036 final-audit Issue
+2. start from the accepted CL-035B main commit
+3. collect pass/fail evidence without hiding implementation fixes in the audit
+4. create separate blocker Issues where required
+5. configure the production origin only if the audit passes
+6. open a PR and stop for review
 ```

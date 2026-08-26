@@ -497,9 +497,43 @@ build
 
 Every runtime dependency needs a concrete reason. Prefer browser/platform APIs and local code.
 
-## 34. Static hosting
+## 34. Static hosting and preview topology
 
-Hosting needs HTTPS, custom domain, static files/CDN, redirects, 404, headers and preferably preview deploys. No always-on Node server required.
+The deployable artifact is the static Astro `dist/` output. The preview image
+copies only that output and the nginx site configuration into the runtime
+stage; Node.js, source files and build dependencies are not present there.
+
+The verified preview path is:
+
+```text
+Internet
+  ↓
+existing Caddy on VPS (:80/:443)
+  ├── HTTPS certificate
+  ├── Basic Auth
+  └── X-Robots-Tag: noindex, nofollow, noarchive
+  ↓
+external Docker network: vps_booking_network
+  ↓
+listcontrast-preview:8080
+  ↓
+nginx
+  ↓
+static Astro dist/
+```
+
+The preview container exposes port 8080 only to the Docker network. It does not
+publish a host port and does not own TLS. The existing Caddy instance is shared
+with another project and remains outside this repository, so preview
+deploy/update/rollback operations must never restart, recreate or remove it.
+
+The host ingress configuration must preserve the List Contrast preview block
+when the repository that owns the external Caddyfile is updated. Validation and
+a graceful Caddy config reload are sufficient after changing that block.
+
+See `deploy/vps/README.md` for the bounded operational runbook. The production
+origin remains `https://example.com` until the accepted CL-036 release audit
+configures the real HTTPS origin.
 
 ## 35. Future boring-utility template
 
@@ -545,21 +579,17 @@ Do not build a generic multi-tool platform before multiple real products justify
 17. production build
 ```
 
-## 37. Remaining task sequence
+## 37. Release state
 
-```text
-CL-007 — Astro foundation migration
-CL-008…CL-012 — comparison domain and formatting
-CL-013…CL-017 — CompareTool markup and DOM interaction
-CL-018…CL-023 — results, copy and download
-CL-024…CL-027 — SEO/editorial and static routes
-CL-028…CL-029 — privacy-safe analytics boundary
-CL-030…CL-036 — responsive, accessibility and release gates
-```
+Implementation and quality packages through CL-033 are complete. CL-035A added
+the isolated static preview container. The owner has verified the protected
+HTTPS preview, route behavior and browser interaction.
 
-See `IMPLEMENTATION_PLAN.md` for the intentionally small PR boundaries. These
-CL identifiers continue the accepted project history; they do not reset after
-the stack change.
+CL-035B records the deployment runbook and current release state. The only
+remaining delivery package after its acceptance is CL-036: the final release
+audit and production-origin cutover.
+
+See `IMPLEMENTATION_PLAN.md` for package history and the final audit boundary.
 
 ## 38. Acceptance criteria
 
