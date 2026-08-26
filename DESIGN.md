@@ -1471,3 +1471,22 @@ the accepted production observations:
   large accent surfaces remain prohibited;
 - the visible product wordmark is ListContrast. Descriptive Compare Lists
   wording remains in page headings and SEO copy.
+
+---
+
+# Accepted compact-workspace polish — CL-038
+
+This follow-up refines density without changing the neutral precision direction:
+
+- the tool surface uses compact vertical padding while preserving its single
+  interaction boundary;
+- desktop textareas use a viewport-aware height between approximately 176px and
+  224px and remain vertically resizable;
+- the example action is visually lightweight and aligned with the input header;
+- Options is a flat muted toolbar with its label inside the surface; native
+  fieldset cut-out styling is not used;
+- desktop Swap is a compact icon control with an accessible text name;
+- Results removes repeated headings and aligns summary, navigation and export
+  controls into fewer horizontal rows;
+- Copy and Download retain visible text labels; no decorative cards, shadows or
+  additional accent surfaces are introduced.

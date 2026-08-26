@@ -9,7 +9,7 @@ test("compares two lists with live option update and result navigation", async (
   await page.goto("/");
 
   await expect(
-    page.getByRole("heading", { level: 1, name: "Compare Two Lists Online" }),
+    page.getByRole("heading", { level: 1, name: "Compare Lists Online" }),
   ).toBeVisible();
   await expect(page.getByLabel("List A")).toBeVisible();
   await expect(page.getByLabel("List B")).toBeVisible();
