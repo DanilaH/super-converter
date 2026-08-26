@@ -1,0 +1,25 @@
+name: listcontrast-production
+
+services:
+  listcontrast-production:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    expose:
+      - "8080"
+    networks:
+      vps_booking_network:
+        aliases:
+          - listcontrast-production
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:8080/"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
+networks:
+  vps_booking_network:
+    external: true
+    name: vps_booking_network
