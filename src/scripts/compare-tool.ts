@@ -223,10 +223,7 @@ function mountRoot(root: HTMLElement, analytics: Analytics): void {
   });
   hooks.loadExample.addEventListener("click", () => {
     const hasCurrentInput = state.listA !== "" || state.listB !== "";
-    if (
-      hasCurrentInput &&
-      !window.confirm(labels.replaceExampleConfirmation)
-    ) {
+    if (hasCurrentInput && !window.confirm(labels.replaceExampleConfirmation)) {
       return;
     }
 

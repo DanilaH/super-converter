@@ -977,7 +977,6 @@ DOWNLOAD
 
 Только после UX + Design следует переходить к реализации интерфейса.
 
-
 ---
 
 # Accepted post-launch UX follow-up — CL-037

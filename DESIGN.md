@@ -1449,7 +1449,6 @@ The interface should feel intentionally designed because of **discipline and det
 - future Spanish localization;
 - future Instagram acquisition page.
 
-
 ---
 
 # Accepted post-launch polish — CL-037
