@@ -132,11 +132,9 @@ export type EnglishContent = {
 export const englishContent = {
   siteName: "ListContrast",
   home: {
-    heading: "Compare Two Lists Online",
-    description:
-      "Find differences, matches and unique values between two lists instantly.",
-    privacy:
-      "Your lists are processed locally in your browser and are never uploaded to our servers.",
+    heading: "Compare Lists Online",
+    description: "Find differences, matches and unique values instantly.",
+    privacy: "Processed locally in your browser.",
   },
   compare: {
     heading: "Compare lists",
@@ -145,10 +143,10 @@ export const englishContent = {
     pastePlaceholder: "Paste one item per line",
     clear: "Clear",
     swap: "Swap",
-    loadExample: "Load example",
+    loadExample: "Try example",
     replaceExampleConfirmation:
       "Load the example and replace both current lists? Your current input will be lost.",
-    comparisonOptions: "Comparison options",
+    comparisonOptions: "Options",
     trimWhitespace: "Trim whitespace",
     ignoreEmptyLines: "Ignore empty lines",
     ignoreCase: "Ignore case",
