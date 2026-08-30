@@ -27,8 +27,18 @@ test("new tool routes and navigation are crawlable without horizontal overflow",
     const response = await page.goto(path);
     expect(response?.status()).toBe(200);
     await expect(page.locator("html")).toHaveAttribute("lang", "en");
+    await expect(page.locator("h1")).toHaveCount(1);
+    await expect(
+      page.locator('meta[name="robots"][content*="noindex"]'),
+    ).toHaveCount(0);
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+      "href",
+      new URL(path, "https://listcontrast.com").href,
+    );
     const overflow = await page.evaluate(
-      () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
+      () =>
+        document.documentElement.scrollWidth >
+        document.documentElement.clientWidth,
     );
     expect(overflow).toBe(false);
   }
