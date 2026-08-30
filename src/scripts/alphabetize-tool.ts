@@ -77,6 +77,7 @@ function mountRoot(root: HTMLElement): void {
   };
 
   const recompute = (): void => {
+    resetCopyFeedback(hooks, labels, state);
     state.result = alphabetizeList(state.input, state.options);
     render(hooks, labels, state);
   };
@@ -154,11 +155,12 @@ function render(hooks: Hooks, labels: Labels, state: ToolState): void {
 
 function setupCopy(hooks: Hooks, labels: Labels, state: ToolState): void {
   hooks.copy.addEventListener("click", () => {
-    if (state.result.text === "") {
+    const text = state.result.text;
+    if (text === "") {
       return;
     }
 
-    clearCopyTimer(state);
+    resetCopyFeedback(hooks, labels, state);
     hooks.copy.disabled = true;
     const clipboard = navigator.clipboard;
     const writeText = clipboard?.writeText;
@@ -170,8 +172,11 @@ function setupCopy(hooks: Hooks, labels: Labels, state: ToolState): void {
     }
 
     writeText
-      .call(clipboard, state.result.text)
+      .call(clipboard, text)
       .then(() => {
+        if (state.result.text !== text) {
+          return;
+        }
         hooks.copy.textContent = `\u2713 ${labels.copied}`;
         hooks.localFeedback.textContent = labels.copied;
         hooks.localFeedback.dataset.state = "success";
@@ -183,10 +188,14 @@ function setupCopy(hooks: Hooks, labels: Labels, state: ToolState): void {
         }, 2000);
       })
       .catch(() => {
-        showCopyError(hooks, labels, state);
+        if (state.result.text === text) {
+          showCopyError(hooks, labels, state);
+        }
       })
       .finally(() => {
-        hooks.copy.disabled = state.result.text === "";
+        if (state.result.text === text) {
+          hooks.copy.disabled = false;
+        }
       });
   });
 }
@@ -223,6 +232,17 @@ function showCopyError(hooks: Hooks, labels: Labels, state: ToolState): void {
     delete hooks.localFeedback.dataset.state;
     state.copyTimer = null;
   }, 4000);
+}
+
+function resetCopyFeedback(
+  hooks: Hooks,
+  labels: Labels,
+  state: ToolState,
+): void {
+  clearCopyTimer(state);
+  hooks.copy.textContent = labels.copy;
+  hooks.localFeedback.textContent = "";
+  delete hooks.localFeedback.dataset.state;
 }
 
 function clearCopyTimer(state: ToolState): void {
