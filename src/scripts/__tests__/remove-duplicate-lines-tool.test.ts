@@ -165,6 +165,18 @@ describe("RemoveDuplicateLinesTool", () => {
     expect(input(container).value).toBe("Keep me");
   });
 
+  it("replaces a non-empty list after example confirmation", () => {
+    const container = mountTool();
+    fireEvent.input(input(container), { target: { value: "Replace me" } });
+    const confirm = vi.spyOn(window, "confirm").mockReturnValue(true);
+
+    fireEvent.click(container.querySelector("[data-load-example]")!);
+
+    expect(confirm).toHaveBeenCalledOnce();
+    expect(input(container).value).toContain("Apple");
+    expect(viewer(container).textContent).toBe("Apple\nBanana\nCherry\nbanana");
+  });
+
   it("clears input, summary and exports", () => {
     const container = mountTool();
     fireEvent.input(input(container), { target: { value: "A\nA" } });
