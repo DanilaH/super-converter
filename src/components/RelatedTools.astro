@@ -1,0 +1,73 @@
+---
+type RelatedTool = {
+  href: string;
+  label: string;
+  description: string;
+};
+
+interface Props {
+  tools: readonly RelatedTool[];
+}
+
+const { tools } = Astro.props;
+---
+
+{
+  tools.length > 0 && (
+    <nav class="related-tools" aria-labelledby="related-tools-heading">
+      <h2 id="related-tools-heading">Related tools</h2>
+      <ul>
+        {tools.map((tool) => (
+          <li>
+            <a href={tool.href}>{tool.label}</a>
+            <span>{tool.description}</span>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )
+}
+
+<style>
+  .related-tools {
+    max-width: var(--container-editorial);
+    padding-block: 0 var(--space-7);
+  }
+
+  .related-tools h2 {
+    margin-block: 0 var(--space-3);
+    font-size: var(--font-size-h2-mobile);
+    line-height: var(--line-height-h2-mobile);
+    font-weight: var(--font-weight-h2);
+  }
+
+  .related-tools ul {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .related-tools li {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--space-2);
+  }
+
+  .related-tools a {
+    font-weight: var(--font-weight-control);
+  }
+
+  .related-tools span {
+    color: var(--color-text-secondary);
+  }
+
+  @media (min-width: 760px) {
+    .related-tools h2 {
+      font-size: var(--font-size-h2);
+      line-height: var(--line-height-h2);
+    }
+  }
+</style>

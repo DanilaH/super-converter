@@ -1,31 +1,31 @@
 ---
-import CompareTool from "@/components/CompareTool.astro";
+import AlphabetizeTool from "@/components/AlphabetizeTool.astro";
 import EditorialContent from "@/components/EditorialContent.astro";
 import RelatedTools from "@/components/RelatedTools.astro";
-import { englishContent } from "@/content/en";
+import { alphabetizeListContent } from "@/content/alphabetize-list";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 
-const { home } = englishContent;
+const { page, editorial } = alphabetizeListContent;
 ---
 
-<BaseLayout metadataKey="home">
+<BaseLayout metadataKey="alphabetizeList">
   <div class="intro">
-    <h1>{home.heading}</h1>
+    <h1>{page.heading}</h1>
     <p class="description">
-      {home.description}
-      <span class="privacy">{home.privacy}</span>
+      {page.description}
+      <span class="privacy">{page.privacy}</span>
     </p>
 
-    <CompareTool />
+    <AlphabetizeTool />
   </div>
 
-  <EditorialContent content={englishContent.editorial} />
+  <EditorialContent content={editorial} />
   <RelatedTools
     tools={[
       {
-        href: "/alphabetize-list",
-        label: "Alphabetizer",
-        description: "Sort a list alphabetically.",
+        href: "/",
+        label: "Compare Lists",
+        description: "Find differences, matches and unique values between two lists.",
       },
     ]}
   />

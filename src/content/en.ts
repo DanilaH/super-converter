@@ -83,13 +83,14 @@ export type PrivacyContent = {
 
 export type HeaderContent = {
   ariaLabel: string;
-  tool: string;
+  tools: string;
   about: string;
 };
 
 export type FooterContent = {
   ariaLabel: string;
-  tool: string;
+  compareLists: string;
+  alphabetizer: string;
   about: string;
   privacy: string;
 };
@@ -101,6 +102,8 @@ export type PageMetadata = {
 
 export type MetadataContent = {
   home: PageMetadata;
+  alphabetizeList: PageMetadata;
+  tools: PageMetadata;
   about: PageMetadata;
   privacy: PageMetadata;
   notFound: PageMetadata;
@@ -178,7 +181,7 @@ export const englishContent = {
   },
   header: {
     ariaLabel: "Primary",
-    tool: "Tool",
+    tools: "Tools",
     about: "About",
   },
   editorial: {
@@ -267,36 +270,36 @@ export const englishContent = {
     ],
   },
   about: {
-    heading: "About Compare Lists",
+    heading: "About ListContrast",
     paragraphs: [
-      "Compare Lists is a small browser utility for finding differences, matches and unique values between two lists.",
-      "Paste two lists, choose your comparison options, and review the result as Differences, Only A, Only B, Matches or All — then copy or download what you need.",
-      "The tool deliberately requires no account and processes all list content locally in your browser. Your lists are not uploaded to a server, not sent in network requests and not saved by the site. Results leave the page only when you copy or download them yourself.",
+      "ListContrast is a small collection of browser-based tools for comparing and sorting line-based lists.",
+      "Use Compare Lists to find differences, matches and unique values between two lists, or use the Alphabetizer to put one list into alphabetical order.",
+      "The tools require no account and process list content locally in your browser. Your lists are not uploaded for tool processing or saved by the site. Results leave the page only when you copy or download them yourself.",
     ],
-    toolLinkLabel: "Compare two lists",
+    toolLinkLabel: "Browse list tools",
   },
   privacy: {
     heading: "Privacy",
     intro:
-      "This page describes how Compare Lists handles data. It reflects the current version of the site and will be updated before any privacy-relevant service is enabled.",
+      "This page describes how ListContrast handles data across its browser-based list tools. It reflects the current version of the site and will be updated before any privacy-relevant service is enabled.",
     sections: [
       {
         heading: "List content",
         paragraphs: [
-          "Raw List A and List B text, and the results produced from it, are processed entirely in your browser. List content never enters network requests and is not stored in a database, cookies, localStorage or sessionStorage.",
-          "Copy places the selected result on the system clipboard only after you click the button. Download creates a local text file on your device only after you click the button.",
+          "Raw list text and the results produced from it are processed entirely in your browser. List content never enters tool-processing network requests and is not stored in a database, cookies, localStorage or sessionStorage.",
+          "Copy places the current result on the system clipboard only after you click the button. Download creates a local text file on your device only after you click the button.",
         ],
       },
       {
         heading: "Website requests",
         paragraphs: [
-          "Like any website, Compare Lists is served by a static host. When you open a page, the host may receive ordinary request metadata: your IP address, user agent and the requested path. List content is not part of these requests.",
+          "Like any website, ListContrast is served by a static host. When you open a page, the host may receive ordinary request metadata such as your IP address, user agent and the requested path. Your pasted list content is not part of these requests.",
         ],
       },
       {
         heading: "Advertising and analytics",
         paragraphs: [
-          "The current version does not use advertising scripts, session replay or a production product-analytics provider. Raw list input and results are never included in analytics events.",
+          "The current version does not use advertising scripts, session replay or a production product-analytics provider. Raw list input and results are never included in analytics events or application logging.",
         ],
       },
       {
@@ -306,11 +309,12 @@ export const englishContent = {
         ],
       },
     ],
-    toolLinkLabel: "Back to comparison tool",
+    toolLinkLabel: "Browse list tools",
   },
   footer: {
     ariaLabel: "Footer",
-    tool: "Tool",
+    compareLists: "Compare Lists",
+    alphabetizer: "Alphabetizer",
     about: "About",
     privacy: "Privacy",
   },
@@ -320,26 +324,36 @@ export const englishContent = {
       description:
         "Compare two lists online to find differences, matches and unique items. Fast, free and processed locally in your browser.",
     },
-    about: {
-      title: "About Compare Lists",
+    alphabetizeList: {
+      title: "Alphabetizer — Alphabetize a List Online | ListContrast",
       description:
-        "Learn how Compare Lists finds differences, matches and unique values locally in your browser.",
+        "Alphabetize a list online in A–Z or Z–A order. Sort names, words and line-based lists locally in your browser, then copy or download the result.",
+    },
+    tools: {
+      title: "List Tools | ListContrast",
+      description:
+        "Browse ListContrast tools for comparing two lists or alphabetizing a line-based list directly in your browser.",
+    },
+    about: {
+      title: "About ListContrast",
+      description:
+        "Learn about ListContrast and its browser-based tools for comparing and sorting line-based lists.",
     },
     privacy: {
-      title: "Privacy — Compare Lists",
+      title: "Privacy | ListContrast",
       description:
-        "Learn how Compare Lists processes list content locally in your browser and handles ordinary website requests.",
+        "Learn how ListContrast processes list content locally in your browser and handles ordinary website requests.",
     },
     notFound: {
-      title: "Page Not Found — Compare Lists",
+      title: "Page Not Found | ListContrast",
       description:
-        "The requested page could not be found. Return to Compare Lists to compare two lists online.",
+        "The requested ListContrast page could not be found. Browse the available list tools or return to Compare Lists.",
     },
   },
   notFoundPage: {
     heading: "Page not found",
     explanation:
       "The page you are looking for does not exist or has been moved.",
-    toolLinkLabel: "Return to Compare Lists",
+    toolLinkLabel: "Browse list tools",
   },
 } satisfies EnglishContent;

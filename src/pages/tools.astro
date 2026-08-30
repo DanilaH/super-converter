@@ -1,0 +1,71 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+---
+
+<BaseLayout metadataKey="tools">
+  <div class="tools-page">
+    <h1>List tools</h1>
+    <p class="intro">
+      Focused browser tools for comparing and sorting line-based lists.
+    </p>
+
+    <nav aria-label="Available list tools">
+      <ul class="tool-list">
+        <li>
+          <a href="/">Compare Lists</a>
+          <p>Find differences, matches and unique values between two lists.</p>
+        </li>
+        <li>
+          <a href="/alphabetize-list">Alphabetizer</a>
+          <p>Sort a list alphabetically in A–Z or Z–A order.</p>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</BaseLayout>
+
+<style>
+  .tools-page {
+    max-width: var(--container-editorial);
+    padding-block: var(--space-4) var(--space-7);
+  }
+
+  .tools-page h1 {
+    margin-block: 0 var(--space-3);
+    font-size: var(--font-size-h1-mobile);
+    line-height: var(--line-height-h1-mobile);
+    font-weight: var(--font-weight-h1);
+  }
+
+  .intro {
+    margin-block: 0 var(--space-6);
+    color: var(--color-text-secondary);
+  }
+
+  .tool-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tool-list a {
+    font-size: var(--font-size-h3);
+    line-height: var(--line-height-h3);
+    font-weight: var(--font-weight-h3);
+  }
+
+  .tool-list p {
+    margin-block: var(--space-1) 0;
+    color: var(--color-text-secondary);
+  }
+
+  @media (min-width: 760px) {
+    .tools-page h1 {
+      font-size: var(--font-size-h1);
+      line-height: var(--line-height-h1);
+    }
+  }
+</style>

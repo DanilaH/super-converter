@@ -1,10 +1,6 @@
 import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
 
-// Unique synthetic marker with an HTML payload: if it were ever parsed as
-// HTML, an element with data-cl033-probe would appear and the onerror flag
-// would be set. TOKEN is a stable distinctive substring that survives URL or
-// JSON encoding of the marker.
 const MARKER =
   '<img src="https://cl033-probe.invalid/1.png" data-cl033-probe onerror="window.__cl033Probe = 1">';
 const TOKEN = "cl033-probe";
@@ -99,4 +95,51 @@ test("privacy: list content stays in memory only", async ({ page }) => {
     console: JSON.stringify(consoleText),
     "page errors": JSON.stringify(pageErrors),
   });
+});
+
+test("privacy: alphabetizer content stays local and is rendered as text", async ({
+  page,
+}) => {
+  const requests: string[] = [];
+  const requestBodies: string[] = [];
+  const consoleText: string[] = [];
+  const pageErrors: string[] = [];
+
+  page.on("request", (request) => {
+    requests.push(request.url());
+    const body = request.postData();
+    if (body !== null) {
+      requestBodies.push(body);
+    }
+  });
+  page.on("console", (message) => consoleText.push(message.text()));
+  page.on("pageerror", (error) => pageErrors.push(error.message));
+
+  await page.goto("/alphabetize-list");
+  await page.getByLabel("List").fill(`zeta\n${MARKER}\nalpha`);
+
+  const viewer = page.locator("[data-result-viewer]");
+  await expect(viewer).toContainText(MARKER);
+  await expect(page.locator("[data-cl033-probe]")).toHaveCount(0);
+  expect(
+    await page.evaluate(
+      () => (window as unknown as Record<string, unknown>).__cl033Probe,
+    ),
+  ).toBeUndefined();
+
+  const storage = await collectStorage(page);
+  assertNoLeak({
+    "request urls": JSON.stringify(requests),
+    "request bodies": JSON.stringify(requestBodies),
+    "page url": page.url(),
+    "local storage": storage.local,
+    "session storage": storage.session,
+    "cookies (document)": storage.cookie,
+    "cookies (context)": JSON.stringify(await page.context().cookies()),
+    console: JSON.stringify(consoleText),
+    "page errors": JSON.stringify(pageErrors),
+  });
+
+  await page.reload();
+  await expect(page.getByLabel("List")).toHaveValue("");
 });
