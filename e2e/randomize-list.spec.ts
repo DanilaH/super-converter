@@ -10,7 +10,7 @@ test("randomizes only on explicit action and invalidates stale results", async (
   await page.goto("/randomize-list");
 
   await expect(
-    page.getByRole("heading", { level: 1, name: "Randomize a List Online" }),
+    page.getByRole("heading", { level: 1, name: "List Randomizer" }),
   ).toBeVisible();
 
   const input = page.getByLabel("List");
@@ -43,7 +43,7 @@ test("Try example fills input but does not shuffle automatically", async ({ page
 
   await page.getByRole("button", { name: "Try example" }).click();
 
-  await expect(page.getByLabel("List")).toContainText("Charlie");
+  await expect(page.getByLabel("List")).toHaveValue(/Charlie/);
   await expect(page.locator("[data-result-viewer]")).toBeHidden();
   await expect(page.getByRole("button", { name: "Randomize", exact: true })).toBeEnabled();
   await expect(page.getByRole("button", { name: "Copy" })).toBeDisabled();
