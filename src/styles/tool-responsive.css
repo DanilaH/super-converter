@@ -1,0 +1,80 @@
+/* Cross-tool responsive refinements verified in the CL-045 Chromium audit. */
+
+@media (max-width: 379px) {
+  section[data-alphabetize-tool] .result-toolbar,
+  section[data-randomize-tool] .result-toolbar,
+  section[data-remove-duplicate-lines-tool] .result-toolbar {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  section[data-alphabetize-tool] .result-title,
+  section[data-randomize-tool] .result-title,
+  section[data-remove-duplicate-lines-tool] .result-title {
+    flex: 1 0 100%;
+  }
+
+  section[data-alphabetize-tool] .result-actions,
+  section[data-randomize-tool] .result-actions,
+  section[data-remove-duplicate-lines-tool] .result-actions {
+    margin-left: auto;
+  }
+}
+
+@media (pointer: coarse) {
+  section[data-compare-tool] .example-button {
+    min-height: 44px;
+  }
+}
+
+@media (pointer: coarse) and (min-width: 760px) {
+  section[data-compare-tool] .list-heading {
+    min-height: 44px;
+  }
+}
+
+@media (min-width: 680px) and (max-width: 759px) {
+  section[data-compare-tool] .lists {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+  }
+
+  section[data-compare-tool] .list-heading {
+    min-height: 44px;
+  }
+
+  section[data-compare-tool] .list textarea {
+    height: clamp(176px, 21vh, 224px);
+    min-height: 176px;
+  }
+
+  section[data-compare-tool] .swap {
+    width: 36px;
+    padding-inline: 0;
+  }
+
+  section[data-compare-tool] .swap-mark {
+    transform: none;
+  }
+
+  section[data-compare-tool] .swap-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  section[data-compare-tool] .results-controls {
+    align-items: center;
+    flex-direction: row;
+    gap: var(--space-3);
+  }
+
+  section[data-compare-tool] .result-toolbar {
+    justify-content: flex-start;
+    padding-block: 0;
+  }
+}
