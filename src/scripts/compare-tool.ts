@@ -33,6 +33,13 @@ type ToolState = {
   comparisonCompleted: boolean;
 };
 
+type ExportSnapshot = {
+  listA: string;
+  listB: string;
+  options: CompareOptions;
+  activeResult: ResultType;
+};
+
 type Labels = {
   row: string;
   rows: string;
@@ -156,10 +163,14 @@ function mountRoot(root: HTMLElement, analytics: Analytics): void {
 
   hooks.listA.addEventListener("input", (event) => {
     state.listA = hooks.listA.value;
+    // Large inputs may wait briefly before recomputation; stale Copy feedback
+    // should still disappear as soon as the source changes.
+    resetCopyFeedback(hooks, labels, state);
     handleInput(analytics, state, recompute, event);
   });
   hooks.listB.addEventListener("input", (event) => {
     state.listB = hooks.listB.value;
+    resetCopyFeedback(hooks, labels, state);
     handleInput(analytics, state, recompute, event);
   });
   hooks.trimWhitespace.addEventListener("change", () => {
@@ -426,6 +437,7 @@ function createRecompute(
   state: ToolState,
 ): () => CompareResult | null {
   return () => {
+    resetCopyFeedback(hooks, labels, state);
     hooks.clearListA.disabled = state.listA === "";
     hooks.clearListB.disabled = state.listB === "";
     hooks.swap.disabled = state.listA === "" && state.listB === "";
@@ -452,8 +464,6 @@ function createRecompute(
     hooks.summary.hidden = false;
     hooks.resultTabs.hidden = false;
     hooks.resultPanel.hidden = false;
-    hooks.copyResult.disabled = false;
-    hooks.downloadResult.disabled = false;
     hooks.listACount.textContent = pluralize(
       result.stats.rowsA,
       labels.row,
@@ -481,7 +491,12 @@ function renderResult(
   result: CompareResult,
 ): void {
   const count = resultCountFor(state.activeResult, result);
+  const formatted = formatResult(result, state.activeResult);
+  const hasExportableText = count > 0 && formatted.text.length > 0;
+
   hooks.resultCount.textContent = pluralize(count, labels.item, labels.items);
+  hooks.copyResult.disabled = !hasExportableText;
+  hooks.downloadResult.disabled = !hasExportableText;
 
   if (count === 0) {
     if (state.activeResult === "differences") {
@@ -494,10 +509,7 @@ function renderResult(
     }
   }
 
-  hooks.resultViewer.textContent = formatResult(
-    result,
-    state.activeResult,
-  ).text;
+  hooks.resultViewer.textContent = formatted.text;
 }
 
 function resultCountFor(type: ResultType, result: CompareResult): number {
@@ -520,6 +532,30 @@ function getCurrentFormatted(state: ToolState): FormattedResult {
   return formatResult(result, state.activeResult);
 }
 
+function captureExportSnapshot(state: ToolState): ExportSnapshot {
+  return {
+    listA: state.listA,
+    listB: state.listB,
+    options: { ...state.options },
+    activeResult: state.activeResult,
+  };
+}
+
+function isExportSnapshotCurrent(
+  state: ToolState,
+  snapshot: ExportSnapshot,
+): boolean {
+  return (
+    state.listA === snapshot.listA &&
+    state.listB === snapshot.listB &&
+    state.activeResult === snapshot.activeResult &&
+    state.options.trimWhitespace === snapshot.options.trimWhitespace &&
+    state.options.ignoreEmptyLines === snapshot.options.ignoreEmptyLines &&
+    state.options.ignoreCase === snapshot.options.ignoreCase &&
+    state.options.removeDuplicates === snapshot.options.removeDuplicates
+  );
+}
+
 function setupCopy(
   hooks: Hooks,
   labels: Labels,
@@ -532,13 +568,14 @@ function setupCopy(
     }
     const formatted = getCurrentFormatted(state);
     const resultType = state.activeResult;
-    clearCopyTimer(state);
+    const snapshot = captureExportSnapshot(state);
+    resetCopyFeedback(hooks, labels, state);
     hooks.copyResult.disabled = true;
 
     const clipboard = navigator.clipboard;
     const writeText = clipboard?.writeText;
     if (!writeText) {
-      hooks.copyResult.disabled = state.listA === "" && state.listB === "";
+      hooks.copyResult.disabled = false;
       showCopyError(hooks, labels, state);
       return;
     }
@@ -546,6 +583,10 @@ function setupCopy(
     writeText
       .call(clipboard, formatted.text)
       .then(() => {
+        safeTrack(analytics, "copy_result", { resultType });
+        if (!isExportSnapshotCurrent(state, snapshot)) {
+          return;
+        }
         hooks.copyResult.textContent = `\u2713 ${labels.copied}`;
         hooks.localFeedback.textContent = labels.copied;
         hooks.localFeedback.dataset.state = "success";
@@ -555,13 +596,16 @@ function setupCopy(
           delete hooks.localFeedback.dataset.state;
           state.copyTimer = null;
         }, 2000);
-        safeTrack(analytics, "copy_result", { resultType });
       })
       .catch(() => {
-        showCopyError(hooks, labels, state);
+        if (isExportSnapshotCurrent(state, snapshot)) {
+          showCopyError(hooks, labels, state);
+        }
       })
       .finally(() => {
-        hooks.copyResult.disabled = state.listA === "" && state.listB === "";
+        if (isExportSnapshotCurrent(state, snapshot)) {
+          hooks.copyResult.disabled = false;
+        }
       });
   });
 }
@@ -578,6 +622,17 @@ function showCopyError(hooks: Hooks, labels: Labels, state: ToolState): void {
   }, 4000);
 }
 
+function resetCopyFeedback(
+  hooks: Hooks,
+  labels: Labels,
+  state: ToolState,
+): void {
+  clearCopyTimer(state);
+  hooks.copyResult.textContent = labels.copy;
+  hooks.localFeedback.textContent = "";
+  delete hooks.localFeedback.dataset.state;
+}
+
 function clearCopyTimer(state: ToolState): void {
   if (state.copyTimer !== null) {
     window.clearTimeout(state.copyTimer);
@@ -591,7 +646,7 @@ function setupDownload(
   analytics: Analytics,
 ): void {
   hooks.downloadResult.addEventListener("click", () => {
-    if (state.listA === "" && state.listB === "") {
+    if (hooks.downloadResult.disabled) {
       return;
     }
     const formatted = getCurrentFormatted(state);
