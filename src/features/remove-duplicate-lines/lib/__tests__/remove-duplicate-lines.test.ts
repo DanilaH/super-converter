@@ -26,6 +26,20 @@ describe("removeDuplicateLines", () => {
     ).toEqual(["Apple"]);
   });
 
+  it("builds case identity from the already trimmed processed value", () => {
+    expect(
+      removeDuplicateLines("  Apple  \napple\n APPLE ", {
+        trimWhitespace: true,
+        ignoreEmptyLines: true,
+        ignoreCase: true,
+      }),
+    ).toEqual({
+      items: ["Apple"],
+      text: "Apple",
+      stats: { input: 3, unique: 1, removed: 2 },
+    });
+  });
+
   it("uses English-facing lowercase identity without rewriting output", () => {
     expect(
       removeDuplicateLines("Apple\napple\nAPPLE\nrésumé\nresume", {
