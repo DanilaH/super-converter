@@ -1,6 +1,17 @@
-export const INDEXABLE_PATHS = ["/", "/about", "/privacy"] as const;
+export const INDEXABLE_PATHS = [
+  "/",
+  "/alphabetize-list",
+  "/tools",
+  "/about",
+  "/privacy",
+] as const;
 
-export type IndexableMetadataKey = "home" | "about" | "privacy";
+export type IndexableMetadataKey =
+  | "home"
+  | "alphabetizeList"
+  | "tools"
+  | "about"
+  | "privacy";
 
 export type SiteMetadataKey = IndexableMetadataKey | "notFound";
 
@@ -40,6 +51,10 @@ export function canonicalPathFor(key: IndexableMetadataKey): string {
   switch (key) {
     case "home":
       return "/";
+    case "alphabetizeList":
+      return "/alphabetize-list";
+    case "tools":
+      return "/tools";
     case "about":
       return "/about";
     case "privacy":

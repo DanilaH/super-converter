@@ -9,9 +9,7 @@ import {
 
 describe("site origin", () => {
   it("throws when the site is missing", () => {
-    expect(() => resolveSiteOrigin(undefined)).toThrow(
-      /Site origin is missing/,
-    );
+    expect(() => resolveSiteOrigin(undefined)).toThrow(/Site origin is missing/);
   });
 
   it("rejects an HTTP origin", () => {
@@ -39,9 +37,9 @@ describe("site origin", () => {
   });
 
   it("rejects a hash", () => {
-    expect(() =>
-      resolveSiteOrigin(new URL("https://example.com/#top")),
-    ).toThrow(/hash/);
+    expect(() => resolveSiteOrigin(new URL("https://example.com/#top"))).toThrow(
+      /hash/,
+    );
   });
 
   it("accepts a valid HTTPS root origin", () => {
@@ -59,6 +57,10 @@ describe("site origin", () => {
   it("builds stable absolute URLs from a validated site", () => {
     const site = resolveSiteOrigin(new URL("https://example.com"));
     expect(absoluteUrl(site, "/").href).toBe("https://example.com/");
+    expect(absoluteUrl(site, "/alphabetize-list").href).toBe(
+      "https://example.com/alphabetize-list",
+    );
+    expect(absoluteUrl(site, "/tools").href).toBe("https://example.com/tools");
     expect(absoluteUrl(site, "/about").href).toBe("https://example.com/about");
     expect(absoluteUrl(site, "/privacy").href).toBe(
       "https://example.com/privacy",
@@ -67,11 +69,19 @@ describe("site origin", () => {
 
   it("maps indexable metadata keys to fixed paths", () => {
     expect(canonicalPathFor("home")).toBe("/");
+    expect(canonicalPathFor("alphabetizeList")).toBe("/alphabetize-list");
+    expect(canonicalPathFor("tools")).toBe("/tools");
     expect(canonicalPathFor("about")).toBe("/about");
     expect(canonicalPathFor("privacy")).toBe("/privacy");
   });
 
   it("exposes the exact indexable paths list", () => {
-    expect(INDEXABLE_PATHS).toEqual(["/", "/about", "/privacy"]);
+    expect(INDEXABLE_PATHS).toEqual([
+      "/",
+      "/alphabetize-list",
+      "/tools",
+      "/about",
+      "/privacy",
+    ]);
   });
 });

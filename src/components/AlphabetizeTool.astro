@@ -1,0 +1,360 @@
+---
+import { alphabetizeListContent } from "@/content/alphabetize-list";
+
+const { tool } = alphabetizeListContent;
+---
+
+<section
+  data-alphabetize-tool
+  aria-labelledby="alphabetize-tool-heading"
+  data-label-item={tool.item}
+  data-label-items={tool.items}
+  data-label-empty-result={tool.emptyResult}
+  data-label-no-effective-items={tool.noEffectiveItems}
+  data-label-copy={tool.copy}
+  data-label-copied={tool.copied}
+  data-label-copy-error={tool.copyError}
+  data-label-replace-example-confirmation={tool.replaceExampleConfirmation}
+>
+  <h2 id="alphabetize-tool-heading" class="visually-hidden">{tool.heading}</h2>
+
+  <div class="workspace">
+    <div class="pane input-pane">
+      <div class="pane-heading">
+        <label for="alphabetize-input">{tool.listLabel}</label>
+        <button type="button" class="example-button" data-load-example disabled>
+          {tool.loadExample}
+        </button>
+      </div>
+      <textarea
+        id="alphabetize-input"
+        name="alphabetize-input"
+        data-list-input
+        rows="10"
+        placeholder={tool.pastePlaceholder}
+        spellcheck="false"></textarea>
+      <div class="input-footer">
+        <button type="button" class="text-button" data-clear-list disabled>
+          {tool.clear}
+        </button>
+      </div>
+
+      <fieldset class="options">
+        <legend class="visually-hidden">{tool.options}</legend>
+        <span class="options-label" aria-hidden="true">{tool.options}</span>
+        <label class="option">
+          <input type="checkbox" data-option-trim-whitespace checked />
+          {tool.trimWhitespace}
+        </label>
+        <label class="option">
+          <input type="checkbox" data-option-ignore-empty-lines checked />
+          {tool.ignoreEmptyLines}
+        </label>
+        <label class="order-option">
+          <span>{tool.order}</span>
+          <select data-order aria-label={tool.order}>
+            <option value="asc" selected>{tool.ascending}</option>
+            <option value="desc">{tool.descending}</option>
+          </select>
+        </label>
+      </fieldset>
+    </div>
+
+    <div class="pane result-pane">
+      <div class="result-toolbar">
+        <p class="result-title">
+          <span>{tool.resultLabel}</span>
+          <span aria-hidden="true">·</span>
+          <span data-result-count>0 {tool.items}</span>
+        </p>
+        <div class="result-actions">
+          <button type="button" class="action" data-copy-result disabled>
+            {tool.copy}
+          </button>
+          <button type="button" class="action" data-download-result disabled>
+            {tool.download}
+          </button>
+        </div>
+      </div>
+
+      <div class="viewer-shell">
+        <p data-empty-result>{tool.emptyResult}</p>
+        <pre class="viewer" data-result-viewer tabindex="0" hidden></pre>
+      </div>
+      <p
+        class="local-feedback"
+        data-local-feedback
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+      >
+      </p>
+    </div>
+  </div>
+
+  <noscript>
+    <p class="noscript">{tool.noscript}</p>
+  </noscript>
+</section>
+
+<script>
+  import { mountAlphabetizeTool } from "../scripts/alphabetize-tool";
+
+  mountAlphabetizeTool();
+</script>
+
+<style>
+  section[data-alphabetize-tool] {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-top: var(--space-2);
+    padding: var(--space-4);
+    border: var(--border-default);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+  }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .options {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-4);
+    min-width: 0;
+    margin: var(--space-2) 0 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .options-label {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-ui-label);
+    line-height: var(--line-height-ui-label);
+    font-weight: var(--font-weight-ui-label);
+    letter-spacing: var(--letter-spacing-ui-label);
+    text-transform: uppercase;
+  }
+
+  .option,
+  .order-option {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--font-size-control);
+    line-height: var(--line-height-control);
+  }
+
+  .option input {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: var(--color-accent);
+  }
+
+  .order-option select {
+    min-height: 32px;
+    padding: var(--space-1) var(--space-2);
+    border: var(--border-default);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    color: var(--color-text);
+  }
+
+  .workspace {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-4);
+  }
+
+  .pane {
+    min-width: 0;
+  }
+
+  .pane-heading,
+  .result-toolbar,
+  .input-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+
+  .pane-heading {
+    min-height: 28px;
+    margin-bottom: var(--space-2);
+  }
+
+  .pane-heading label,
+  .result-title {
+    margin: 0;
+    font-size: var(--font-size-control);
+    line-height: var(--line-height-control);
+    font-weight: var(--font-weight-control);
+  }
+
+  .result-title {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--space-1);
+  }
+
+  textarea,
+  .viewer-shell {
+    width: 100%;
+    height: clamp(176px, 22vh, 224px);
+    border: var(--border-default);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+  }
+
+  textarea {
+    display: block;
+    padding: var(--space-3);
+    min-height: 176px;
+    resize: vertical;
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-size: var(--font-size-result-data);
+    line-height: var(--line-height-result-data);
+  }
+
+  textarea:hover,
+  textarea:focus,
+  .order-option select:hover,
+  .order-option select:focus {
+    border-color: var(--color-border-strong);
+  }
+
+  .input-footer {
+    justify-content: flex-end;
+    min-height: 28px;
+    margin-top: var(--space-1);
+  }
+
+  .viewer-shell {
+    overflow: auto;
+    background: var(--color-surface-muted);
+  }
+
+  .viewer-shell > p {
+    margin: 0;
+    padding: var(--space-3);
+    color: var(--color-text-secondary);
+  }
+
+  .viewer {
+    min-width: max-content;
+    margin: 0;
+    padding: var(--space-3);
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-size: var(--font-size-result-data);
+    line-height: var(--line-height-result-data);
+    white-space: pre;
+  }
+
+  .result-toolbar {
+    min-height: 28px;
+    margin-bottom: var(--space-2);
+  }
+
+  .result-actions {
+    display: flex;
+    gap: var(--space-2);
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  button:disabled {
+    cursor: default;
+    opacity: 0.5;
+  }
+
+  .example-button,
+  .text-button {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--color-accent);
+    font-size: var(--font-size-control);
+    line-height: var(--line-height-control);
+    font-weight: var(--font-weight-control);
+  }
+
+  .example-button:not(:disabled):hover,
+  .text-button:not(:disabled):hover {
+    color: var(--color-accent-hover);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .action {
+    min-height: 32px;
+    padding: var(--space-1) var(--space-3);
+    border: var(--border-default);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-size: var(--font-size-control);
+    line-height: var(--line-height-control);
+    font-weight: var(--font-weight-control);
+  }
+
+  .action:not(:disabled):hover {
+    border-color: var(--color-border-strong);
+    background: var(--color-surface-muted);
+  }
+
+  .local-feedback {
+    min-height: var(--line-height-body-secondary);
+    margin: var(--space-1) 0 0;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-body-secondary);
+    line-height: var(--line-height-body-secondary);
+  }
+
+  .local-feedback[data-state="error"] {
+    color: var(--color-danger);
+  }
+
+  .noscript {
+    margin: 0;
+    color: var(--color-text-secondary);
+  }
+
+  @media (min-width: 760px) {
+    .workspace {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (pointer: coarse) {
+    .option,
+    .order-option,
+    .example-button,
+    .text-button,
+    .action {
+      min-height: 44px;
+    }
+
+    .option,
+    .order-option {
+      align-items: center;
+    }
+  }
+</style>

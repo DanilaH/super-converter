@@ -1,7 +1,11 @@
 ---
-import { englishContent } from "@/content/en";
+import type { EditorialContent as EditorialContentData } from "@/content/en";
 
-const { editorial } = englishContent;
+interface Props {
+  content: EditorialContentData;
+}
+
+const { content: editorial } = Astro.props;
 ---
 
 <div class="editorial">
