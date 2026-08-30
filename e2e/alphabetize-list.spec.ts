@@ -1,5 +1,14 @@
 import { expect, test } from "@playwright/test";
 
+const INDEXABLE_PATHS = [
+  "/",
+  "/alphabetize-list",
+  "/randomize-list",
+  "/tools",
+  "/about",
+  "/privacy",
+] as const;
+
 test("alphabetizes a list live and changes order", async ({ page }) => {
   await page.goto("/alphabetize-list");
 
@@ -23,7 +32,7 @@ test("alphabetizes a list live and changes order", async ({ page }) => {
 test("new tool routes and navigation are crawlable without horizontal overflow", async ({
   page,
 }) => {
-  for (const path of ["/", "/alphabetize-list", "/tools", "/about", "/privacy"]) {
+  for (const path of INDEXABLE_PATHS) {
     const response = await page.goto(path);
     expect(response?.status()).toBe(200);
     await expect(page.locator("html")).toHaveAttribute("lang", "en");
@@ -59,11 +68,14 @@ test("new tool routes and navigation are crawlable without horizontal overflow",
   await expect(
     toolIndex.getByRole("link", { name: "Alphabetizer" }),
   ).toHaveAttribute("href", "/alphabetize-list");
+  await expect(
+    toolIndex.getByRole("link", { name: "List Randomizer" }),
+  ).toHaveAttribute("href", "/randomize-list");
 
   const sitemap = await page.request.get("/sitemap.xml");
   expect(sitemap.status()).toBe(200);
   const sitemapText = await sitemap.text();
-  for (const path of ["/", "/alphabetize-list", "/tools", "/about", "/privacy"]) {
+  for (const path of INDEXABLE_PATHS) {
     expect(sitemapText).toContain(
       new URL(path, "https://listcontrast.com").href,
     );
