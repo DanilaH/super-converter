@@ -34,14 +34,30 @@ test("new tool routes and navigation are crawlable without horizontal overflow",
   }
 
   await page.goto("/tools");
-  await expect(page.getByRole("link", { name: "Compare Lists" })).toHaveAttribute(
+  await expect(page).toHaveTitle("List Tools | ListContrast");
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     "href",
-    "/",
+    /\/tools$/,
   );
-  await expect(page.getByRole("link", { name: "Alphabetizer" })).toHaveAttribute(
-    "href",
-    "/alphabetize-list",
-  );
+
+  const toolIndex = page.getByRole("navigation", {
+    name: "Available list tools",
+  });
+  await expect(
+    toolIndex.getByRole("link", { name: "Compare Lists" }),
+  ).toHaveAttribute("href", "/");
+  await expect(
+    toolIndex.getByRole("link", { name: "Alphabetizer" }),
+  ).toHaveAttribute("href", "/alphabetize-list");
+
+  const sitemap = await page.request.get("/sitemap.xml");
+  expect(sitemap.status()).toBe(200);
+  const sitemapText = await sitemap.text();
+  for (const path of ["/", "/alphabetize-list", "/tools", "/about", "/privacy"]) {
+    expect(sitemapText).toContain(
+      new URL(path, "https://listcontrast.com").href,
+    );
+  }
 });
 
 test("alphabetizer exposes canonical metadata and download filename", async ({ page }) => {
