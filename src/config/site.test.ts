@@ -60,6 +60,9 @@ describe("site origin", () => {
     expect(absoluteUrl(site, "/alphabetize-list").href).toBe(
       "https://example.com/alphabetize-list",
     );
+    expect(absoluteUrl(site, "/randomize-list").href).toBe(
+      "https://example.com/randomize-list",
+    );
     expect(absoluteUrl(site, "/tools").href).toBe("https://example.com/tools");
     expect(absoluteUrl(site, "/about").href).toBe("https://example.com/about");
     expect(absoluteUrl(site, "/privacy").href).toBe(
@@ -70,6 +73,7 @@ describe("site origin", () => {
   it("maps indexable metadata keys to fixed paths", () => {
     expect(canonicalPathFor("home")).toBe("/");
     expect(canonicalPathFor("alphabetizeList")).toBe("/alphabetize-list");
+    expect(canonicalPathFor("randomizeList")).toBe("/randomize-list");
     expect(canonicalPathFor("tools")).toBe("/tools");
     expect(canonicalPathFor("about")).toBe("/about");
     expect(canonicalPathFor("privacy")).toBe("/privacy");
@@ -79,6 +83,7 @@ describe("site origin", () => {
     expect(INDEXABLE_PATHS).toEqual([
       "/",
       "/alphabetize-list",
+      "/randomize-list",
       "/tools",
       "/about",
       "/privacy",
