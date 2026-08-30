@@ -563,7 +563,7 @@ function setupCopy(
   analytics: Analytics,
 ): void {
   hooks.copyResult.addEventListener("click", () => {
-    if (state.listA === "" && state.listB === "") {
+    if (hooks.copyResult.disabled) {
       return;
     }
     const formatted = getCurrentFormatted(state);
