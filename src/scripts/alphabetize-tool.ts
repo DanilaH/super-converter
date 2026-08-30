@@ -15,6 +15,12 @@ type ToolState = {
   copyTimer: number | null;
 };
 
+type CopySnapshot = {
+  input: string;
+  options: AlphabetizeOptions;
+  text: string;
+};
+
 type Labels = {
   item: string;
   items: string;
@@ -153,10 +159,28 @@ function render(hooks: Hooks, labels: Labels, state: ToolState): void {
   hooks.download.disabled = !hasExportableText;
 }
 
+function captureCopySnapshot(state: ToolState): CopySnapshot {
+  return {
+    input: state.input,
+    options: { ...state.options },
+    text: state.result.text,
+  };
+}
+
+function isCopySnapshotCurrent(state: ToolState, snapshot: CopySnapshot): boolean {
+  return (
+    state.input === snapshot.input &&
+    state.options.trimWhitespace === snapshot.options.trimWhitespace &&
+    state.options.ignoreEmptyLines === snapshot.options.ignoreEmptyLines &&
+    state.options.order === snapshot.options.order &&
+    state.result.text === snapshot.text
+  );
+}
+
 function setupCopy(hooks: Hooks, labels: Labels, state: ToolState): void {
   hooks.copy.addEventListener("click", () => {
-    const text = state.result.text;
-    if (text === "") {
+    const snapshot = captureCopySnapshot(state);
+    if (snapshot.text === "") {
       return;
     }
 
@@ -172,9 +196,9 @@ function setupCopy(hooks: Hooks, labels: Labels, state: ToolState): void {
     }
 
     writeText
-      .call(clipboard, text)
+      .call(clipboard, snapshot.text)
       .then(() => {
-        if (state.result.text !== text) {
+        if (!isCopySnapshotCurrent(state, snapshot)) {
           return;
         }
         hooks.copy.textContent = `\u2713 ${labels.copied}`;
@@ -188,12 +212,12 @@ function setupCopy(hooks: Hooks, labels: Labels, state: ToolState): void {
         }, 2000);
       })
       .catch(() => {
-        if (state.result.text === text) {
+        if (isCopySnapshotCurrent(state, snapshot)) {
           showCopyError(hooks, labels, state);
         }
       })
       .finally(() => {
-        if (state.result.text === text) {
+        if (isCopySnapshotCurrent(state, snapshot)) {
           hooks.copy.disabled = false;
         }
       });
