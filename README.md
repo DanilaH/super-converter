@@ -1,11 +1,12 @@
 # ListContrast
 
-Browser-based, account-free tools for working with line-based lists. The current product includes Compare Lists and an Alphabetizer; list processing runs client-side and raw list content never leaves the browser for tool processing.
+Browser-based, account-free tools for working with line-based lists. The current product includes Compare Lists, an Alphabetizer and a List Randomizer; list processing runs client-side and raw list content never leaves the browser for tool processing.
 
 ## Current tools
 
 - `/` — Compare Lists: differences, matches and unique values between two lists.
 - `/alphabetize-list` — Alphabetizer: A–Z / Z–A sorting for one item per line.
+- `/randomize-list` — List Randomizer: explicit-action shuffling for one item per line.
 - `/tools` — crawlable navigation index for currently available tools.
 
 ## Docs
