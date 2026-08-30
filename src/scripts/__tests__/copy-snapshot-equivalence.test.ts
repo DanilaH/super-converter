@@ -191,4 +191,25 @@ describe("Copy snapshot equivalence", () => {
     expect(copy.textContent).toBe("Copy");
     expect(feedback.textContent).toBe("");
   });
+
+  it("does not restore Randomizer feedback when Randomize again produces the same text", async () => {
+    const { pending } = installDeferredClipboard();
+    const root = mount(RANDOMIZER_HTML, mountRandomizeTool);
+    const input = element<HTMLTextAreaElement>(root, "[data-list-input]");
+    const randomize = element<HTMLButtonElement>(root, "[data-randomize-list]");
+    const copy = element<HTMLButtonElement>(root, "[data-copy-result]");
+    const feedback = element<HTMLElement>(root, "[data-local-feedback]");
+
+    fireEvent.input(input, { target: { value: "A" } });
+    fireEvent.click(randomize);
+    fireEvent.click(copy);
+    fireEvent.click(randomize);
+
+    expect(element(root, "[data-result-viewer]").textContent).toBe("A");
+    pending.resolve();
+    await flushPromises();
+
+    expect(copy.textContent).toBe("Copy");
+    expect(feedback.textContent).toBe("");
+  });
 });
