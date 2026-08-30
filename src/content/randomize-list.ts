@@ -27,7 +27,7 @@ export type RandomizeMessages = {
 
 export const randomizeListContent = {
   page: {
-    heading: "Randomize a List Online",
+    heading: "List Randomizer",
     description: "Shuffle names, words or any line-based list into a random order.",
     privacy: "Processed locally in your browser.",
   },
