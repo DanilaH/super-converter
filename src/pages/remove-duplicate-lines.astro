@@ -1,14 +1,14 @@
 ---
 import EditorialContent from "@/components/EditorialContent.astro";
-import RandomizeTool from "@/components/RandomizeTool.astro";
 import RelatedTools from "@/components/RelatedTools.astro";
-import { randomizeListContent } from "@/content/randomize-list";
+import RemoveDuplicateLinesTool from "@/components/RemoveDuplicateLinesTool.astro";
+import { removeDuplicateLinesContent } from "@/content/remove-duplicate-lines";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 
-const { page, editorial } = randomizeListContent;
+const { page, editorial } = removeDuplicateLinesContent;
 ---
 
-<BaseLayout metadataKey="randomizeList">
+<BaseLayout metadataKey="removeDuplicateLines">
   <div class="intro">
     <h1>{page.heading}</h1>
     <p class="description">
@@ -16,7 +16,7 @@ const { page, editorial } = randomizeListContent;
       <span class="privacy">{page.privacy}</span>
     </p>
 
-    <RandomizeTool />
+    <RemoveDuplicateLinesTool />
   </div>
 
   <EditorialContent content={editorial} />
@@ -33,9 +33,9 @@ const { page, editorial } = randomizeListContent;
         description: "Sort a list alphabetically in A–Z or Z–A order.",
       },
       {
-        href: "/remove-duplicate-lines",
-        label: "Remove Duplicate Lines",
-        description: "Keep the first occurrence of repeated lines.",
+        href: "/randomize-list",
+        label: "List Randomizer",
+        description: "Shuffle a list into a random order.",
       },
     ]}
   />

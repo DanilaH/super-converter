@@ -231,7 +231,7 @@ Do not create a speculative foundation PR before a real consumer requires the ab
 
 The assigned GitHub Issue is the operational scope. `LISTCONTRAST_EXPANSION_SCOPE_V1_1.md` defines the approved multi-PR expansion and exact semantic contracts.
 
-For CL-041, implement only List Randomizer and the incremental three-tool integration on top of CL-040. A small shared transform-line preprocessing layer is now justified because Alphabetizer and Randomizer are two real consumers of the same emitted-value semantics. Do not generalize their UI/state machines and do not implement or expose Dedupe in this package.
+For CL-042, implement only Remove Duplicate Lines and the incremental final four-tool integration on top of CL-041. Reuse the existing shared transform-line preprocessing layer, but keep Dedupe identity, first-occurrence-wins ordering, summary semantics and live UI behavior feature-specific. Do not expand the shared layer into a generic transformation engine and do not add tools beyond the approved four-tool scope.
 
 ## 32. Scope discipline
 

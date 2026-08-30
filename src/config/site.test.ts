@@ -63,6 +63,9 @@ describe("site origin", () => {
     expect(absoluteUrl(site, "/randomize-list").href).toBe(
       "https://example.com/randomize-list",
     );
+    expect(absoluteUrl(site, "/remove-duplicate-lines").href).toBe(
+      "https://example.com/remove-duplicate-lines",
+    );
     expect(absoluteUrl(site, "/tools").href).toBe("https://example.com/tools");
     expect(absoluteUrl(site, "/about").href).toBe("https://example.com/about");
     expect(absoluteUrl(site, "/privacy").href).toBe(
@@ -74,6 +77,9 @@ describe("site origin", () => {
     expect(canonicalPathFor("home")).toBe("/");
     expect(canonicalPathFor("alphabetizeList")).toBe("/alphabetize-list");
     expect(canonicalPathFor("randomizeList")).toBe("/randomize-list");
+    expect(canonicalPathFor("removeDuplicateLines")).toBe(
+      "/remove-duplicate-lines",
+    );
     expect(canonicalPathFor("tools")).toBe("/tools");
     expect(canonicalPathFor("about")).toBe("/about");
     expect(canonicalPathFor("privacy")).toBe("/privacy");
@@ -84,6 +90,7 @@ describe("site origin", () => {
       "/",
       "/alphabetize-list",
       "/randomize-list",
+      "/remove-duplicate-lines",
       "/tools",
       "/about",
       "/privacy",

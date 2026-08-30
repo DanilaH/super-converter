@@ -4,6 +4,7 @@ const INDEXABLE_PATHS = [
   "/",
   "/alphabetize-list",
   "/randomize-list",
+  "/remove-duplicate-lines",
   "/tools",
   "/about",
   "/privacy",
@@ -71,6 +72,9 @@ test("new tool routes and navigation are crawlable without horizontal overflow",
   await expect(
     toolIndex.getByRole("link", { name: "List Randomizer" }),
   ).toHaveAttribute("href", "/randomize-list");
+  await expect(
+    toolIndex.getByRole("link", { name: "Remove Duplicate Lines" }),
+  ).toHaveAttribute("href", "/remove-duplicate-lines");
 
   const sitemap = await page.request.get("/sitemap.xml");
   expect(sitemap.status()).toBe(200);

@@ -2,6 +2,7 @@ export const INDEXABLE_PATHS = [
   "/",
   "/alphabetize-list",
   "/randomize-list",
+  "/remove-duplicate-lines",
   "/tools",
   "/about",
   "/privacy",
@@ -11,6 +12,7 @@ export type IndexableMetadataKey =
   | "home"
   | "alphabetizeList"
   | "randomizeList"
+  | "removeDuplicateLines"
   | "tools"
   | "about"
   | "privacy";
@@ -57,6 +59,8 @@ export function canonicalPathFor(key: IndexableMetadataKey): string {
       return "/alphabetize-list";
     case "randomizeList":
       return "/randomize-list";
+    case "removeDuplicateLines":
+      return "/remove-duplicate-lines";
     case "tools":
       return "/tools";
     case "about":
