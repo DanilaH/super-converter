@@ -27,6 +27,12 @@
   }
 }
 
+@media (pointer: coarse) and (min-width: 680px) {
+  section[data-compare-tool] .list-heading {
+    min-height: 44px;
+  }
+}
+
 @media (min-width: 680px) and (max-width: 759px) {
   section[data-compare-tool] .lists {
     grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
@@ -64,7 +70,7 @@
   }
 
   section[data-compare-tool] .result-toolbar {
-    justify-content: initial;
+    justify-content: flex-start;
     padding-block: 0;
   }
 }
