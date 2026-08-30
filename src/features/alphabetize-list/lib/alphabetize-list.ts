@@ -1,8 +1,8 @@
+import { processListInput, serializeList } from "../../list-transform/lib/process-list";
 import type {
   AlphabetizeOptions,
   AlphabetizeResult,
 } from "../model/types";
-import { processListInput, serializeList } from "./process-list";
 
 const ENGLISH_COLLATOR = new Intl.Collator("en", {
   numeric: true,
