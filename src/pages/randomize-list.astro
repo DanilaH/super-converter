@@ -1,14 +1,14 @@
 ---
-import AlphabetizeTool from "@/components/AlphabetizeTool.astro";
 import EditorialContent from "@/components/EditorialContent.astro";
+import RandomizeTool from "@/components/RandomizeTool.astro";
 import RelatedTools from "@/components/RelatedTools.astro";
-import { alphabetizeListContent } from "@/content/alphabetize-list";
+import { randomizeListContent } from "@/content/randomize-list";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 
-const { page, editorial } = alphabetizeListContent;
+const { page, editorial } = randomizeListContent;
 ---
 
-<BaseLayout metadataKey="alphabetizeList">
+<BaseLayout metadataKey="randomizeList">
   <div class="intro">
     <h1>{page.heading}</h1>
     <p class="description">
@@ -16,7 +16,7 @@ const { page, editorial } = alphabetizeListContent;
       <span class="privacy">{page.privacy}</span>
     </p>
 
-    <AlphabetizeTool />
+    <RandomizeTool />
   </div>
 
   <EditorialContent content={editorial} />
@@ -28,9 +28,9 @@ const { page, editorial } = alphabetizeListContent;
         description: "Find differences, matches and unique values between two lists.",
       },
       {
-        href: "/randomize-list",
-        label: "List Randomizer",
-        description: "Shuffle a list into a random order.",
+        href: "/alphabetize-list",
+        label: "Alphabetizer",
+        description: "Sort a list alphabetically in A–Z or Z–A order.",
       },
     ]}
   />
@@ -51,13 +51,6 @@ const { page, editorial } = alphabetizeListContent;
     font-weight: var(--font-weight-h1);
   }
 
-  @media (min-width: 760px) {
-    .intro h1 {
-      font-size: var(--font-size-h1);
-      line-height: var(--line-height-h1);
-    }
-  }
-
   .description {
     display: flex;
     flex-wrap: wrap;
@@ -70,5 +63,12 @@ const { page, editorial } = alphabetizeListContent;
 
   .privacy {
     color: var(--color-text-secondary);
+  }
+
+  @media (min-width: 760px) {
+    .intro h1 {
+      font-size: var(--font-size-h1);
+      line-height: var(--line-height-h1);
+    }
   }
 </style>

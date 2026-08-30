@@ -1,9 +1,6 @@
-export type AlphabetizeOrder = "asc" | "desc";
+import type { TransformListOptions } from "../../list-transform/model/types";
 
-export type TransformListOptions = {
-  trimWhitespace: boolean;
-  ignoreEmptyLines: boolean;
-};
+export type AlphabetizeOrder = "asc" | "desc";
 
 export type AlphabetizeOptions = TransformListOptions & {
   order: AlphabetizeOrder;

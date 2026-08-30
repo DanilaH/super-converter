@@ -1,0 +1,378 @@
+---
+import { randomizeListContent } from "@/content/randomize-list";
+
+const { tool } = randomizeListContent;
+---
+
+<section
+  data-randomize-tool
+  aria-labelledby="randomize-tool-heading"
+  data-label-item={tool.item}
+  data-label-items={tool.items}
+  data-label-empty-result={tool.emptyResult}
+  data-label-ready-result={tool.readyResult}
+  data-label-no-effective-items={tool.noEffectiveItems}
+  data-label-randomize={tool.randomize}
+  data-label-randomize-again={tool.randomizeAgain}
+  data-label-copy={tool.copy}
+  data-label-copied={tool.copied}
+  data-label-copy-error={tool.copyError}
+  data-label-replace-example-confirmation={tool.replaceExampleConfirmation}
+>
+  <h2 id="randomize-tool-heading" class="visually-hidden">{tool.heading}</h2>
+
+  <div class="workspace">
+    <div class="pane input-pane">
+      <div class="pane-heading">
+        <label for="randomize-input">{tool.listLabel}</label>
+        <button type="button" class="example-button" data-load-example disabled>
+          {tool.loadExample}
+        </button>
+      </div>
+      <textarea
+        id="randomize-input"
+        name="randomize-input"
+        data-list-input
+        rows="10"
+        placeholder={tool.pastePlaceholder}
+        spellcheck="false"></textarea>
+      <div class="input-footer">
+        <button type="button" class="text-button" data-clear-list disabled>
+          {tool.clear}
+        </button>
+      </div>
+
+      <div class="controls">
+        <fieldset class="options">
+          <legend class="visually-hidden">{tool.options}</legend>
+          <span class="options-label" aria-hidden="true">{tool.options}</span>
+          <label class="option">
+            <input type="checkbox" data-option-trim-whitespace checked />
+            {tool.trimWhitespace}
+          </label>
+          <label class="option">
+            <input type="checkbox" data-option-ignore-empty-lines checked />
+            {tool.ignoreEmptyLines}
+          </label>
+        </fieldset>
+
+        <button type="button" class="primary-action" data-randomize-list disabled>
+          {tool.randomize}
+        </button>
+      </div>
+    </div>
+
+    <div class="pane result-pane">
+      <div class="result-toolbar">
+        <p class="result-title">
+          <span>{tool.resultLabel}</span>
+          <span aria-hidden="true">·</span>
+          <span data-result-count>0 {tool.items}</span>
+        </p>
+        <div class="result-actions">
+          <button type="button" class="action" data-copy-result disabled>
+            {tool.copy}
+          </button>
+          <button type="button" class="action" data-download-result disabled>
+            {tool.download}
+          </button>
+        </div>
+      </div>
+
+      <div class="viewer-shell">
+        <p data-empty-result>{tool.emptyResult}</p>
+        <pre class="viewer" data-result-viewer tabindex="0" hidden></pre>
+      </div>
+      <p
+        class="local-feedback"
+        data-local-feedback
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+      >
+      </p>
+    </div>
+  </div>
+
+  <noscript>
+    <p class="noscript">{tool.noscript}</p>
+  </noscript>
+</section>
+
+<script>
+  import { mountRandomizeTool } from "../scripts/randomize-tool";
+
+  mountRandomizeTool();
+</script>
+
+<style>
+  section[data-randomize-tool] {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-top: var(--space-2);
+    padding: var(--space-4);
+    border: var(--border-default);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+  }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .workspace {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-4);
+  }
+
+  .pane {
+    min-width: 0;
+  }
+
+  .pane-heading,
+  .result-toolbar,
+  .input-footer,
+  .controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+
+  .pane-heading {
+    min-height: 28px;
+    margin-bottom: var(--space-2);
+  }
+
+  .pane-heading label,
+  .result-title {
+    margin: 0;
+    font-size: var(--font-size-control);
+    line-height: var(--line-height-control);
+    font-weight: var(--font-weight-control);
+  }
+
+  .result-title {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--space-1);
+  }
+
+  textarea,
+  .viewer-shell {
+    width: 100%;
+    height: clamp(176px, 22vh, 224px);
+    border: var(--border-default);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+  }
+
+  textarea {
+    display: block;
+    min-height: 176px;
+    padding: var(--space-3);
+    resize: vertical;
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-size: var(--font-size-result-data);
+    line-height: var(--line-height-result-data);
+  }
+
+  textarea:hover,
+  textarea:focus {
+    border-color: var(--color-border-strong);
+  }
+
+  .input-footer {
+    justify-content: flex-end;
+    min-height: 28px;
+    margin-top: var(--space-1);
+  }
+
+  .controls {
+    align-items: flex-end;
+    margin-top: var(--space-2);
+  }
+
+  .options {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-4);
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .options-label {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-ui-label);
+    line-height: var(--line-height-ui-label);
+    font-weight: var(--font-weight-ui-label);
+    letter-spacing: var(--letter-spacing-ui-label);
+    text-transform: uppercase;
+  }
+
+  .option {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--font-size-control);
+    line-height: var(--line-height-control);
+  }
+
+  .option input {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: var(--color-accent);
+  }
+
+  .viewer-shell {
+    overflow: auto;
+    background: var(--color-surface-muted);
+  }
+
+  .viewer-shell > p {
+    margin: 0;
+    padding: var(--space-3);
+    color: var(--color-text-secondary);
+  }
+
+  .viewer {
+    min-width: max-content;
+    margin: 0;
+    padding: var(--space-3);
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-size: var(--font-size-result-data);
+    line-height: var(--line-height-result-data);
+    white-space: pre;
+  }
+
+  .result-toolbar {
+    min-height: 28px;
+    margin-bottom: var(--space-2);
+  }
+
+  .result-actions {
+    display: flex;
+    gap: var(--space-2);
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  button:disabled {
+    cursor: default;
+    opacity: 0.5;
+  }
+
+  .example-button,
+  .text-button {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--color-accent);
+    font-size: var(--font-size-control);
+    line-height: var(--line-height-control);
+    font-weight: var(--font-weight-control);
+  }
+
+  .example-button:not(:disabled):hover,
+  .text-button:not(:disabled):hover {
+    color: var(--color-accent-hover);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .primary-action,
+  .action {
+    min-height: 32px;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-control);
+    line-height: var(--line-height-control);
+    font-weight: var(--font-weight-control);
+  }
+
+  .primary-action {
+    flex: none;
+    border: 1px solid var(--color-accent);
+    background: var(--color-accent);
+    color: var(--color-surface);
+  }
+
+  .primary-action:not(:disabled):hover {
+    border-color: var(--color-accent-hover);
+    background: var(--color-accent-hover);
+  }
+
+  .action {
+    border: var(--border-default);
+    background: var(--color-surface);
+    color: var(--color-text);
+  }
+
+  .action:not(:disabled):hover {
+    border-color: var(--color-border-strong);
+    background: var(--color-surface-muted);
+  }
+
+  .local-feedback {
+    min-height: var(--line-height-body-secondary);
+    margin: var(--space-1) 0 0;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-body-secondary);
+    line-height: var(--line-height-body-secondary);
+  }
+
+  .local-feedback[data-state="error"] {
+    color: var(--color-danger);
+  }
+
+  .noscript {
+    margin: 0;
+    color: var(--color-text-secondary);
+  }
+
+  @media (max-width: 559px) {
+    .controls {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    .primary-action {
+      width: 100%;
+    }
+  }
+
+  @media (min-width: 760px) {
+    .workspace {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (pointer: coarse) {
+    .option,
+    .example-button,
+    .text-button,
+    .primary-action,
+    .action {
+      min-height: 44px;
+    }
+  }
+</style>

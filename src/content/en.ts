@@ -91,6 +91,7 @@ export type FooterContent = {
   ariaLabel: string;
   compareLists: string;
   alphabetizer: string;
+  randomizer: string;
   about: string;
   privacy: string;
 };
@@ -103,6 +104,7 @@ export type PageMetadata = {
 export type MetadataContent = {
   home: PageMetadata;
   alphabetizeList: PageMetadata;
+  randomizeList: PageMetadata;
   tools: PageMetadata;
   about: PageMetadata;
   privacy: PageMetadata;
@@ -272,8 +274,8 @@ export const englishContent = {
   about: {
     heading: "About ListContrast",
     paragraphs: [
-      "ListContrast is a small collection of browser-based tools for comparing and sorting line-based lists.",
-      "Use Compare Lists to find differences, matches and unique values between two lists, or use the Alphabetizer to put one list into alphabetical order.",
+      "ListContrast is a small collection of browser-based tools for comparing, sorting and shuffling line-based lists.",
+      "Use Compare Lists to find differences and matches, the Alphabetizer to sort a list, or the List Randomizer to shuffle one into a random order.",
       "The tools require no account and process list content locally in your browser. Your lists are not uploaded for tool processing or saved by the site. Results leave the page only when you copy or download them yourself.",
     ],
     toolLinkLabel: "Browse list tools",
@@ -315,6 +317,7 @@ export const englishContent = {
     ariaLabel: "Footer",
     compareLists: "Compare Lists",
     alphabetizer: "Alphabetizer",
+    randomizer: "List Randomizer",
     about: "About",
     privacy: "Privacy",
   },
@@ -329,15 +332,20 @@ export const englishContent = {
       description:
         "Alphabetize a list online in A–Z or Z–A order. Sort names, words and line-based lists locally in your browser, then copy or download the result.",
     },
+    randomizeList: {
+      title: "List Randomizer — Randomize a List Online | ListContrast",
+      description:
+        "Randomize a list online with an in-browser shuffle. Paste one item per line, shuffle the list, then copy or download the randomized result.",
+    },
     tools: {
       title: "List Tools | ListContrast",
       description:
-        "Browse ListContrast tools for comparing two lists or alphabetizing a line-based list directly in your browser.",
+        "Browse ListContrast tools for comparing, alphabetizing or randomizing line-based lists directly in your browser.",
     },
     about: {
       title: "About ListContrast",
       description:
-        "Learn about ListContrast and its browser-based tools for comparing and sorting line-based lists.",
+        "Learn about ListContrast and its browser-based tools for comparing, sorting and randomizing line-based lists.",
     },
     privacy: {
       title: "Privacy | ListContrast",

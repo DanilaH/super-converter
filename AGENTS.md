@@ -127,7 +127,7 @@ onlyA   = max(countA - countB, 0)
 onlyB   = max(countB - countA, 0)
 ```
 
-Alphabetizer preserves duplicates. Remove Duplicate Lines has its own first-occurrence-wins semantics. Do not merge these domain rules into one generic processor.
+Alphabetizer and Randomizer preserve duplicates. Remove Duplicate Lines has its own first-occurrence-wins semantics. Do not merge these domain rules into one generic processor.
 
 ## 15. Ordering
 
@@ -231,7 +231,7 @@ Do not create a speculative foundation PR before a real consumer requires the ab
 
 The assigned GitHub Issue is the operational scope. `LISTCONTRAST_EXPANSION_SCOPE_V1_1.md` defines the approved multi-PR expansion and exact semantic contracts.
 
-For CL-040, implement only Alphabetizer + the minimum two-tool site foundation. Randomizer/Dedupe behavior may inform future extraction decisions but must not be implemented or scaffolded as a generic framework now.
+For CL-041, implement only List Randomizer and the incremental three-tool integration on top of CL-040. A small shared transform-line preprocessing layer is now justified because Alphabetizer and Randomizer are two real consumers of the same emitted-value semantics. Do not generalize their UI/state machines and do not implement or expose Dedupe in this package.
 
 ## 32. Scope discipline
 
