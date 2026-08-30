@@ -27,7 +27,7 @@
   }
 }
 
-@media (pointer: coarse) and (min-width: 680px) {
+@media (pointer: coarse) and (min-width: 760px) {
   section[data-compare-tool] .list-heading {
     min-height: 44px;
   }
@@ -37,6 +37,10 @@
   section[data-compare-tool] .lists {
     grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     align-items: center;
+  }
+
+  section[data-compare-tool] .list-heading {
+    min-height: 44px;
   }
 
   section[data-compare-tool] .list textarea {
