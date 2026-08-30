@@ -1,0 +1,79 @@
+---
+import EditorialContent from "@/components/EditorialContent.astro";
+import RelatedTools from "@/components/RelatedTools.astro";
+import RemoveDuplicateLinesTool from "@/components/RemoveDuplicateLinesTool.astro";
+import { removeDuplicateLinesContent } from "@/content/remove-duplicate-lines";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+
+const { page, editorial } = removeDuplicateLinesContent;
+---
+
+<BaseLayout metadataKey="removeDuplicateLines">
+  <div class="intro">
+    <h1>{page.heading}</h1>
+    <p class="description">
+      {page.description}
+      <span class="privacy">{page.privacy}</span>
+    </p>
+
+    <RemoveDuplicateLinesTool />
+  </div>
+
+  <EditorialContent content={editorial} />
+  <RelatedTools
+    tools={[
+      {
+        href: "/",
+        label: "Compare Lists",
+        description: "Find differences, matches and unique values between two lists.",
+      },
+      {
+        href: "/alphabetize-list",
+        label: "Alphabetizer",
+        description: "Sort a list alphabetically in A–Z or Z–A order.",
+      },
+      {
+        href: "/randomize-list",
+        label: "List Randomizer",
+        description: "Shuffle a list into a random order.",
+      },
+    ]}
+  />
+</BaseLayout>
+
+<style>
+  .intro {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding-block: var(--space-3) var(--space-5);
+  }
+
+  .intro h1 {
+    margin: 0;
+    font-size: var(--font-size-h1-mobile);
+    line-height: var(--line-height-h1-mobile);
+    font-weight: var(--font-weight-h1);
+  }
+
+  .description {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--space-1);
+    margin: 0;
+    max-width: var(--container-editorial);
+    font-size: var(--font-size-body);
+    line-height: var(--line-height-body);
+  }
+
+  .privacy {
+    color: var(--color-text-secondary);
+  }
+
+  @media (min-width: 760px) {
+    .intro h1 {
+      font-size: var(--font-size-h1);
+      line-height: var(--line-height-h1);
+    }
+  }
+</style>
