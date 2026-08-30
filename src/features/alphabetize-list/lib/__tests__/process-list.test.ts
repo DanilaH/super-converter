@@ -20,6 +20,24 @@ describe("processListInput", () => {
     ).toEqual(["Apple", "Banana"]);
   });
 
+  it("can emit one intentional empty item after trimming", () => {
+    expect(
+      processListInput("   ", {
+        trimWhitespace: true,
+        ignoreEmptyLines: false,
+      }),
+    ).toEqual([""]);
+  });
+
+  it("preserves a final intentional empty item from a trailing line break", () => {
+    expect(
+      processListInput("A\n", {
+        trimWhitespace: true,
+        ignoreEmptyLines: false,
+      }),
+    ).toEqual(["A", ""]);
+  });
+
   it("preserves whitespace-only lines when trim is off", () => {
     expect(
       processListInput("A\n   \nB", {
