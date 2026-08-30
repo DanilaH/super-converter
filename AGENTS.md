@@ -42,7 +42,7 @@ SEO/indexing            → SEO.md
 Technical design        → ARCHITECTURE.md
 Analytics/privacy       → ANALYTICS.md
 Delivery/release        → LAUNCH_PLAN.md
-Task sequencing         → IMPLEMENTATION_PLAN.md + current expansion scope
+Task sequencing         → IMPLEMENTATION_PLAN.md + assigned Issue / approved scope
 Stack revision          → STACK_CHANGE.md
 ```
 
@@ -50,7 +50,7 @@ The expansion scope explicitly supersedes older planning only where it says so. 
 
 ## 4. Goal
 
-Maintain a small, coherent, static ListContrast toolkit for line-based list work. Compare Lists remains the anchor utility; post-MVP tools are added only when approved by the expansion source of truth.
+Maintain a small, coherent, static ListContrast toolkit for line-based list work. Compare Lists remains the anchor utility. The shipped post-MVP expansion is defined by `LISTCONTRAST_EXPANSION_SCOPE_V1_1.md`; any additional tools require a new evidence-backed approved scope.
 
 This is an SEO/product experiment, not a SaaS platform or a generic utility portal.
 
@@ -75,7 +75,7 @@ Do not introduce SSR, server adapter, processing API, backend or database for li
 
 ## 8. Current product scope
 
-The existing Compare Lists page on `/` remains stable. The approved post-MVP expansion is defined in `LISTCONTRAST_EXPANSION_SCOPE_V1_1.md` and currently covers:
+The existing Compare Lists page on `/` remains stable. The shipped post-MVP expansion is defined in `LISTCONTRAST_EXPANSION_SCOPE_V1_1.md` and covers:
 
 ```text
 /
@@ -87,11 +87,11 @@ The existing Compare Lists page on `/` remains stable. The approved post-MVP exp
 /privacy
 ```
 
-Implement only the routes included in the assigned delivery PR. Never expose navigation links to planned routes before those routes exist in the merged/releasable codebase.
+These routes are the current shipped product scope. Add or expose new routes only when a newly assigned delivery issue or other explicitly approved scope requires them. Never expose navigation links to planned routes before those routes exist in the merged/releasable codebase.
 
 ## 9. Out of scope
 
-Follow the explicit out-of-scope list in `LISTCONTRAST_EXPANSION_SCOPE_V1_1.md`. In particular: no auth, accounts, backend, database, history, saved data, AI, arbitrary generic text-tool expansion, file-processing suite, dark mode, ads or payments in this expansion.
+Follow the explicit out-of-scope list in `LISTCONTRAST_EXPANSION_SCOPE_V1_1.md` for the shipped expansion. In particular: no auth, accounts, backend, database, history, saved data, AI, arbitrary generic text-tool expansion, file-processing suite, dark mode, ads or payments without a new explicit scope decision.
 
 Spanish localization and the Instagram export idea remain deferred and require their own evidence/priority decision.
 
@@ -187,11 +187,11 @@ Each confirmed intent family maps to one canonical acquisition page. Do not crea
 
 ## 25. Analytics
 
-Production analytics currently use the existing no-op boundary. Enabling a provider is not part of the expansion. Never send raw input/output or list values.
+Production analytics currently use the existing no-op boundary. Do not enable a provider without a specific approved task. Never send raw input/output or list values.
 
 ## 26. Ads
 
-OFF in the current expansion.
+OFF by default. Adding ads requires explicit approval/evidence and its own scoped task.
 
 ## 27. Accessibility
 
@@ -216,7 +216,7 @@ e2e/browser smoke where relevant
 
 A platform quota/infrastructure failure is not evidence that code is correct or incorrect; record it separately from test failures and run the checks locally when required.
 
-## 30. Post-MVP expansion delivery order
+## 30. Completed post-MVP expansion delivery order
 
 ```text
 PR-1 — Alphabetizer + minimum expansion foundation
@@ -225,13 +225,15 @@ PR-3 — Remove Duplicate Lines
 PR-4 — cross-tool finalization only if real remaining work exists
 ```
 
-Do not create a speculative foundation PR before a real consumer requires the abstraction.
+CL-040 through CL-043 are complete and merged. This sequence is historical; do not reopen it as an active roadmap. Do not create a speculative foundation PR before a real consumer requires the abstraction.
 
-## 31. Current package
+## 31. Current delivery scope
 
-The assigned GitHub Issue is the operational scope. `LISTCONTRAST_EXPANSION_SCOPE_V1_1.md` defines the approved multi-PR expansion and exact semantic contracts.
+There is no active expansion package after CL-043. The four-tool expansion is complete.
 
-For CL-043, make only evidence-backed cross-tool finalization fixes discovered by the whole-stack audit. The current scope is export lifecycle consistency: selected-result Copy/Download availability and stale asynchronous Copy feedback across Compare Lists and the three transform tools. Do not add new tools, redesign pages, alter SEO intent mapping, or introduce a generic export/UI framework merely because several tools share this correctness rule.
+For future work, the assigned GitHub Issue or other explicitly approved task is the operational scope. `LISTCONTRAST_EXPANSION_SCOPE_V1_1.md` remains the source of truth for the shipped expansion semantics; it is not automatic authorization to add more tools or broaden the product.
+
+If no implementation scope is assigned, review and report findings only. Do not invent a delivery package, new routes or roadmap work.
 
 ## 32. Scope discipline
 
