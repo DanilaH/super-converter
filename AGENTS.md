@@ -231,7 +231,7 @@ Do not create a speculative foundation PR before a real consumer requires the ab
 
 The assigned GitHub Issue is the operational scope. `LISTCONTRAST_EXPANSION_SCOPE_V1_1.md` defines the approved multi-PR expansion and exact semantic contracts.
 
-For CL-042, implement only Remove Duplicate Lines and the incremental final four-tool integration on top of CL-041. Reuse the existing shared transform-line preprocessing layer, but keep Dedupe identity, first-occurrence-wins ordering, summary semantics and live UI behavior feature-specific. Do not expand the shared layer into a generic transformation engine and do not add tools beyond the approved four-tool scope.
+For CL-043, make only evidence-backed cross-tool finalization fixes discovered by the whole-stack audit. The current scope is export lifecycle consistency: selected-result Copy/Download availability and stale asynchronous Copy feedback across Compare Lists and the three transform tools. Do not add new tools, redesign pages, alter SEO intent mapping, or introduce a generic export/UI framework merely because several tools share this correctness rule.
 
 ## 32. Scope discipline
 

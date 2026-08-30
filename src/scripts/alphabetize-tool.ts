@@ -15,6 +15,12 @@ type ToolState = {
   copyTimer: number | null;
 };
 
+type CopySnapshot = {
+  input: string;
+  options: AlphabetizeOptions;
+  text: string;
+};
+
 type Labels = {
   item: string;
   items: string;
@@ -77,6 +83,7 @@ function mountRoot(root: HTMLElement): void {
   };
 
   const recompute = (): void => {
+    resetCopyFeedback(hooks, labels, state);
     state.result = alphabetizeList(state.input, state.options);
     render(hooks, labels, state);
   };
@@ -152,13 +159,32 @@ function render(hooks: Hooks, labels: Labels, state: ToolState): void {
   hooks.download.disabled = !hasExportableText;
 }
 
+function captureCopySnapshot(state: ToolState): CopySnapshot {
+  return {
+    input: state.input,
+    options: { ...state.options },
+    text: state.result.text,
+  };
+}
+
+function isCopySnapshotCurrent(state: ToolState, snapshot: CopySnapshot): boolean {
+  return (
+    state.input === snapshot.input &&
+    state.options.trimWhitespace === snapshot.options.trimWhitespace &&
+    state.options.ignoreEmptyLines === snapshot.options.ignoreEmptyLines &&
+    state.options.order === snapshot.options.order &&
+    state.result.text === snapshot.text
+  );
+}
+
 function setupCopy(hooks: Hooks, labels: Labels, state: ToolState): void {
   hooks.copy.addEventListener("click", () => {
-    if (state.result.text === "") {
+    const snapshot = captureCopySnapshot(state);
+    if (snapshot.text === "") {
       return;
     }
 
-    clearCopyTimer(state);
+    resetCopyFeedback(hooks, labels, state);
     hooks.copy.disabled = true;
     const clipboard = navigator.clipboard;
     const writeText = clipboard?.writeText;
@@ -170,8 +196,11 @@ function setupCopy(hooks: Hooks, labels: Labels, state: ToolState): void {
     }
 
     writeText
-      .call(clipboard, state.result.text)
+      .call(clipboard, snapshot.text)
       .then(() => {
+        if (!isCopySnapshotCurrent(state, snapshot)) {
+          return;
+        }
         hooks.copy.textContent = `\u2713 ${labels.copied}`;
         hooks.localFeedback.textContent = labels.copied;
         hooks.localFeedback.dataset.state = "success";
@@ -183,10 +212,14 @@ function setupCopy(hooks: Hooks, labels: Labels, state: ToolState): void {
         }, 2000);
       })
       .catch(() => {
-        showCopyError(hooks, labels, state);
+        if (isCopySnapshotCurrent(state, snapshot)) {
+          showCopyError(hooks, labels, state);
+        }
       })
       .finally(() => {
-        hooks.copy.disabled = state.result.text === "";
+        if (isCopySnapshotCurrent(state, snapshot)) {
+          hooks.copy.disabled = false;
+        }
       });
   });
 }
@@ -223,6 +256,17 @@ function showCopyError(hooks: Hooks, labels: Labels, state: ToolState): void {
     delete hooks.localFeedback.dataset.state;
     state.copyTimer = null;
   }, 4000);
+}
+
+function resetCopyFeedback(
+  hooks: Hooks,
+  labels: Labels,
+  state: ToolState,
+): void {
+  clearCopyTimer(state);
+  hooks.copy.textContent = labels.copy;
+  hooks.localFeedback.textContent = "";
+  delete hooks.localFeedback.dataset.state;
 }
 
 function clearCopyTimer(state: ToolState): void {
