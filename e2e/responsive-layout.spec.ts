@@ -52,11 +52,35 @@ test.describe("Compare Lists narrow-tablet layout", () => {
     expect(listA).not.toBeNull();
     expect(listB).not.toBeNull();
     expect(example).not.toBeNull();
-    expect(Math.abs(listA!.y - listB!.y)).toBeLessThan(16);
+    expect(Math.abs(listA!.y - listB!.y)).toBeLessThan(1);
     expect(listA!.width).toBeGreaterThan(260);
     expect(listB!.width).toBeGreaterThan(260);
     expect(listB!.x).toBeGreaterThan(listA!.x + listA!.width);
     expect(example!.height).toBeGreaterThanOrEqual(44);
+
+    const hasHorizontalOverflow = await page.evaluate(
+      () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
+    );
+    expect(hasHorizontalOverflow).toBe(false);
+  });
+});
+
+test.describe("Compare Lists upper narrow-tablet edge", () => {
+  test.use({
+    viewport: { width: 759, height: 800 },
+    isMobile: false,
+    hasTouch: false,
+  });
+
+  test("keeps both input fields aligned before the desktop breakpoint", async ({ page }) => {
+    await page.goto("/");
+
+    const listA = await page.getByLabel("List A").boundingBox();
+    const listB = await page.getByLabel("List B").boundingBox();
+
+    expect(listA).not.toBeNull();
+    expect(listB).not.toBeNull();
+    expect(Math.abs(listA!.y - listB!.y)).toBeLessThan(1);
 
     const hasHorizontalOverflow = await page.evaluate(
       () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
