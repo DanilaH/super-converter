@@ -18,6 +18,7 @@ type ToolState = {
 type CopySnapshot = {
   input: string;
   options: RandomizeOptions;
+  result: RandomizeResult;
   text: string;
 };
 
@@ -184,13 +185,14 @@ function captureCopySnapshot(state: ToolState): CopySnapshot | null {
   return {
     input: state.input,
     options: { ...state.options },
+    result: state.result,
     text: state.result.text,
   };
 }
 
 function isCopySnapshotCurrent(state: ToolState, snapshot: CopySnapshot): boolean {
   return (
-    state.result !== null &&
+    state.result === snapshot.result &&
     state.input === snapshot.input &&
     state.options.trimWhitespace === snapshot.options.trimWhitespace &&
     state.options.ignoreEmptyLines === snapshot.options.ignoreEmptyLines &&
