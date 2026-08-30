@@ -1,4 +1,5 @@
 import { fireEvent, within } from "@testing-library/dom";
+import axe from "axe-core";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { mountAlphabetizeTool } from "../alphabetize-tool";
 
@@ -14,7 +15,12 @@ const TOOL_HTML = `
   data-label-copy-error="Couldn’t copy. Select the result manually."
   data-label-replace-example-confirmation="Load the example and replace your current list? Your current input will be lost."
 >
+  <label for="input">List</label>
+  <textarea id="input" data-list-input></textarea>
+  <button type="button" data-load-example disabled>Try example</button>
+  <button type="button" data-clear-list disabled>Clear</button>
   <fieldset>
+    <legend>Options</legend>
     <label><input type="checkbox" data-option-trim-whitespace checked />Trim whitespace</label>
     <label><input type="checkbox" data-option-ignore-empty-lines checked />Ignore empty lines</label>
     <label>Order
@@ -24,10 +30,6 @@ const TOOL_HTML = `
       </select>
     </label>
   </fieldset>
-  <label for="input">List</label>
-  <textarea id="input" data-list-input></textarea>
-  <button type="button" data-load-example disabled>Try example</button>
-  <button type="button" data-clear-list disabled>Clear</button>
   <span data-result-count>0 items</span>
   <p data-empty-result>Paste a list to see the alphabetized result.</p>
   <pre data-result-viewer hidden></pre>
@@ -59,6 +61,13 @@ afterEach(() => {
 });
 
 describe("AlphabetizeTool", () => {
+  it("has no obvious accessibility violations", async () => {
+    const container = mountTool();
+    const result = await axe.run(container);
+
+    expect(result.violations).toEqual([]);
+  });
+
   it("renders a live normalized A to Z result", () => {
     const container = mountTool();
     fireEvent.input(input(container), {
