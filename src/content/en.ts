@@ -92,6 +92,7 @@ export type FooterContent = {
   compareLists: string;
   alphabetizer: string;
   randomizer: string;
+  duplicateLines: string;
   about: string;
   privacy: string;
 };
@@ -105,6 +106,7 @@ export type MetadataContent = {
   home: PageMetadata;
   alphabetizeList: PageMetadata;
   randomizeList: PageMetadata;
+  removeDuplicateLines: PageMetadata;
   tools: PageMetadata;
   about: PageMetadata;
   privacy: PageMetadata;
@@ -274,8 +276,8 @@ export const englishContent = {
   about: {
     heading: "About ListContrast",
     paragraphs: [
-      "ListContrast is a small collection of browser-based tools for comparing, sorting and shuffling line-based lists.",
-      "Use Compare Lists to find differences and matches, the Alphabetizer to sort a list, or the List Randomizer to shuffle one into a random order.",
+      "ListContrast is a small collection of browser-based tools for comparing, sorting, randomizing and cleaning line-based lists.",
+      "Use Compare Lists to find differences and matches, the Alphabetizer to sort a list, the List Randomizer to shuffle it, or Remove Duplicate Lines to keep only first occurrences.",
       "The tools require no account and process list content locally in your browser. Your lists are not uploaded for tool processing or saved by the site. Results leave the page only when you copy or download them yourself.",
     ],
     toolLinkLabel: "Browse list tools",
@@ -318,6 +320,7 @@ export const englishContent = {
     compareLists: "Compare Lists",
     alphabetizer: "Alphabetizer",
     randomizer: "List Randomizer",
+    duplicateLines: "Remove Duplicate Lines",
     about: "About",
     privacy: "Privacy",
   },
@@ -337,15 +340,20 @@ export const englishContent = {
       description:
         "Randomize a list online with an in-browser shuffle. Paste one item per line, shuffle the list, then copy or download the randomized result.",
     },
+    removeDuplicateLines: {
+      title: "Remove Duplicate Lines Online | ListContrast",
+      description:
+        "Remove duplicate lines online while preserving the first occurrence and original order. Process text locally in your browser, then copy or download unique lines.",
+    },
     tools: {
       title: "List Tools | ListContrast",
       description:
-        "Browse ListContrast tools for comparing, alphabetizing or randomizing line-based lists directly in your browser.",
+        "Browse ListContrast tools for comparing, alphabetizing, randomizing or cleaning line-based lists directly in your browser.",
     },
     about: {
       title: "About ListContrast",
       description:
-        "Learn about ListContrast and its browser-based tools for comparing, sorting and randomizing line-based lists.",
+        "Learn about ListContrast and its browser-based tools for comparing, sorting, randomizing and cleaning line-based lists.",
     },
     privacy: {
       title: "Privacy | ListContrast",
