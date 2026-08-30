@@ -18,26 +18,6 @@ const { tool } = alphabetizeListContent;
 >
   <h2 id="alphabetize-tool-heading" class="visually-hidden">{tool.heading}</h2>
 
-  <fieldset class="options">
-    <legend class="visually-hidden">{tool.options}</legend>
-    <span class="options-label" aria-hidden="true">{tool.options}</span>
-    <label class="option">
-      <input type="checkbox" data-option-trim-whitespace checked />
-      {tool.trimWhitespace}
-    </label>
-    <label class="option">
-      <input type="checkbox" data-option-ignore-empty-lines checked />
-      {tool.ignoreEmptyLines}
-    </label>
-    <label class="order-option">
-      <span>{tool.order}</span>
-      <select data-order aria-label={tool.order}>
-        <option value="asc" selected>{tool.ascending}</option>
-        <option value="desc">{tool.descending}</option>
-      </select>
-    </label>
-  </fieldset>
-
   <div class="workspace">
     <div class="pane input-pane">
       <div class="pane-heading">
@@ -58,6 +38,26 @@ const { tool } = alphabetizeListContent;
           {tool.clear}
         </button>
       </div>
+
+      <fieldset class="options">
+        <legend class="visually-hidden">{tool.options}</legend>
+        <span class="options-label" aria-hidden="true">{tool.options}</span>
+        <label class="option">
+          <input type="checkbox" data-option-trim-whitespace checked />
+          {tool.trimWhitespace}
+        </label>
+        <label class="option">
+          <input type="checkbox" data-option-ignore-empty-lines checked />
+          {tool.ignoreEmptyLines}
+        </label>
+        <label class="order-option">
+          <span>{tool.order}</span>
+          <select data-order aria-label={tool.order}>
+            <option value="asc" selected>{tool.ascending}</option>
+            <option value="desc">{tool.descending}</option>
+          </select>
+        </label>
+      </fieldset>
     </div>
 
     <div class="pane result-pane">
@@ -134,7 +134,7 @@ const { tool } = alphabetizeListContent;
     align-items: center;
     gap: var(--space-2) var(--space-4);
     min-width: 0;
-    margin: 0;
+    margin: var(--space-2) 0 0;
     padding: 0;
     border: 0;
   }
