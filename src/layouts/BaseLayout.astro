@@ -22,6 +22,15 @@ const canonicalUrl =
   metadataKey === "notFound"
     ? null
     : new URL(canonicalPathFor(metadataKey), site).href;
+const websiteStructuredData =
+  metadataKey === "home"
+    ? JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        url: new URL("/", site).href,
+        name: englishContent.siteName,
+      })
+    : null;
 ---
 
 <!doctype html>
@@ -39,6 +48,14 @@ const canonicalUrl =
     <meta property="og:site_name" content={englishContent.siteName} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     {noIndex && <meta name="robots" content="noindex,nofollow" />}
+    {
+      websiteStructuredData && (
+        <script
+          type="application/ld+json"
+          set:html={websiteStructuredData}
+        />
+      )
+    }
   </head>
   <body class="shell">
     <SiteHeader />
