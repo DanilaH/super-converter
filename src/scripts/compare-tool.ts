@@ -166,12 +166,12 @@ function mountRoot(root: HTMLElement, analytics: Analytics): void {
     // Large inputs may wait briefly before recomputation; stale Copy feedback
     // should still disappear as soon as the source changes.
     resetCopyFeedback(hooks, labels, state);
-    handleInput(analytics, state, recompute, event);
+    handleInput(analytics, hooks, state, recompute, event);
   });
   hooks.listB.addEventListener("input", (event) => {
     state.listB = hooks.listB.value;
     resetCopyFeedback(hooks, labels, state);
-    handleInput(analytics, state, recompute, event);
+    handleInput(analytics, hooks, state, recompute, event);
   });
   hooks.trimWhitespace.addEventListener("change", () => {
     state.options.trimWhitespace = hooks.trimWhitespace.checked;
@@ -262,6 +262,7 @@ function mountRoot(root: HTMLElement, analytics: Analytics): void {
 
 function handleInput(
   analytics: Analytics,
+  hooks: Hooks,
   state: ToolState,
   recompute: () => CompareResult | null,
   event: Event,
@@ -269,6 +270,11 @@ function handleInput(
   markToolUsed(analytics, state, event);
   cancelPendingInput(state);
   if (isLargeInput(state)) {
+    // While the visible result is intentionally stale during the short
+    // large-input debounce, export actions must not compute a newer result
+    // than the one the user can currently inspect.
+    hooks.copyResult.disabled = true;
+    hooks.downloadResult.disabled = true;
     // Every new large-input event immediately cancels any already scheduled
     // comparison_completed timer so a stale result cannot emit completion
     // while a newer large-input recompute is pending.
@@ -563,7 +569,11 @@ function setupCopy(
   analytics: Analytics,
 ): void {
   hooks.copyResult.addEventListener("click", () => {
-    if (state.listA === "" && state.listB === "") {
+    if (
+      hooks.copyResult.disabled ||
+      state.inputTimer !== null ||
+      (state.listA === "" && state.listB === "")
+    ) {
       return;
     }
     const formatted = getCurrentFormatted(state);
@@ -646,7 +656,7 @@ function setupDownload(
   analytics: Analytics,
 ): void {
   hooks.downloadResult.addEventListener("click", () => {
-    if (hooks.downloadResult.disabled) {
+    if (state.inputTimer !== null || hooks.downloadResult.disabled) {
       return;
     }
     const formatted = getCurrentFormatted(state);
