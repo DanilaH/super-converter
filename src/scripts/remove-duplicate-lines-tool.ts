@@ -157,7 +157,7 @@ function emptyResult(): RemoveDuplicateLinesResult {
 
 function render(hooks: Hooks, labels: Labels, state: ToolState): void {
   hooks.clear.disabled = state.input === "";
-  hooks.summary.hidden = state.input === "";
+  hooks.summary.hidden = false;
   hooks.summaryInput.textContent = `${labels.input}: ${state.result.stats.input}`;
   hooks.summaryUnique.textContent = `${labels.unique}: ${state.result.stats.unique}`;
   hooks.summaryRemoved.textContent = `${labels.removed}: ${state.result.stats.removed}`;
