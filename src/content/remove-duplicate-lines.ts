@@ -35,14 +35,14 @@ export const removeDuplicateLinesContent = {
   },
   tool: {
     heading: "Remove duplicate lines",
-    listLabel: "Text or list",
+    listLabel: "List",
     pastePlaceholder: "Paste one item per line",
     clear: "Clear",
     loadExample: "Try example",
     replaceExampleConfirmation:
       "Load the example and replace your current text? Your current input will be lost.",
     options: "Options",
-    trimWhitespace: "Trim whitespace",
+    trimWhitespace: "Trim surrounding whitespace",
     ignoreEmptyLines: "Ignore empty lines",
     ignoreCase: "Ignore case",
     resultLabel: "Unique lines",
@@ -64,7 +64,7 @@ export const removeDuplicateLinesContent = {
     howToHeading: "How to remove duplicate lines",
     howToSteps: [
       "Paste text or a list with one item per line.",
-      "Adjust whitespace, empty-line or case handling if needed.",
+      "Adjust surrounding-whitespace, empty-line or case handling if needed.",
       "Duplicate lines are removed automatically while the first occurrence stays in place.",
       "Review the unique lines, then copy or download the result.",
     ],
@@ -99,7 +99,7 @@ export const removeDuplicateLinesContent = {
     dataParagraph:
       "Duplicate removal happens entirely in your browser. The pasted lines and unique result are not uploaded for tool processing.",
     dataItems: [
-      "Trim whitespace changes emitted values when the option is enabled.",
+      "Trim surrounding whitespace removes spaces and tabs from the beginning and end of emitted lines before duplicate matching. When it is off, lines that differ only by surrounding whitespace remain distinct.",
       "Ignore empty lines removes empty processed items when enabled.",
       "Ignore case changes duplicate identity only; it does not lowercase the retained line.",
       "Copy and Download export the result only after you activate those actions.",
@@ -116,6 +116,11 @@ export const removeDuplicateLinesContent = {
         question: "Can duplicate matching ignore uppercase and lowercase?",
         answer:
           "Yes. Turn on Ignore case to treat case variants such as Apple and apple as duplicates while preserving the text of the first retained occurrence.",
+      },
+      {
+        question: "Why can two lines that look the same remain when trimming is off?",
+        answer:
+          "Spaces or tabs at the beginning or end of a line are part of that line when Trim surrounding whitespace is off, so visually similar lines can still be distinct.",
       },
       {
         question: "Does the tool sort the unique lines?",
