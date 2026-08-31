@@ -41,7 +41,7 @@ export const alphabetizeListContent = {
     replaceExampleConfirmation:
       "Load the example and replace your current list? Your current input will be lost.",
     options: "Options",
-    trimWhitespace: "Trim whitespace",
+    trimWhitespace: "Trim surrounding whitespace",
     ignoreEmptyLines: "Ignore empty lines",
     order: "Order",
     ascending: "A → Z",
@@ -98,7 +98,7 @@ export const alphabetizeListContent = {
     dataParagraph:
       "Alphabetizing happens entirely in your browser. The pasted list and sorted result are not uploaded for tool processing.",
     dataItems: [
-      "Trim whitespace changes emitted values when the option is enabled.",
+      "Trim surrounding whitespace removes spaces and tabs from the beginning and end of emitted lines when the option is enabled.",
       "Ignore empty lines removes empty processed items when enabled.",
       "Copy uses the Clipboard API only after you click Copy.",
       "Download creates a local text file only after you click Download.",

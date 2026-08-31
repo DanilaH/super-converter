@@ -30,16 +30,13 @@ test("randomizes only on explicit action and invalidates stale results", async (
   expect([...resultItems].sort()).toEqual(
     ["Alpha", "Bravo", "Charlie", "Delta"].sort(),
   );
-  await expect(
-    page.getByRole("button", { name: "Randomize again" }),
-  ).toBeVisible();
+  await expect(randomize).toBeVisible();
+  await expect(randomize).toHaveText("Randomize");
   await expect(page.getByRole("button", { name: "Copy" })).toBeEnabled();
 
   await input.fill("Alpha\nBravo\nCharlie\nDelta\nEcho");
   await expect(viewer).toBeHidden();
-  await expect(
-    page.getByRole("button", { name: "Randomize", exact: true }),
-  ).toBeVisible();
+  await expect(randomize).toBeVisible();
   await expect(page.getByRole("button", { name: "Copy" })).toBeDisabled();
 });
 

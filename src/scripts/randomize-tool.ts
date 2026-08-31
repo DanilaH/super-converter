@@ -29,7 +29,6 @@ type Labels = {
   readyResult: string;
   noEffectiveItems: string;
   randomize: string;
-  randomizeAgain: string;
   copy: string;
   copied: string;
   copyError: string;
@@ -150,9 +149,7 @@ function render(hooks: Hooks, labels: Labels, state: ToolState): void {
 
   hooks.clear.disabled = state.input === "";
   hooks.randomize.disabled = !hasEffectiveItems;
-  hooks.randomize.textContent = result
-    ? labels.randomizeAgain
-    : labels.randomize;
+  hooks.randomize.textContent = labels.randomize;
   hooks.resultCount.textContent = pluralize(
     result?.items.length ?? 0,
     labels.item,
@@ -342,7 +339,6 @@ function readLabels(root: HTMLElement): Labels {
     readyResult: root.dataset.labelReadyResult ?? "",
     noEffectiveItems: root.dataset.labelNoEffectiveItems ?? "",
     randomize: root.dataset.labelRandomize ?? "",
-    randomizeAgain: root.dataset.labelRandomizeAgain ?? "",
     copy: root.dataset.labelCopy ?? "",
     copied: root.dataset.labelCopied ?? "",
     copyError: root.dataset.labelCopyError ?? "",

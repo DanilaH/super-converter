@@ -23,84 +23,85 @@ const { tool } = removeDuplicateLinesContent;
     {tool.heading}
   </h2>
 
-  <div class="workspace">
-    <div class="pane input-pane">
-      <div class="pane-heading">
-        <label for="remove-duplicate-lines-input">{tool.listLabel}</label>
+  <div class="input-section">
+    <div class="input-toolbar">
+      <label for="remove-duplicate-lines-input">{tool.listLabel}</label>
+      <div class="input-actions">
         <button type="button" class="example-button" data-load-example disabled>
           {tool.loadExample}
         </button>
-      </div>
-      <textarea
-        id="remove-duplicate-lines-input"
-        name="remove-duplicate-lines-input"
-        data-list-input
-        rows="10"
-        placeholder={tool.pastePlaceholder}
-        spellcheck="false"></textarea>
-      <div class="input-footer">
         <button type="button" class="text-button" data-clear-list disabled>
           {tool.clear}
         </button>
       </div>
-
-      <fieldset class="options">
-        <legend class="visually-hidden">{tool.options}</legend>
-        <span class="options-label" aria-hidden="true">{tool.options}</span>
-        <label class="option">
-          <input type="checkbox" data-option-trim-whitespace checked />
-          {tool.trimWhitespace}
-        </label>
-        <label class="option">
-          <input type="checkbox" data-option-ignore-empty-lines checked />
-          {tool.ignoreEmptyLines}
-        </label>
-        <label class="option">
-          <input type="checkbox" data-option-ignore-case />
-          {tool.ignoreCase}
-        </label>
-      </fieldset>
     </div>
 
-    <div class="pane result-pane">
-      <div class="result-toolbar">
-        <p class="result-title">
-          <span>{tool.resultLabel}</span>
-          <span aria-hidden="true">·</span>
-          <span data-result-count>0 {tool.items}</span>
-        </p>
-        <div class="result-actions">
-          <button type="button" class="action" data-copy-result disabled>
-            {tool.copy}
-          </button>
-          <button type="button" class="action" data-download-result disabled>
-            {tool.download}
-          </button>
-        </div>
-      </div>
-
-      <p class="summary" data-summary hidden>
-        <span data-summary-input>{tool.input}: 0</span>
-        <span aria-hidden="true">·</span>
-        <span data-summary-unique>{tool.unique}: 0</span>
-        <span aria-hidden="true">·</span>
-        <span data-summary-removed>{tool.removed}: 0</span>
-      </p>
-
-      <div class="viewer-shell">
-        <p data-empty-result>{tool.emptyResult}</p>
-        <pre class="viewer" data-result-viewer tabindex="0" hidden></pre>
-      </div>
-      <p
-        class="local-feedback"
-        data-local-feedback
-        role="status"
-        aria-live="polite"
-        aria-atomic="true"
-      >
-      </p>
-    </div>
+    <textarea
+      id="remove-duplicate-lines-input"
+      name="remove-duplicate-lines-input"
+      data-list-input
+      rows="10"
+      placeholder={tool.pastePlaceholder}
+      spellcheck="false"></textarea>
   </div>
+
+  <div class="controls">
+    <fieldset class="options">
+      <legend class="visually-hidden">{tool.options}</legend>
+      <span class="options-label" aria-hidden="true">{tool.options}</span>
+      <label class="option">
+        <input type="checkbox" data-option-trim-whitespace checked />
+        {tool.trimWhitespace}
+      </label>
+      <label class="option">
+        <input type="checkbox" data-option-ignore-empty-lines checked />
+        {tool.ignoreEmptyLines}
+      </label>
+      <label class="option">
+        <input type="checkbox" data-option-ignore-case />
+        {tool.ignoreCase}
+      </label>
+    </fieldset>
+  </div>
+
+  <section class="result-section" aria-label={tool.resultLabel}>
+    <div class="result-toolbar">
+      <p class="result-title">
+        <span>{tool.resultLabel}</span>
+        <span aria-hidden="true">·</span>
+        <span data-result-count>0 {tool.items}</span>
+      </p>
+      <div class="result-actions">
+        <button type="button" class="action" data-copy-result disabled>
+          {tool.copy}
+        </button>
+        <button type="button" class="action" data-download-result disabled>
+          {tool.download}
+        </button>
+      </div>
+    </div>
+
+    <p class="summary" data-summary>
+      <span data-summary-input>{tool.input}: 0</span>
+      <span aria-hidden="true">·</span>
+      <span data-summary-unique>{tool.unique}: 0</span>
+      <span aria-hidden="true">·</span>
+      <span data-summary-removed>{tool.removed}: 0</span>
+    </p>
+
+    <div class="viewer-shell">
+      <p data-empty-result>{tool.emptyResult}</p>
+      <pre class="viewer" data-result-viewer tabindex="0" hidden></pre>
+    </div>
+    <p
+      class="local-feedback"
+      data-local-feedback
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+    >
+    </p>
+  </section>
 
   <noscript>
     <p class="noscript">{tool.noscript}</p>
@@ -133,92 +134,26 @@ const { tool } = removeDuplicateLinesContent;
     padding: 0;
     margin: -1px;
     overflow: hidden;
-    clip: rect(0, 0, 0, 0);
+    clip-path: inset(50%);
     white-space: nowrap;
     border: 0;
   }
 
-  .workspace {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--space-4);
-  }
-
-  .pane {
-    min-width: 0;
-  }
-
-  .pane-heading,
+  .input-toolbar,
   .result-toolbar,
-  .input-footer {
+  .controls {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: var(--space-3);
   }
 
-  .pane-heading {
-    min-height: 28px;
+  .input-toolbar {
+    min-height: 36px;
     margin-bottom: var(--space-2);
   }
 
-  .pane-heading label,
-  .result-title {
-    margin: 0;
-    font-size: var(--font-size-control);
-    line-height: var(--line-height-control);
-    font-weight: var(--font-weight-control);
-  }
-
-  .result-title {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0 var(--space-1);
-  }
-
-  textarea,
-  .viewer-shell {
-    width: 100%;
-    height: clamp(176px, 22vh, 224px);
-    border: var(--border-default);
-    border-radius: var(--radius-md);
-    background: var(--color-surface);
-  }
-
-  textarea {
-    display: block;
-    min-height: 176px;
-    padding: var(--space-3);
-    resize: vertical;
-    color: var(--color-text);
-    font-family: var(--font-mono);
-    font-size: var(--font-size-result-data);
-    line-height: var(--line-height-result-data);
-  }
-
-  textarea:hover,
-  textarea:focus {
-    border-color: var(--color-border-strong);
-  }
-
-  .input-footer {
-    justify-content: flex-end;
-    min-height: 28px;
-    margin-top: var(--space-1);
-  }
-
-  .options {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--space-2) var(--space-4);
-    min-width: 0;
-    margin: var(--space-2) 0 0;
-    padding: 0;
-    border: 0;
-  }
-
-  .options-label {
+  .input-toolbar > label {
     color: var(--color-text-secondary);
     font-size: var(--font-size-ui-label);
     line-height: var(--line-height-ui-label);
@@ -227,12 +162,66 @@ const { tool } = removeDuplicateLinesContent;
     text-transform: uppercase;
   }
 
+  .input-actions,
+  .result-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  textarea {
+    display: block;
+    width: 100%;
+    height: clamp(160px, 19vh, 192px);
+    min-height: 144px;
+    padding: var(--space-3);
+    border: var(--border-default);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-size: var(--font-size-result-data);
+    line-height: var(--line-height-result-data);
+    resize: vertical;
+  }
+
+  textarea:hover,
+  textarea:focus {
+    border-color: var(--color-border-strong);
+  }
+
+  .controls {
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-muted);
+  }
+
+  .options {
+    display: flex;
+    flex: 1 1 auto;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-4);
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .options-label {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-body-secondary);
+    line-height: var(--line-height-body-secondary);
+    font-weight: var(--font-weight-control);
+  }
+
   .option {
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
     font-size: var(--font-size-control);
     line-height: var(--line-height-control);
+    font-weight: var(--font-weight-control);
   }
 
   .option input {
@@ -242,9 +231,26 @@ const { tool } = removeDuplicateLinesContent;
     accent-color: var(--color-accent);
   }
 
+  .result-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding-top: var(--space-3);
+    border-top: var(--border-default);
+  }
+
   .result-toolbar {
-    min-height: 28px;
-    margin-bottom: var(--space-2);
+    min-height: 36px;
+  }
+
+  .result-title {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--space-1);
+    margin: 0;
+    font-size: var(--font-size-control);
+    line-height: var(--line-height-control);
+    font-weight: var(--font-weight-control);
   }
 
   .summary {
@@ -252,23 +258,18 @@ const { tool } = removeDuplicateLinesContent;
     flex-wrap: wrap;
     gap: 0 var(--space-1);
     min-height: var(--line-height-body-secondary);
-    margin: 0 0 var(--space-2);
+    margin: 0;
     color: var(--color-text-secondary);
     font-size: var(--font-size-body-secondary);
     line-height: var(--line-height-body-secondary);
   }
 
-  .summary[hidden] {
-    display: none;
-  }
-
-  .result-actions {
-    display: flex;
-    gap: var(--space-2);
-  }
-
   .viewer-shell {
+    width: 100%;
+    height: clamp(128px, 16vh, 168px);
     overflow: auto;
+    border: var(--border-default);
+    border-radius: var(--radius-md);
     background: var(--color-surface-muted);
   }
 
@@ -300,13 +301,21 @@ const { tool } = removeDuplicateLinesContent;
 
   .example-button,
   .text-button {
+    min-height: 32px;
     padding: 0;
     border: 0;
     background: transparent;
-    color: var(--color-accent);
     font-size: var(--font-size-control);
     line-height: var(--line-height-control);
     font-weight: var(--font-weight-control);
+  }
+
+  .example-button {
+    color: var(--color-accent);
+  }
+
+  .text-button {
+    color: var(--color-text-secondary);
   }
 
   .example-button:not(:disabled):hover,
@@ -317,7 +326,7 @@ const { tool } = removeDuplicateLinesContent;
   }
 
   .action {
-    min-height: 32px;
+    min-height: 36px;
     padding: var(--space-1) var(--space-3);
     border: var(--border-default);
     border-radius: var(--radius-md);
@@ -335,7 +344,7 @@ const { tool } = removeDuplicateLinesContent;
 
   .local-feedback {
     min-height: var(--line-height-body-secondary);
-    margin: var(--space-1) 0 0;
+    margin: 0;
     color: var(--color-text-secondary);
     font-size: var(--font-size-body-secondary);
     line-height: var(--line-height-body-secondary);
@@ -348,12 +357,6 @@ const { tool } = removeDuplicateLinesContent;
   .noscript {
     margin: 0;
     color: var(--color-text-secondary);
-  }
-
-  @media (min-width: 760px) {
-    .workspace {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
   }
 
   @media (pointer: coarse) {

@@ -11,7 +11,6 @@ export type RandomizeMessages = {
   trimWhitespace: string;
   ignoreEmptyLines: string;
   randomize: string;
-  randomizeAgain: string;
   resultLabel: string;
   item: string;
   items: string;
@@ -41,10 +40,9 @@ export const randomizeListContent = {
     replaceExampleConfirmation:
       "Load the example and replace your current list? Your current input will be lost.",
     options: "Options",
-    trimWhitespace: "Trim whitespace",
+    trimWhitespace: "Trim surrounding whitespace",
     ignoreEmptyLines: "Ignore empty lines",
     randomize: "Randomize",
-    randomizeAgain: "Randomize again",
     resultLabel: "Randomized list",
     item: "item",
     items: "items",
@@ -64,7 +62,7 @@ export const randomizeListContent = {
       "Paste one item per line into the List field.",
       "Adjust whitespace or empty-line handling if needed.",
       "Select Randomize to shuffle the processed items.",
-      "Select Randomize again for another order, then copy or download the result you want.",
+      "Select Randomize again whenever you want another order, then copy or download the result you want.",
     ],
     resultsHeading: "How list randomization works",
     resultsIntro:
@@ -73,11 +71,7 @@ export const randomizeListContent = {
       {
         term: "Randomize",
         description:
-          "creates one shuffled permutation of the current processed list.",
-      },
-      {
-        term: "Randomize again",
-        description: "runs a fresh shuffle without changing your source list.",
+          "creates a fresh shuffled permutation of the current processed list every time you select it.",
       },
       {
         term: "Repeated items",
@@ -98,7 +92,7 @@ export const randomizeListContent = {
     dataParagraph:
       "Randomizing happens entirely in your browser. The pasted list and shuffled result are not uploaded for tool processing.",
     dataItems: [
-      "Trim whitespace changes emitted values when the option is enabled.",
+      "Trim surrounding whitespace removes spaces and tabs from the beginning and end of emitted lines when the option is enabled.",
       "Ignore empty lines removes empty processed items when enabled.",
       "Copy uses the Clipboard API only after you click Copy.",
       "Download creates a local text file only after you click Download.",
