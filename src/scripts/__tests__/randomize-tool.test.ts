@@ -13,7 +13,6 @@ const TOOL_HTML = `
   data-label-ready-result="Select Randomize to shuffle the current list."
   data-label-no-effective-items="No items remain with the current options."
   data-label-randomize="Randomize"
-  data-label-randomize-again="Randomize again"
   data-label-copy="Copy"
   data-label-copied="Copied"
   data-label-copy-error="Couldn’t copy. Select the result manually."
@@ -26,7 +25,7 @@ const TOOL_HTML = `
   <button type="button" data-clear-list disabled>Clear</button>
   <fieldset>
     <legend>Options</legend>
-    <label><input type="checkbox" data-option-trim-whitespace checked />Trim whitespace</label>
+    <label><input type="checkbox" data-option-trim-whitespace checked />Trim surrounding whitespace</label>
     <label><input type="checkbox" data-option-ignore-empty-lines checked />Ignore empty lines</label>
   </fieldset>
   <button type="button" data-randomize-list disabled>Randomize</button>
@@ -77,7 +76,7 @@ describe("RandomizeTool", () => {
     expect(container.querySelector("[data-copy-result]")).toBeDisabled();
   });
 
-  it("randomizes on demand and changes the action label", () => {
+  it("randomizes on demand while keeping the action label stable", () => {
     const container = mountTool();
     vi.spyOn(Math, "random").mockReturnValue(0);
     fireEvent.input(input(container), { target: { value: "A\nB\nC" } });
@@ -85,7 +84,7 @@ describe("RandomizeTool", () => {
     fireEvent.click(randomizeButton(container));
 
     expect(viewer(container).textContent).toBe("B\nC\nA");
-    expect(randomizeButton(container)).toHaveTextContent("Randomize again");
+    expect(randomizeButton(container)).toHaveTextContent("Randomize");
     expect(container.querySelector("[data-result-count]")).toHaveTextContent(
       "3 items",
     );
@@ -115,7 +114,9 @@ describe("RandomizeTool", () => {
     fireEvent.click(randomizeButton(container));
 
     fireEvent.click(
-      within(container).getByRole("checkbox", { name: "Trim whitespace" }),
+      within(container).getByRole("checkbox", {
+        name: "Trim surrounding whitespace",
+      }),
     );
 
     expect(viewer(container)).toHaveAttribute("hidden");
