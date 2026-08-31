@@ -154,7 +154,7 @@ export const englishContent = {
     replaceExampleConfirmation:
       "Load the example and replace both current lists? Your current input will be lost.",
     comparisonOptions: "Options",
-    trimWhitespace: "Trim whitespace",
+    trimWhitespace: "Ignore surrounding whitespace",
     ignoreEmptyLines: "Ignore empty lines",
     ignoreCase: "Ignore case",
     removeDuplicates: "Remove duplicates",
@@ -238,6 +238,7 @@ export const englishContent = {
     dataParagraph:
       "The comparison runs entirely in your browser. Raw lists and result content are never uploaded to a server.",
     dataItems: [
+      "Comparison options change matching rules while preserving the original line text shown in results.",
       "Copy uses the Clipboard API only after you click the button.",
       "Download creates a local text file on your device.",
       "The site does not save your lists in cookies, localStorage or sessionStorage.",
@@ -255,6 +256,11 @@ export const englishContent = {
         question: "Is the comparison case-sensitive?",
         answer:
           "Yes, by default. The Ignore case option changes the comparison key but not your raw text, so both spellings can match while the original input stays unchanged.",
+      },
+      {
+        question: "What does Ignore surrounding whitespace do?",
+        answer:
+          "It ignores spaces and tabs at the beginning and end of a line when deciding whether values match. The original line text is still preserved in the displayed results.",
       },
       {
         question: "Can I compare columns from Excel or Google Sheets?",
