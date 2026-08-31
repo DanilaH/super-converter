@@ -13,7 +13,6 @@ const { tool } = randomizeListContent;
   data-label-ready-result={tool.readyResult}
   data-label-no-effective-items={tool.noEffectiveItems}
   data-label-randomize={tool.randomize}
-  data-label-randomize-again={tool.randomizeAgain}
   data-label-copy={tool.copy}
   data-label-copied={tool.copied}
   data-label-copy-error={tool.copyError}
@@ -21,83 +20,82 @@ const { tool } = randomizeListContent;
 >
   <h2 id="randomize-tool-heading" class="visually-hidden">{tool.heading}</h2>
 
-  <div class="workspace">
-    <div class="pane input-pane">
-      <div class="pane-heading">
-        <label for="randomize-input">{tool.listLabel}</label>
+  <div class="input-section">
+    <div class="input-toolbar">
+      <label for="randomize-input">{tool.listLabel}</label>
+      <div class="input-actions">
         <button type="button" class="example-button" data-load-example disabled>
           {tool.loadExample}
         </button>
-      </div>
-      <textarea
-        id="randomize-input"
-        name="randomize-input"
-        data-list-input
-        rows="10"
-        placeholder={tool.pastePlaceholder}
-        spellcheck="false"></textarea>
-      <div class="input-footer">
         <button type="button" class="text-button" data-clear-list disabled>
           {tool.clear}
         </button>
       </div>
+    </div>
 
-      <div class="controls">
-        <fieldset class="options">
-          <legend class="visually-hidden">{tool.options}</legend>
-          <span class="options-label" aria-hidden="true">{tool.options}</span>
-          <label class="option">
-            <input type="checkbox" data-option-trim-whitespace checked />
-            {tool.trimWhitespace}
-          </label>
-          <label class="option">
-            <input type="checkbox" data-option-ignore-empty-lines checked />
-            {tool.ignoreEmptyLines}
-          </label>
-        </fieldset>
+    <textarea
+      id="randomize-input"
+      name="randomize-input"
+      data-list-input
+      rows="10"
+      placeholder={tool.pastePlaceholder}
+      spellcheck="false"></textarea>
+  </div>
 
-        <button
-          type="button"
-          class="primary-action"
-          data-randomize-list
-          disabled
-        >
-          {tool.randomize}
+  <div class="controls">
+    <fieldset class="options">
+      <legend class="visually-hidden">{tool.options}</legend>
+      <span class="options-label" aria-hidden="true">{tool.options}</span>
+      <label class="option">
+        <input type="checkbox" data-option-trim-whitespace checked />
+        {tool.trimWhitespace}
+      </label>
+      <label class="option">
+        <input type="checkbox" data-option-ignore-empty-lines checked />
+        {tool.ignoreEmptyLines}
+      </label>
+    </fieldset>
+
+    <button
+      type="button"
+      class="primary-action"
+      data-randomize-list
+      disabled
+    >
+      {tool.randomize}
+    </button>
+  </div>
+
+  <section class="result-section" aria-label={tool.resultLabel}>
+    <div class="result-toolbar">
+      <p class="result-title">
+        <span>{tool.resultLabel}</span>
+        <span aria-hidden="true">·</span>
+        <span data-result-count>0 {tool.items}</span>
+      </p>
+      <div class="result-actions">
+        <button type="button" class="action" data-copy-result disabled>
+          {tool.copy}
+        </button>
+        <button type="button" class="action" data-download-result disabled>
+          {tool.download}
         </button>
       </div>
     </div>
 
-    <div class="pane result-pane">
-      <div class="result-toolbar">
-        <p class="result-title">
-          <span>{tool.resultLabel}</span>
-          <span aria-hidden="true">·</span>
-          <span data-result-count>0 {tool.items}</span>
-        </p>
-        <div class="result-actions">
-          <button type="button" class="action" data-copy-result disabled>
-            {tool.copy}
-          </button>
-          <button type="button" class="action" data-download-result disabled>
-            {tool.download}
-          </button>
-        </div>
-      </div>
-
-      <div class="viewer-shell">
-        <p data-empty-result>{tool.emptyResult}</p>
-        <pre class="viewer" data-result-viewer tabindex="0" hidden></pre>
-      </div>
-      <p
-        class="local-feedback"
-        data-local-feedback
-        role="status"
-        aria-live="polite"
-        aria-atomic="true"
-      >
-      </p>
+    <div class="viewer-shell">
+      <p data-empty-result>{tool.emptyResult}</p>
+      <pre class="viewer" data-result-viewer tabindex="0" hidden></pre>
     </div>
-  </div>
+    <p
+      class="local-feedback"
+      data-local-feedback
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+    >
+    </p>
+  </section>
 
   <noscript>
     <p class="noscript">{tool.noscript}</p>
@@ -130,24 +128,13 @@ const { tool } = randomizeListContent;
     padding: 0;
     margin: -1px;
     overflow: hidden;
-    clip: rect(0, 0, 0, 0);
+    clip-path: inset(50%);
     white-space: nowrap;
     border: 0;
   }
 
-  .workspace {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--space-4);
-  }
-
-  .pane {
-    min-width: 0;
-  }
-
-  .pane-heading,
+  .input-toolbar,
   .result-toolbar,
-  .input-footer,
   .controls {
     display: flex;
     align-items: center;
@@ -155,43 +142,41 @@ const { tool } = randomizeListContent;
     gap: var(--space-3);
   }
 
-  .pane-heading {
-    min-height: 28px;
+  .input-toolbar {
+    min-height: 36px;
     margin-bottom: var(--space-2);
   }
 
-  .pane-heading label,
-  .result-title {
-    margin: 0;
-    font-size: var(--font-size-control);
-    line-height: var(--line-height-control);
-    font-weight: var(--font-weight-control);
+  .input-toolbar > label {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-ui-label);
+    line-height: var(--line-height-ui-label);
+    font-weight: var(--font-weight-ui-label);
+    letter-spacing: var(--letter-spacing-ui-label);
+    text-transform: uppercase;
   }
 
-  .result-title {
+  .input-actions,
+  .result-actions {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0 var(--space-1);
-  }
-
-  textarea,
-  .viewer-shell {
-    width: 100%;
-    height: clamp(176px, 22vh, 224px);
-    border: var(--border-default);
-    border-radius: var(--radius-md);
-    background: var(--color-surface);
+    align-items: center;
+    gap: var(--space-3);
   }
 
   textarea {
     display: block;
-    min-height: 176px;
+    width: 100%;
+    height: clamp(160px, 19vh, 192px);
+    min-height: 144px;
     padding: var(--space-3);
-    resize: vertical;
+    border: var(--border-default);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
     color: var(--color-text);
     font-family: var(--font-mono);
     font-size: var(--font-size-result-data);
     line-height: var(--line-height-result-data);
+    resize: vertical;
   }
 
   textarea:hover,
@@ -199,19 +184,15 @@ const { tool } = randomizeListContent;
     border-color: var(--color-border-strong);
   }
 
-  .input-footer {
-    justify-content: flex-end;
-    min-height: 28px;
-    margin-top: var(--space-1);
-  }
-
   .controls {
-    align-items: flex-end;
-    margin-top: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-muted);
   }
 
   .options {
     display: flex;
+    flex: 1 1 auto;
     flex-wrap: wrap;
     align-items: center;
     gap: var(--space-2) var(--space-4);
@@ -223,11 +204,9 @@ const { tool } = randomizeListContent;
 
   .options-label {
     color: var(--color-text-secondary);
-    font-size: var(--font-size-ui-label);
-    line-height: var(--line-height-ui-label);
-    font-weight: var(--font-weight-ui-label);
-    letter-spacing: var(--letter-spacing-ui-label);
-    text-transform: uppercase;
+    font-size: var(--font-size-body-secondary);
+    line-height: var(--line-height-body-secondary);
+    font-weight: var(--font-weight-control);
   }
 
   .option {
@@ -236,6 +215,7 @@ const { tool } = randomizeListContent;
     gap: var(--space-2);
     font-size: var(--font-size-control);
     line-height: var(--line-height-control);
+    font-weight: var(--font-weight-control);
   }
 
   .option input {
@@ -245,8 +225,53 @@ const { tool } = randomizeListContent;
     accent-color: var(--color-accent);
   }
 
+  .primary-action {
+    flex: none;
+    min-width: 112px;
+    min-height: 36px;
+    padding: var(--space-1) var(--space-3);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--radius-md);
+    background: var(--color-accent);
+    color: var(--color-surface);
+    font-size: var(--font-size-control);
+    line-height: var(--line-height-control);
+    font-weight: var(--font-weight-control);
+  }
+
+  .primary-action:not(:disabled):hover {
+    border-color: var(--color-accent-hover);
+    background: var(--color-accent-hover);
+  }
+
+  .result-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding-top: var(--space-3);
+    border-top: var(--border-default);
+  }
+
+  .result-toolbar {
+    min-height: 36px;
+  }
+
+  .result-title {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--space-1);
+    margin: 0;
+    font-size: var(--font-size-control);
+    line-height: var(--line-height-control);
+    font-weight: var(--font-weight-control);
+  }
+
   .viewer-shell {
+    width: 100%;
+    height: clamp(128px, 16vh, 168px);
     overflow: auto;
+    border: var(--border-default);
+    border-radius: var(--radius-md);
     background: var(--color-surface-muted);
   }
 
@@ -267,16 +292,6 @@ const { tool } = randomizeListContent;
     white-space: pre;
   }
 
-  .result-toolbar {
-    min-height: 28px;
-    margin-bottom: var(--space-2);
-  }
-
-  .result-actions {
-    display: flex;
-    gap: var(--space-2);
-  }
-
   button {
     cursor: pointer;
   }
@@ -288,13 +303,21 @@ const { tool } = randomizeListContent;
 
   .example-button,
   .text-button {
+    min-height: 32px;
     padding: 0;
     border: 0;
     background: transparent;
-    color: var(--color-accent);
     font-size: var(--font-size-control);
     line-height: var(--line-height-control);
     font-weight: var(--font-weight-control);
+  }
+
+  .example-button {
+    color: var(--color-accent);
+  }
+
+  .text-button {
+    color: var(--color-text-secondary);
   }
 
   .example-button:not(:disabled):hover,
@@ -304,32 +327,16 @@ const { tool } = randomizeListContent;
     text-underline-offset: 3px;
   }
 
-  .primary-action,
   .action {
-    min-height: 32px;
+    min-height: 36px;
     padding: var(--space-1) var(--space-3);
+    border: var(--border-default);
     border-radius: var(--radius-md);
+    background: var(--color-surface);
+    color: var(--color-text);
     font-size: var(--font-size-control);
     line-height: var(--line-height-control);
     font-weight: var(--font-weight-control);
-  }
-
-  .primary-action {
-    flex: none;
-    border: 1px solid var(--color-accent);
-    background: var(--color-accent);
-    color: var(--color-surface);
-  }
-
-  .primary-action:not(:disabled):hover {
-    border-color: var(--color-accent-hover);
-    background: var(--color-accent-hover);
-  }
-
-  .action {
-    border: var(--border-default);
-    background: var(--color-surface);
-    color: var(--color-text);
   }
 
   .action:not(:disabled):hover {
@@ -339,7 +346,7 @@ const { tool } = randomizeListContent;
 
   .local-feedback {
     min-height: var(--line-height-body-secondary);
-    margin: var(--space-1) 0 0;
+    margin: 0;
     color: var(--color-text-secondary);
     font-size: var(--font-size-body-secondary);
     line-height: var(--line-height-body-secondary);
@@ -362,12 +369,6 @@ const { tool } = randomizeListContent;
 
     .primary-action {
       width: 100%;
-    }
-  }
-
-  @media (min-width: 760px) {
-    .workspace {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
