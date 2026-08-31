@@ -99,9 +99,7 @@ test("alphabetizer exposes canonical metadata and download filename", async ({
     /\/alphabetize-list$/,
   );
 
-  await page
-    .getByRole("textbox", { name: "List", exact: true })
-    .fill("B\nA");
+  await page.getByRole("textbox", { name: "List", exact: true }).fill("B\nA");
   const downloadPromise = page.waitForEvent("download");
   await page.getByRole("button", { name: "Download" }).click();
   const download = await downloadPromise;
