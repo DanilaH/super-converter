@@ -13,7 +13,7 @@ test("removes duplicate lines live and updates case identity", async ({
     page.getByRole("heading", { level: 1, name: "Remove Duplicate Lines" }),
   ).toBeVisible();
 
-  const input = page.getByLabel("Text or list");
+  const input = page.getByRole("textbox", { name: "List", exact: true });
   const viewer = page.locator("[data-result-viewer]");
 
   await input.fill("Apple\napple\nApple\nBanana");
@@ -41,7 +41,9 @@ test("Dedupe metadata, canonical and download filename are stable", async ({
     "https://listcontrast.com/remove-duplicate-lines",
   );
 
-  await page.getByLabel("Text or list").fill("B\nA\nB");
+  await page
+    .getByRole("textbox", { name: "List", exact: true })
+    .fill("B\nA\nB");
   const downloadPromise = page.waitForEvent("download");
   await page.getByRole("button", { name: "Download" }).click();
   const download = await downloadPromise;
@@ -67,7 +69,9 @@ test("privacy: Dedupe content stays local and renders as text", async ({
   page.on("pageerror", (error) => pageErrors.push(error.message));
 
   await page.goto("/remove-duplicate-lines");
-  await page.getByLabel("Text or list").fill(`Alpha\n${MARKER}\nAlpha`);
+  await page
+    .getByRole("textbox", { name: "List", exact: true })
+    .fill(`Alpha\n${MARKER}\nAlpha`);
 
   const viewer = page.locator("[data-result-viewer]");
   await expect(viewer).toContainText(MARKER);
@@ -100,5 +104,7 @@ test("privacy: Dedupe content stays local and renders as text", async ({
   }
 
   await page.reload();
-  await expect(page.getByLabel("Text or list")).toHaveValue("");
+  await expect(
+    page.getByRole("textbox", { name: "List", exact: true }),
+  ).toHaveValue("");
 });
