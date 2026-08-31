@@ -13,7 +13,7 @@ test("randomizes only on explicit action and invalidates stale results", async (
     page.getByRole("heading", { level: 1, name: "List Randomizer" }),
   ).toBeVisible();
 
-  const input = page.getByLabel("List");
+  const input = page.getByRole("textbox", { name: "List", exact: true });
   const viewer = page.locator("[data-result-viewer]");
   const randomize = page.getByRole("button", {
     name: "Randomize",
@@ -50,7 +50,9 @@ test("Try example fills input but does not shuffle automatically", async ({
 
   await page.getByRole("button", { name: "Try example" }).click();
 
-  await expect(page.getByLabel("List")).toHaveValue(/Charlie/);
+  await expect(
+    page.getByRole("textbox", { name: "List", exact: true }),
+  ).toHaveValue(/Charlie/);
   await expect(page.locator("[data-result-viewer]")).toBeHidden();
   await expect(
     page.getByRole("button", { name: "Randomize", exact: true }),
@@ -71,7 +73,9 @@ test("Randomizer exposes canonical metadata and stable download filename", async
     "https://listcontrast.com/randomize-list",
   );
 
-  await page.getByLabel("List").fill("A\nB\nC");
+  await page
+    .getByRole("textbox", { name: "List", exact: true })
+    .fill("A\nB\nC");
   await page.getByRole("button", { name: "Randomize", exact: true }).click();
   const downloadPromise = page.waitForEvent("download");
   await page.getByRole("button", { name: "Download" }).click();
@@ -98,7 +102,9 @@ test("privacy: Randomizer content stays local and renders as text", async ({
   page.on("pageerror", (error) => pageErrors.push(error.message));
 
   await page.goto("/randomize-list");
-  await page.getByLabel("List").fill(`Alpha\n${MARKER}\nBravo`);
+  await page
+    .getByRole("textbox", { name: "List", exact: true })
+    .fill(`Alpha\n${MARKER}\nBravo`);
   await page.getByRole("button", { name: "Randomize", exact: true }).click();
 
   const viewer = page.locator("[data-result-viewer]");
@@ -132,5 +138,7 @@ test("privacy: Randomizer content stays local and renders as text", async ({
   }
 
   await page.reload();
-  await expect(page.getByLabel("List")).toHaveValue("");
+  await expect(
+    page.getByRole("textbox", { name: "List", exact: true }),
+  ).toHaveValue("");
 });
