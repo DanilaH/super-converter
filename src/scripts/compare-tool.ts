@@ -570,7 +570,6 @@ function setupCopy(
 ): void {
   hooks.copyResult.addEventListener("click", () => {
     if (
-      hooks.copyResult.disabled ||
       state.inputTimer !== null ||
       (state.listA === "" && state.listB === "")
     ) {
