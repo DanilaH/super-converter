@@ -42,25 +42,17 @@ jobs:
 
           compare = Path("src/scripts/compare-tool.ts")
           text = compare.read_text()
-          old = '''    if (
-              hooks.copyResult.disabled ||
-              state.inputTimer !== null ||
-              (state.listA === "" && state.listB === "")
-            ) {'''
-          new = '''    if (
-              state.inputTimer !== null ||
-              (state.listA === "" && state.listB === "")
-            ) {'''
-          if old not in text:
-              raise SystemExit("Compare Copy guard pattern not found")
-          compare.write_text(text.replace(old, new, 1))
+          needle = "      hooks.copyResult.disabled ||\n"
+          if text.count(needle) != 1:
+              raise SystemExit("Expected exactly one Copy disabled guard")
+          compare.write_text(text.replace(needle, "", 1))
 
           layout = Path("src/layouts/BaseLayout.astro")
           text = layout.read_text()
           old = '<script type="application/ld+json" set:html={websiteStructuredData} />'
           new = '<script is:inline type="application/ld+json" set:html={websiteStructuredData} />'
-          if old not in text:
-              raise SystemExit("JSON-LD script pattern not found")
+          if text.count(old) != 1:
+              raise SystemExit("Expected exactly one JSON-LD script")
           layout.write_text(text.replace(old, new, 1))
           PY
           pnpm format
