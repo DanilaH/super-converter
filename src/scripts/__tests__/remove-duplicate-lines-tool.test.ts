@@ -20,17 +20,17 @@ const TOOL_HTML = `
   data-label-replace-example-confirmation="Load the example and replace your current text? Your current input will be lost."
 >
   <h2 id="dedupe-heading">Remove duplicate lines</h2>
-  <label for="input">Text or list</label>
+  <label for="input">List</label>
   <textarea id="input" data-list-input></textarea>
   <button type="button" data-load-example disabled>Try example</button>
   <button type="button" data-clear-list disabled>Clear</button>
   <fieldset>
     <legend>Options</legend>
-    <label><input type="checkbox" data-option-trim-whitespace checked />Trim whitespace</label>
+    <label><input type="checkbox" data-option-trim-whitespace checked />Trim surrounding whitespace</label>
     <label><input type="checkbox" data-option-ignore-empty-lines checked />Ignore empty lines</label>
     <label><input type="checkbox" data-option-ignore-case />Ignore case</label>
   </fieldset>
-  <p data-summary hidden>
+  <p data-summary>
     <span data-summary-input>Input: 0</span>
     <span data-summary-unique>Unique: 0</span>
     <span data-summary-removed>Removed: 0</span>
@@ -117,10 +117,21 @@ describe("RemoveDuplicateLinesTool", () => {
     expect(viewer(container).textContent).toBe("Apple");
   });
 
-  it("hides summary and disables exports for untouched empty input", () => {
+  it("keeps zero stats visible and exports disabled for untouched empty input", () => {
     const container = mountTool();
 
-    expect(container.querySelector("[data-summary]")).toHaveAttribute("hidden");
+    expect(container.querySelector("[data-summary]")).not.toHaveAttribute(
+      "hidden",
+    );
+    expect(container.querySelector("[data-summary-input]")).toHaveTextContent(
+      "Input: 0",
+    );
+    expect(container.querySelector("[data-summary-unique]")).toHaveTextContent(
+      "Unique: 0",
+    );
+    expect(container.querySelector("[data-summary-removed]")).toHaveTextContent(
+      "Removed: 0",
+    );
     expect(container.querySelector("[data-copy-result]")).toBeDisabled();
     expect(container.querySelector("[data-download-result]")).toBeDisabled();
   });
@@ -179,13 +190,18 @@ describe("RemoveDuplicateLinesTool", () => {
     expect(viewer(container).textContent).toBe("Apple\nBanana\nCherry\nbanana");
   });
 
-  it("clears input, summary and exports", () => {
+  it("clears input while keeping the zero-stat layout and exports disabled", () => {
     const container = mountTool();
     fireEvent.input(input(container), { target: { value: "A\nA" } });
     fireEvent.click(container.querySelector("[data-clear-list]")!);
 
     expect(input(container).value).toBe("");
-    expect(container.querySelector("[data-summary]")).toHaveAttribute("hidden");
+    expect(container.querySelector("[data-summary]")).not.toHaveAttribute(
+      "hidden",
+    );
+    expect(container.querySelector("[data-summary-input]")).toHaveTextContent(
+      "Input: 0",
+    );
     expect(viewer(container)).toHaveAttribute("hidden");
     expect(container.querySelector("[data-copy-result]")).toBeDisabled();
   });
