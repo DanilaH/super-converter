@@ -54,7 +54,9 @@ test.describe("single-list workspace consistency", () => {
       expect(Math.abs(inputAfter!.x - inputBefore!.x)).toBeLessThan(1);
       expect(Math.abs(inputAfter!.y - inputBefore!.y)).toBeLessThan(1);
       expect(Math.abs(inputAfter!.width - inputBefore!.width)).toBeLessThan(1);
-      expect(Math.abs(inputAfter!.height - inputBefore!.height)).toBeLessThan(1);
+      expect(Math.abs(inputAfter!.height - inputBefore!.height)).toBeLessThan(
+        1,
+      );
 
       const hasHorizontalOverflow = await page.evaluate(
         () =>
