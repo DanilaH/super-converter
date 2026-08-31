@@ -8,12 +8,9 @@ function sequenceRandom(values: readonly number[]): () => number {
 
 describe("shuffleItems", () => {
   it("uses deterministic Fisher-Yates swaps with an injected random source", () => {
-    expect(shuffleItems(["A", "B", "C", "D"], sequenceRandom([0, 0, 0]))).toEqual([
-      "B",
-      "C",
-      "D",
-      "A",
-    ]);
+    expect(
+      shuffleItems(["A", "B", "C", "D"], sequenceRandom([0, 0, 0])),
+    ).toEqual(["B", "C", "D", "A"]);
   });
 
   it("preserves every occurrence including duplicates", () => {
@@ -25,11 +22,9 @@ describe("shuffleItems", () => {
   });
 
   it("allows a valid shuffle to equal the source order", () => {
-    expect(shuffleItems(["A", "B", "C"], sequenceRandom([0.99, 0.99]))).toEqual([
-      "A",
-      "B",
-      "C",
-    ]);
+    expect(shuffleItems(["A", "B", "C"], sequenceRandom([0.99, 0.99]))).toEqual(
+      ["A", "B", "C"],
+    );
   });
 
   it("does not mutate the source array", () => {

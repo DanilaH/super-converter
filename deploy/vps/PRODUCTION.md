@@ -4,6 +4,9 @@ This runbook cuts the accepted static build over to
 `https://listcontrast.com`. Production is a separate Compose project and
 container. Do not reuse, rename or expose the protected preview container.
 
+The current shipped route/indexing snapshot is recorded in `CURRENT_STATE.md`.
+Keep this runbook synchronized with that file.
+
 ## Topology
 
 ```text
@@ -32,11 +35,11 @@ a backend or a database.
 Use this order so production can be verified internally before DNS sends public
 traffic:
 
-1. merge the accepted production-cutover PR;
+1. merge the accepted release PR;
 2. update the dedicated VPS checkout;
 3. build and start the production Compose service;
 4. verify the container through the shared Docker network;
-5. add and validate the external Caddy production blocks;
+5. add or confirm the external Caddy production blocks;
 6. create/confirm Beget DNS records;
 7. wait for DNS and certificate issuance;
 8. run public smoke and SEO checks;
@@ -61,10 +64,18 @@ pnpm test:e2e
 Inspect the generated production SEO output:
 
 ```bash
+INDEXABLE_HTML=(
+  dist/index.html
+  dist/alphabetize-list/index.html
+  dist/randomize-list/index.html
+  dist/remove-duplicate-lines/index.html
+  dist/tools/index.html
+  dist/about/index.html
+  dist/privacy/index.html
+)
+
 rg -n 'https://listcontrast\.com' \
-  dist/index.html \
-  dist/about/index.html \
-  dist/privacy/index.html \
+  "${INDEXABLE_HTML[@]}" \
   dist/robots.txt \
   dist/sitemap.xml
 
@@ -73,8 +84,7 @@ if rg -n 'example\.com|preview\.listcontrast\.com' dist; then
   exit 1
 fi
 
-if rg -n 'noindex' \
-  dist/index.html dist/about/index.html dist/privacy/index.html; then
+if rg -n 'noindex' "${INDEXABLE_HTML[@]}"; then
   echo "Unexpected noindex on an indexable production page" >&2
   exit 1
 fi
@@ -85,10 +95,10 @@ rg -n 'noindex,nofollow' dist/404.html
 Expected:
 
 - canonical and Open Graph URLs use only `https://listcontrast.com`;
-- `/`, `/about` and `/privacy` have no noindex directive;
+- all seven indexable routes have no noindex directive;
 - 404 remains `noindex,nofollow` and has no canonical or `og:url`;
 - robots allows crawling and references the production sitemap;
-- sitemap contains exactly the three indexable production URLs.
+- sitemap contains exactly the seven routes listed in `CURRENT_STATE.md`.
 
 Do not commit `dist/`.
 
@@ -116,27 +126,29 @@ docker compose -f deploy/vps/compose.production.yml up -d --build
 docker compose -f deploy/vps/compose.production.yml ps
 ```
 
-Wait for `healthy`, then check internal routes:
+Wait for `healthy`, then check every shipped route through the shared Docker
+network:
 
 ```bash
-docker run --rm --network vps_booking_network curlimages/curl:8.11.1 \
-  -fsS -o /dev/null -w '/ -> %{http_code}\n' \
-  http://listcontrast-production:8080/
-
-docker run --rm --network vps_booking_network curlimages/curl:8.11.1 \
-  -fsS -o /dev/null -w '/about -> %{http_code}\n' \
-  http://listcontrast-production:8080/about
-
-docker run --rm --network vps_booking_network curlimages/curl:8.11.1 \
-  -fsS -o /dev/null -w '/privacy -> %{http_code}\n' \
-  http://listcontrast-production:8080/privacy
+for path in \
+  / \
+  /alphabetize-list \
+  /randomize-list \
+  /remove-duplicate-lines \
+  /tools \
+  /about \
+  /privacy; do
+  docker run --rm --network vps_booking_network curlimages/curl:8.11.1 \
+    -fsS -o /dev/null -w "$path -> %{http_code}\n" \
+    "http://listcontrast-production:8080$path"
+done
 
 docker run --rm --network vps_booking_network curlimages/curl:8.11.1 \
   -sS -o /dev/null -w '/missing-production-check -> %{http_code}\n' \
   http://listcontrast-production:8080/missing-production-check
 ```
 
-Expected: `200`, `200`, `200`, `404`.
+Expected: every shipped route returns `200`; the unknown route returns `404`.
 
 If this gate fails, inspect logs and stop before changing Caddy or DNS:
 
@@ -215,12 +227,18 @@ Certificate issuance can take a short time after DNS becomes visible. Do not
 disable TLS validation or replace public HTTPS with an insecure workaround.
 
 ```bash
-curl -fsS -o /dev/null -w 'home %{http_code}\n' \
-  https://listcontrast.com/
-curl -fsS -o /dev/null -w 'about %{http_code}\n' \
-  https://listcontrast.com/about
-curl -fsS -o /dev/null -w 'privacy %{http_code}\n' \
-  https://listcontrast.com/privacy
+for path in \
+  / \
+  /alphabetize-list \
+  /randomize-list \
+  /remove-duplicate-lines \
+  /tools \
+  /about \
+  /privacy; do
+  curl -fsS -o /dev/null -w "$path %{http_code}\n" \
+    "https://listcontrast.com$path"
+done
+
 curl -sS -o /dev/null -w 'missing %{http_code}\n' \
   https://listcontrast.com/missing-production-check
 curl -sSI https://www.listcontrast.com/a-test-path
@@ -228,7 +246,8 @@ curl -sSI https://www.listcontrast.com/a-test-path
 
 Expected:
 
-- apex routes: `200`, `200`, `200`, `404`;
+- all seven shipped apex routes return `200`;
+- unknown apex route returns `404`;
 - `www` permanently redirects to
   `https://listcontrast.com/a-test-path`;
 - no Basic Auth challenge on production;
@@ -237,20 +256,32 @@ Expected:
 
 Then verify in a browser:
 
-- both inputs and all four options;
-- live counts and all five result tabs;
-- Swap, Clear and Load example;
-- Copy and Download;
+- Compare Lists: both inputs, all four options, counters, five result tabs,
+  Swap, Clear, Load example, Copy and Download;
+- Alphabetizer: input, order/options, result, Copy and Download;
+- List Randomizer: input/options, Randomize/Randomize again, Copy and Download;
+- Remove Duplicate Lines: input/options, summary, Copy and Download;
 - desktop and narrow/mobile layout;
-- About, Privacy and unknown route.
+- Tools, About, Privacy and an unknown route.
 
 ## Live SEO verification
 
 ```bash
 curl -fsS https://listcontrast.com/robots.txt
 curl -fsS https://listcontrast.com/sitemap.xml
-curl -fsS https://listcontrast.com/ | \
-  rg 'canonical|og:url|noindex|example\.com|preview\.listcontrast\.com'
+
+for path in \
+  / \
+  /alphabetize-list \
+  /randomize-list \
+  /remove-duplicate-lines \
+  /tools \
+  /about \
+  /privacy; do
+  curl -fsS "https://listcontrast.com$path" | \
+    rg 'canonical|og:url|noindex|example\.com|preview\.listcontrast\.com'
+done
+
 curl -fsS https://listcontrast.com/404-does-not-exist | \
   rg 'canonical|og:url|noindex'
 ```
@@ -259,11 +290,14 @@ Required:
 
 - robots contains `Allow: /` and
   `Sitemap: https://listcontrast.com/sitemap.xml`;
-- sitemap has exactly three production `<loc>` values;
-- homepage canonical and `og:url` use the apex origin;
+- sitemap has exactly the seven production `<loc>` values from
+  `CURRENT_STATE.md`;
+- each indexable page has a self-canonical and production `og:url`;
 - indexable pages contain no noindex;
 - live 404 contains `noindex,nofollow` and no canonical/`og:url`;
-- neither placeholder nor preview hostname appears.
+- neither placeholder nor preview hostname appears;
+- homepage contains the expected `WebSite` JSON-LD when that feature is part of
+  the accepted release commit.
 
 ## Search Console
 
@@ -273,7 +307,8 @@ Only after public smoke and SEO verification pass:
 2. complete the DNS TXT verification requested by Google;
 3. submit `https://listcontrast.com/sitemap.xml`;
 4. inspect `https://listcontrast.com/`;
-5. request indexing only after the live URL reports the expected canonical and
+5. spot-check the three additional acquisition routes;
+6. request indexing only after the live URLs report the expected canonical and
    indexability.
 
 Product analytics remains optional and must not delay launch.
@@ -308,7 +343,7 @@ Record:
 
 - deployed Git commit;
 - deployment time;
-- internal route results;
+- internal results for every shipped route;
 - public route and redirect results;
 - live canonical/robots/sitemap results;
 - Search Console property verification and sitemap submission;

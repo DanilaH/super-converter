@@ -116,7 +116,9 @@ test("privacy: alphabetizer content stays local and is rendered as text", async 
   page.on("pageerror", (error) => pageErrors.push(error.message));
 
   await page.goto("/alphabetize-list");
-  await page.getByLabel("List").fill(`zeta\n${MARKER}\nalpha`);
+  await page
+    .getByRole("textbox", { name: "List", exact: true })
+    .fill(`zeta\n${MARKER}\nalpha`);
 
   const viewer = page.locator("[data-result-viewer]");
   await expect(viewer).toContainText(MARKER);
@@ -141,5 +143,7 @@ test("privacy: alphabetizer content stays local and is rendered as text", async 
   });
 
   await page.reload();
-  await expect(page.getByLabel("List")).toHaveValue("");
+  await expect(
+    page.getByRole("textbox", { name: "List", exact: true }),
+  ).toHaveValue("");
 });

@@ -63,7 +63,9 @@ function findRoots(scope: ParentNode): HTMLElement[] {
   if (scope instanceof HTMLElement && scope.matches("[data-randomize-tool]")) {
     return [scope];
   }
-  return Array.from(scope.querySelectorAll<HTMLElement>("[data-randomize-tool]"));
+  return Array.from(
+    scope.querySelectorAll<HTMLElement>("[data-randomize-tool]"),
+  );
 }
 
 function mountRoot(root: HTMLElement): void {
@@ -148,7 +150,9 @@ function render(hooks: Hooks, labels: Labels, state: ToolState): void {
 
   hooks.clear.disabled = state.input === "";
   hooks.randomize.disabled = !hasEffectiveItems;
-  hooks.randomize.textContent = result ? labels.randomizeAgain : labels.randomize;
+  hooks.randomize.textContent = result
+    ? labels.randomizeAgain
+    : labels.randomize;
   hooks.resultCount.textContent = pluralize(
     result?.items.length ?? 0,
     labels.item,
@@ -190,7 +194,10 @@ function captureCopySnapshot(state: ToolState): CopySnapshot | null {
   };
 }
 
-function isCopySnapshotCurrent(state: ToolState, snapshot: CopySnapshot): boolean {
+function isCopySnapshotCurrent(
+  state: ToolState,
+  snapshot: CopySnapshot,
+): boolean {
   return (
     state.result === snapshot.result &&
     state.input === snapshot.input &&
@@ -241,7 +248,8 @@ function setupCopy(hooks: Hooks, labels: Labels, state: ToolState): void {
       })
       .finally(() => {
         if (isCopySnapshotCurrent(state, snapshot)) {
-          hooks.copy.disabled = state.result === null || state.result.text === "";
+          hooks.copy.disabled =
+            state.result === null || state.result.text === "";
         }
       });
   });

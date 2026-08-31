@@ -28,7 +28,8 @@ export type RandomizeMessages = {
 export const randomizeListContent = {
   page: {
     heading: "List Randomizer",
-    description: "Shuffle names, words or any line-based list into a random order.",
+    description:
+      "Shuffle names, words or any line-based list into a random order.",
     privacy: "Processed locally in your browser.",
   },
   tool: {
@@ -71,7 +72,8 @@ export const randomizeListContent = {
     resultsItems: [
       {
         term: "Randomize",
-        description: "creates one shuffled permutation of the current processed list.",
+        description:
+          "creates one shuffled permutation of the current processed list.",
       },
       {
         term: "Randomize again",
@@ -79,7 +81,8 @@ export const randomizeListContent = {
       },
       {
         term: "Repeated items",
-        description: "remain as separate occurrences and are not removed automatically.",
+        description:
+          "remain as separate occurrences and are not removed automatically.",
       },
     ],
     commonUsesHeading: "Common ways to use a list randomizer",

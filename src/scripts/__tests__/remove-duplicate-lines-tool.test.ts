@@ -129,7 +129,9 @@ describe("RemoveDuplicateLinesTool", () => {
     const container = mountTool();
     fireEvent.input(input(container), { target: { value: "   \n  " } });
 
-    expect(container.querySelector("[data-summary]")).not.toHaveAttribute("hidden");
+    expect(container.querySelector("[data-summary]")).not.toHaveAttribute(
+      "hidden",
+    );
     expect(container.querySelector("[data-summary-input]")).toHaveTextContent(
       "Input: 0",
     );

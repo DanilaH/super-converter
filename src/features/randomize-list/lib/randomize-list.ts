@@ -1,4 +1,7 @@
-import { processListInput, serializeList } from "../../list-transform/lib/process-list";
+import {
+  processListInput,
+  serializeList,
+} from "../../list-transform/lib/process-list";
 import type {
   RandomizeOptions,
   RandomizeResult,

@@ -77,21 +77,22 @@ Wait until the service is healthy, then check it through the shared network:
 docker run --rm --network vps_booking_network curlimages/curl:8.11.1 \
   -fsS -o /dev/null -w '/ -> %{http_code}\n' \
   http://listcontrast-preview:8080/
-
 docker run --rm --network vps_booking_network curlimages/curl:8.11.1 \
   -fsS -o /dev/null -w '/about -> %{http_code}\n' \
   http://listcontrast-preview:8080/about
-
 docker run --rm --network vps_booking_network curlimages/curl:8.11.1 \
   -fsS -o /dev/null -w '/privacy -> %{http_code}\n' \
   http://listcontrast-preview:8080/privacy
-
 docker run --rm --network vps_booking_network curlimages/curl:8.11.1 \
   -sS -o /dev/null -w '/missing-preview-check -> %{http_code}\n' \
   http://listcontrast-preview:8080/missing-preview-check
 ```
 
 Expected statuses are `200`, `200`, `200` and `404`.
+
+For current full-route release verification, use `CURRENT_STATE.md` and
+`deploy/vps/PRODUCTION.md`; the checks above remain the minimum preview-service
+smoke inherited from the original preview rollout.
 
 ## External Caddy integration
 
@@ -230,7 +231,14 @@ reproduce afterward.
 
 ## Production boundary
 
-The preview hostname is never a canonical or sitemap origin. The application
-configuration intentionally remains on the reserved `https://example.com`
-origin until CL-036 passes. Production domain/redirect configuration, Search
-Console verification and sitemap submission belong only to that final audit.
+The preview hostname is never a canonical or sitemap origin. The repository is
+now intentionally configured for the production canonical origin
+`https://listcontrast.com`, so the preview build may contain production
+canonical/Open Graph/sitemap URLs. Preview non-indexability therefore relies on
+the externally owned Caddy boundary documented above: Basic Auth plus
+`X-Robots-Tag: noindex, nofollow, noarchive`.
+
+Do not change the application canonical origin to the preview hostname and do
+not remove the ingress-level preview protection. Production domain/redirect
+configuration, Search Console verification and sitemap submission belong only
+to the public production release path in `deploy/vps/PRODUCTION.md`.
