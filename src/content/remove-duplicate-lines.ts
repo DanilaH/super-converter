@@ -118,7 +118,8 @@ export const removeDuplicateLinesContent = {
           "Yes. Turn on Ignore case to treat case variants such as Apple and apple as duplicates while preserving the text of the first retained occurrence.",
       },
       {
-        question: "Why can two lines that look the same remain when trimming is off?",
+        question:
+          "Why can two lines that look the same remain when trimming is off?",
         answer:
           "Spaces or tabs at the beginning or end of a line are part of that line when Trim surrounding whitespace is off, so visually similar lines can still be distinct.",
       },
