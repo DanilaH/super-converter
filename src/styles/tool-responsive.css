@@ -21,6 +21,13 @@
   }
 }
 
+@media (max-width: 479px) {
+  section[data-compare-tool] .tabs {
+    flex-wrap: wrap;
+    overflow-x: visible;
+  }
+}
+
 @media (pointer: coarse) {
   section[data-compare-tool] .example-button {
     min-height: 44px;
