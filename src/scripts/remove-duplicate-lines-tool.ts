@@ -55,7 +55,9 @@ type Hooks = {
 
 const mountedRoots = new WeakSet<HTMLElement>();
 
-export function mountRemoveDuplicateLinesTool(scope: ParentNode = document): void {
+export function mountRemoveDuplicateLinesTool(
+  scope: ParentNode = document,
+): void {
   for (const root of findRoots(scope)) {
     mountRoot(root);
   }
@@ -188,7 +190,10 @@ function captureCopySnapshot(state: ToolState): CopySnapshot {
   };
 }
 
-function isCopySnapshotCurrent(state: ToolState, snapshot: CopySnapshot): boolean {
+function isCopySnapshotCurrent(
+  state: ToolState,
+  snapshot: CopySnapshot,
+): boolean {
   return (
     state.input === snapshot.input &&
     state.options.trimWhitespace === snapshot.options.trimWhitespace &&
@@ -323,7 +328,9 @@ function requireElement<T extends Element>(
 ): T {
   const element = root.querySelector<T>(selector);
   if (!element) {
-    throw new Error(`RemoveDuplicateLinesTool: missing required hook ${selector}`);
+    throw new Error(
+      `RemoveDuplicateLinesTool: missing required hook ${selector}`,
+    );
   }
   return element;
 }
@@ -346,7 +353,9 @@ function readLabels(root: HTMLElement): Labels {
 
   for (const [name, value] of Object.entries(labels)) {
     if (value === "") {
-      throw new Error(`RemoveDuplicateLinesTool: missing required label ${name}`);
+      throw new Error(
+        `RemoveDuplicateLinesTool: missing required label ${name}`,
+      );
     }
   }
   return labels;

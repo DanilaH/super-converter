@@ -31,7 +31,9 @@ test.describe("Compare Lists narrow result navigation", () => {
     }
 
     const hasHorizontalOverflow = await page.evaluate(
-      () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
+      () =>
+        document.documentElement.scrollWidth >
+        document.documentElement.clientWidth,
     );
     expect(hasHorizontalOverflow).toBe(false);
   });
@@ -55,6 +57,8 @@ test.describe("homepage WebSite structured data", () => {
     });
 
     await page.goto("/alphabetize-list");
-    await expect(page.locator('script[type="application/ld+json"]')).toHaveCount(0);
+    await expect(
+      page.locator('script[type="application/ld+json"]'),
+    ).toHaveCount(0);
   });
 });

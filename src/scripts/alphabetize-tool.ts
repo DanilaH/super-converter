@@ -56,7 +56,10 @@ export function mountAlphabetizeTool(scope: ParentNode = document): void {
 }
 
 function findRoots(scope: ParentNode): HTMLElement[] {
-  if (scope instanceof HTMLElement && scope.matches("[data-alphabetize-tool]")) {
+  if (
+    scope instanceof HTMLElement &&
+    scope.matches("[data-alphabetize-tool]")
+  ) {
     return [scope];
   }
   return Array.from(
@@ -167,7 +170,10 @@ function captureCopySnapshot(state: ToolState): CopySnapshot {
   };
 }
 
-function isCopySnapshotCurrent(state: ToolState, snapshot: CopySnapshot): boolean {
+function isCopySnapshotCurrent(
+  state: ToolState,
+  snapshot: CopySnapshot,
+): boolean {
   return (
     state.input === snapshot.input &&
     state.options.trimWhitespace === snapshot.options.trimWhitespace &&

@@ -86,7 +86,9 @@ test("new tool routes and navigation are crawlable without horizontal overflow",
   }
 });
 
-test("alphabetizer exposes canonical metadata and download filename", async ({ page }) => {
+test("alphabetizer exposes canonical metadata and download filename", async ({
+  page,
+}) => {
   await page.goto("/alphabetize-list");
 
   await expect(page).toHaveTitle(

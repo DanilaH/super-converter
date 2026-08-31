@@ -28,7 +28,8 @@ export type AlphabetizeMessages = {
 export const alphabetizeListContent = {
   page: {
     heading: "Alphabetize a List Online",
-    description: "Sort names, words or any line-based list into alphabetical order.",
+    description:
+      "Sort names, words or any line-based list into alphabetical order.",
     privacy: "Processed locally in your browser.",
   },
   tool: {
@@ -71,7 +72,8 @@ export const alphabetizeListContent = {
     resultsItems: [
       {
         term: "A → Z",
-        description: "sorts the processed list in ascending alphabetical order.",
+        description:
+          "sorts the processed list in ascending alphabetical order.",
       },
       {
         term: "Z → A",

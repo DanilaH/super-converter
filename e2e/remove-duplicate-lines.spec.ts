@@ -4,7 +4,9 @@ const MARKER =
   '<img src="https://cl042-probe.invalid/1.png" data-cl042-probe onerror="window.__cl042Probe = 1">';
 const TOKEN = "cl042-probe";
 
-test("removes duplicate lines live and updates case identity", async ({ page }) => {
+test("removes duplicate lines live and updates case identity", async ({
+  page,
+}) => {
   await page.goto("/remove-duplicate-lines");
 
   await expect(
@@ -26,10 +28,14 @@ test("removes duplicate lines live and updates case identity", async ({ page }) 
   await expect(page.locator("[data-summary-removed]")).toHaveText("Removed: 2");
 });
 
-test("Dedupe metadata, canonical and download filename are stable", async ({ page }) => {
+test("Dedupe metadata, canonical and download filename are stable", async ({
+  page,
+}) => {
   await page.goto("/remove-duplicate-lines");
 
-  await expect(page).toHaveTitle("Remove Duplicate Lines Online | ListContrast");
+  await expect(page).toHaveTitle(
+    "Remove Duplicate Lines Online | ListContrast",
+  );
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     "href",
     "https://listcontrast.com/remove-duplicate-lines",
@@ -42,7 +48,9 @@ test("Dedupe metadata, canonical and download filename are stable", async ({ pag
   expect(download.suggestedFilename()).toBe("unique-lines.txt");
 });
 
-test("privacy: Dedupe content stays local and renders as text", async ({ page }) => {
+test("privacy: Dedupe content stays local and renders as text", async ({
+  page,
+}) => {
   const requests: string[] = [];
   const requestBodies: string[] = [];
   const consoleText: string[] = [];

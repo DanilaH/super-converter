@@ -14,7 +14,9 @@ test.describe("narrow single-list result toolbars", () => {
   });
 
   for (const route of SINGLE_LIST_ROUTES) {
-    test(`${route} keeps the result label above export actions`, async ({ page }) => {
+    test(`${route} keeps the result label above export actions`, async ({
+      page,
+    }) => {
       await page.goto(route);
 
       const title = page.locator("[data-result-count]").locator("..");
@@ -25,10 +27,14 @@ test.describe("narrow single-list result toolbars", () => {
       expect(titleBox).not.toBeNull();
       expect(actionsBox).not.toBeNull();
       expect(titleBox!.width).toBeGreaterThan(250);
-      expect(actionsBox!.y).toBeGreaterThanOrEqual(titleBox!.y + titleBox!.height);
+      expect(actionsBox!.y).toBeGreaterThanOrEqual(
+        titleBox!.y + titleBox!.height,
+      );
 
       const hasHorizontalOverflow = await page.evaluate(
-        () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
+        () =>
+          document.documentElement.scrollWidth >
+          document.documentElement.clientWidth,
       );
       expect(hasHorizontalOverflow).toBe(false);
     });
@@ -42,12 +48,16 @@ test.describe("Compare Lists narrow-tablet layout", () => {
     hasTouch: true,
   });
 
-  test("keeps both inputs side by side with usable touch controls", async ({ page }) => {
+  test("keeps both inputs side by side with usable touch controls", async ({
+    page,
+  }) => {
     await page.goto("/");
 
     const listA = await page.getByLabel("List A").boundingBox();
     const listB = await page.getByLabel("List B").boundingBox();
-    const example = await page.getByRole("button", { name: "Try example" }).boundingBox();
+    const example = await page
+      .getByRole("button", { name: "Try example" })
+      .boundingBox();
 
     expect(listA).not.toBeNull();
     expect(listB).not.toBeNull();
@@ -59,7 +69,9 @@ test.describe("Compare Lists narrow-tablet layout", () => {
     expect(example!.height).toBeGreaterThanOrEqual(44);
 
     const hasHorizontalOverflow = await page.evaluate(
-      () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
+      () =>
+        document.documentElement.scrollWidth >
+        document.documentElement.clientWidth,
     );
     expect(hasHorizontalOverflow).toBe(false);
   });
@@ -72,7 +84,9 @@ test.describe("Compare Lists upper narrow-tablet edge", () => {
     hasTouch: false,
   });
 
-  test("keeps both input fields aligned before the desktop breakpoint", async ({ page }) => {
+  test("keeps both input fields aligned before the desktop breakpoint", async ({
+    page,
+  }) => {
     await page.goto("/");
 
     const listA = await page.getByLabel("List A").boundingBox();
@@ -83,7 +97,9 @@ test.describe("Compare Lists upper narrow-tablet edge", () => {
     expect(Math.abs(listA!.y - listB!.y)).toBeLessThan(1);
 
     const hasHorizontalOverflow = await page.evaluate(
-      () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
+      () =>
+        document.documentElement.scrollWidth >
+        document.documentElement.clientWidth,
     );
     expect(hasHorizontalOverflow).toBe(false);
   });

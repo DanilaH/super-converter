@@ -89,7 +89,10 @@ function element<T extends Element>(root: ParentNode, selector: string): T {
   return value;
 }
 
-function mount(html: string, mountTool: (scope: ParentNode) => void): HTMLElement {
+function mount(
+  html: string,
+  mountTool: (scope: ParentNode) => void,
+): HTMLElement {
   const root = document.createElement("div");
   root.innerHTML = html;
   document.body.appendChild(root);

@@ -103,7 +103,10 @@ describe("CompareTool pending large-input export lifecycle", () => {
     const listB = hook<HTMLTextAreaElement>(container, "[data-list-b]");
     const viewer = hook(container, "[data-result-viewer]");
     const copy = hook<HTMLButtonElement>(container, "[data-copy-result]");
-    const download = hook<HTMLButtonElement>(container, "[data-download-result]");
+    const download = hook<HTMLButtonElement>(
+      container,
+      "[data-download-result]",
+    );
 
     fireEvent.input(listA, { target: { value: "a\nb" } });
     fireEvent.input(listB, { target: { value: "b\nc" } });
