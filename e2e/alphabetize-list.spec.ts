@@ -17,7 +17,7 @@ test("alphabetizes a list live and changes order", async ({ page }) => {
     page.getByRole("heading", { level: 1, name: "Alphabetize a List Online" }),
   ).toBeVisible();
 
-  const input = page.getByLabel("List");
+  const input = page.getByRole("textbox", { name: "List", exact: true });
   const viewer = page.locator("[data-result-viewer]");
 
   await input.fill("item 10\nBanana\nitem 2\napple");
@@ -99,7 +99,9 @@ test("alphabetizer exposes canonical metadata and download filename", async ({
     /\/alphabetize-list$/,
   );
 
-  await page.getByLabel("List").fill("B\nA");
+  await page
+    .getByRole("textbox", { name: "List", exact: true })
+    .fill("B\nA");
   const downloadPromise = page.waitForEvent("download");
   await page.getByRole("button", { name: "Download" }).click();
   const download = await downloadPromise;
