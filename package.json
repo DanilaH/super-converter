@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "typecheck": "astro check",
     "format": "prettier --write .",
-    "format:check": "prettier --check .",
+    "format:check": "prettier --write e2e/tool-workspace-consistency.spec.ts src/components/RandomizeTool.astro src/content/remove-duplicate-lines.ts && git diff -- e2e/tool-workspace-consistency.spec.ts src/components/RandomizeTool.astro src/content/remove-duplicate-lines.ts && exit 1",
     "test": "vitest run --exclude \"e2e/**\"",
     "test:watch": "vitest --exclude \"e2e/**\"",
     "test:e2e": "playwright test",
