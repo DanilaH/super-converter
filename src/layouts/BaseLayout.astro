@@ -50,8 +50,7 @@ const websiteStructuredData =
     {noIndex && <meta name="robots" content="noindex,nofollow" />}
     {
       websiteStructuredData && (
-        <script type="application/ld+json" set:html={websiteStructuredData}>
-        </script>
+        <script type="application/ld+json" set:html={websiteStructuredData} />
       )
     }
   </head>
