@@ -18,35 +18,38 @@ Do not restore the previous Next.js/React architecture.
 
 ```text
 1. PRODUCT.md
-2. UX.md
-3. DESIGN.md
-4. LISTCONTRAST_EXPANSION_SCOPE_V1_1.md
-5. SEO.md
-6. ARCHITECTURE.md
-7. ANALYTICS.md
-8. STACK_CHANGE.md
-9. LAUNCH_PLAN.md
-10. IMPLEMENTATION_PLAN.md
-11. AGENTS.md
-12. the assigned GitHub Issue
+2. CURRENT_STATE.md
+3. UX.md
+4. DESIGN.md
+5. LISTCONTRAST_EXPANSION_SCOPE_V1_1.md
+6. SEO.md
+7. ARCHITECTURE.md
+8. ANALYTICS.md
+9. STACK_CHANGE.md
+10. LAUNCH_PLAN.md
+11. IMPLEMENTATION_PLAN.md
+12. AGENTS.md
+13. the assigned GitHub Issue / explicitly approved task
 ```
 
 ## 3. Source-of-truth hierarchy
 
 ```text
-Product semantics       → PRODUCT.md
-Interaction             → UX.md
-Visual design           → DESIGN.md
-Post-MVP tool expansion → LISTCONTRAST_EXPANSION_SCOPE_V1_1.md
-SEO/indexing            → SEO.md
-Technical design        → ARCHITECTURE.md
-Analytics/privacy       → ANALYTICS.md
-Delivery/release        → LAUNCH_PLAN.md
-Task sequencing         → IMPLEMENTATION_PLAN.md + assigned Issue / approved scope
-Stack revision          → STACK_CHANGE.md
+Current routes/release   → CURRENT_STATE.md
+Product semantics        → PRODUCT.md
+Interaction              → UX.md
+Visual design            → DESIGN.md
+Post-MVP tool expansion  → LISTCONTRAST_EXPANSION_SCOPE_V1_1.md
+SEO/indexing strategy    → SEO.md + CURRENT_STATE.md for the current route/origin snapshot
+Technical design         → ARCHITECTURE.md
+Analytics/privacy        → ANALYTICS.md
+Delivery/release history → LAUNCH_PLAN.md + IMPLEMENTATION_PLAN.md
+Live production ops      → deploy/vps/PRODUCTION.md
+Task execution           → assigned Issue / explicitly approved scope
+Stack revision           → STACK_CHANGE.md
 ```
 
-The expansion scope explicitly supersedes older planning only where it says so. Report real contradictions before coding around them.
+`CURRENT_STATE.md` supersedes older current-state statements about route count, placeholder origin, indexing surface or remaining delivery packages. Historical planning and audit documents remain evidence/rationale; do not rewrite history by treating them as the latest repository snapshot. Report real contradictions before coding around them.
 
 ## 4. Goal
 
@@ -87,7 +90,7 @@ The existing Compare Lists page on `/` remains stable. The shipped post-MVP expa
 /privacy
 ```
 
-These routes are the current shipped product scope. Add or expose new routes only when a newly assigned delivery issue or other explicitly approved scope requires them. Never expose navigation links to planned routes before those routes exist in the merged/releasable codebase.
+These routes are the current shipped product scope. `CURRENT_STATE.md` records their current indexing/release role. Add or expose new routes only when a newly assigned delivery issue or other explicitly approved scope requires them. Never expose navigation links to planned routes before those routes exist in the merged/releasable codebase.
 
 ## 9. Out of scope
 
@@ -183,7 +186,7 @@ Every runtime dependency needs a real reason. Prefer platform APIs (`Intl.Collat
 
 Each confirmed intent family maps to one canonical acquisition page. Do not create synonym pages for wording variants. Static HTML must contain meaningful content before JavaScript runs.
 
-`/tools` is a navigation/internal-linking resource, not a fabricated generic SEO opportunity. Keep `INDEXABLE_PATHS`, metadata, canonical paths and sitemap synchronized with actually implemented routes.
+`/tools` is a navigation/internal-linking resource, not a fabricated generic SEO opportunity. Keep `INDEXABLE_PATHS`, metadata, canonical paths and sitemap synchronized with actually implemented routes. Use `CURRENT_STATE.md` for the current route/origin/indexability snapshot instead of old MVP route counts in historical sections of `SEO.md`.
 
 ## 25. Analytics
 
@@ -229,9 +232,9 @@ CL-040 through CL-043 are complete and merged. This sequence is historical; do n
 
 ## 31. Current delivery scope
 
-There is no active expansion package after CL-043. The four-tool expansion is complete.
+There is no standing expansion package after the completed four-tool expansion. Maintenance/hardening work exists only when explicitly assigned. `CURRENT_STATE.md` records the current repository snapshot; the assigned GitHub Issue or other explicitly approved task is the operational implementation scope.
 
-For future work, the assigned GitHub Issue or other explicitly approved task is the operational scope. `LISTCONTRAST_EXPANSION_SCOPE_V1_1.md` remains the source of truth for the shipped expansion semantics; it is not automatic authorization to add more tools or broaden the product.
+`LISTCONTRAST_EXPANSION_SCOPE_V1_1.md` remains the source of truth for the shipped expansion semantics; it is not automatic authorization to add more tools or broaden the product.
 
 If no implementation scope is assigned, review and report findings only. Do not invent a delivery package, new routes or roadmap work.
 
