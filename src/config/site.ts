@@ -1,23 +1,11 @@
-export const INDEXABLE_PATHS = [
-  "/",
-  "/alphabetize-list",
-  "/randomize-list",
-  "/remove-duplicate-lines",
-  "/tools",
-  "/about",
-  "/privacy",
-] as const;
+import { DEFAULT_LOCALE, type Locale } from "@/i18n/locales";
+import { activeIndexablePaths, routeFor } from "@/i18n/routes";
+import type { MetadataKey, PageKey } from "@/i18n/types";
 
-export type IndexableMetadataKey =
-  | "home"
-  | "alphabetizeList"
-  | "randomizeList"
-  | "removeDuplicateLines"
-  | "tools"
-  | "about"
-  | "privacy";
+export const INDEXABLE_PATHS = activeIndexablePaths();
 
-export type SiteMetadataKey = IndexableMetadataKey | "notFound";
+export type IndexableMetadataKey = PageKey;
+export type SiteMetadataKey = MetadataKey;
 
 const PLACEHOLDER_HOST = "example.com";
 
@@ -51,21 +39,9 @@ export function absoluteUrl(site: URL, path: string): URL {
   return new URL(path, site);
 }
 
-export function canonicalPathFor(key: IndexableMetadataKey): string {
-  switch (key) {
-    case "home":
-      return "/";
-    case "alphabetizeList":
-      return "/alphabetize-list";
-    case "randomizeList":
-      return "/randomize-list";
-    case "removeDuplicateLines":
-      return "/remove-duplicate-lines";
-    case "tools":
-      return "/tools";
-    case "about":
-      return "/about";
-    case "privacy":
-      return "/privacy";
-  }
+export function canonicalPathFor(
+  key: IndexableMetadataKey,
+  locale: Locale = DEFAULT_LOCALE,
+): string {
+  return routeFor(locale, key);
 }
