@@ -5,6 +5,7 @@ import RelatedTools from "@/components/RelatedTools.astro";
 import { contentFor } from "@/i18n/content";
 import { DEFAULT_LOCALE } from "@/i18n/locales";
 import { relatedToolsFor } from "@/i18n/page";
+import { routeFor } from "@/i18n/routes";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 
 const locale = DEFAULT_LOCALE;
@@ -24,7 +25,10 @@ const relatedTools = relatedToolsFor(locale, "alphabetizeList");
     <AlphabetizeTool tool={tool} />
   </div>
 
-  <EditorialContent content={editorial} />
+  <EditorialContent
+    content={editorial}
+    privacyHref={routeFor(locale, "privacy")}
+  />
   <RelatedTools heading={content.relatedTools.heading} tools={relatedTools} />
 </BaseLayout>
 
