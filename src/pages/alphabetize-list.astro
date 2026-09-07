@@ -2,13 +2,18 @@
 import AlphabetizeTool from "@/components/AlphabetizeTool.astro";
 import EditorialContent from "@/components/EditorialContent.astro";
 import RelatedTools from "@/components/RelatedTools.astro";
-import { alphabetizeListContent } from "@/content/alphabetize-list";
+import { contentFor } from "@/i18n/content";
+import { DEFAULT_LOCALE } from "@/i18n/locales";
+import { relatedToolsFor } from "@/i18n/page";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 
-const { page, editorial } = alphabetizeListContent;
+const locale = DEFAULT_LOCALE;
+const content = contentFor(locale);
+const { page, editorial } = content.alphabetizeList;
+const relatedTools = relatedToolsFor(locale, "alphabetizeList");
 ---
 
-<BaseLayout metadataKey="alphabetizeList">
+<BaseLayout metadataKey="alphabetizeList" locale={locale}>
   <div class="intro">
     <h1>{page.heading}</h1>
     <p class="description">
@@ -20,26 +25,7 @@ const { page, editorial } = alphabetizeListContent;
   </div>
 
   <EditorialContent content={editorial} />
-  <RelatedTools
-    tools={[
-      {
-        href: "/",
-        label: "Compare Lists",
-        description:
-          "Find differences, matches and unique values between two lists.",
-      },
-      {
-        href: "/randomize-list",
-        label: "List Randomizer",
-        description: "Shuffle a list into a random order.",
-      },
-      {
-        href: "/remove-duplicate-lines",
-        label: "Remove Duplicate Lines",
-        description: "Keep the first occurrence of repeated lines.",
-      },
-    ]}
-  />
+  <RelatedTools heading={content.relatedTools.heading} tools={relatedTools} />
 </BaseLayout>
 
 <style>
