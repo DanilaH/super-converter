@@ -4,6 +4,7 @@ import { germanContent } from "../content/locales/de";
 import { spanishContent } from "../content/locales/es";
 import { frenchContent } from "../content/locales/fr";
 import { brazilianPortugueseContent } from "../content/locales/pt-br";
+import { russianContent } from "../content/locales/ru";
 import { randomizeListContent } from "../content/randomize-list";
 import { removeDuplicateLinesContent } from "../content/remove-duplicate-lines";
 import type { ActiveLocale } from "./locales";
@@ -150,6 +151,7 @@ const ACTIVE_CONTENT = {
   fr: frenchContent,
   es: spanishContent,
   "pt-br": brazilianPortugueseContent,
+  ru: russianContent,
 } as const satisfies Record<ActiveLocale, LocaleContent>;
 
 export function contentFor(locale: ActiveLocale): LocaleContent {
