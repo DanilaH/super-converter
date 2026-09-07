@@ -98,6 +98,7 @@ export type HeaderContent = {
   ariaLabel: string;
   tools: string;
   about: string;
+  language: string;
 };
 
 export type FooterContent = {
@@ -135,6 +136,7 @@ export type AlphabetizeMessages = {
   pastePlaceholder: string;
   clear: string;
   loadExample: string;
+  example: string;
   replaceExampleConfirmation: string;
   options: string;
   trimWhitespace: string;
@@ -160,6 +162,7 @@ export type RandomizeMessages = {
   pastePlaceholder: string;
   clear: string;
   loadExample: string;
+  example: string;
   replaceExampleConfirmation: string;
   options: string;
   trimWhitespace: string;
@@ -184,6 +187,7 @@ export type RemoveDuplicateLinesMessages = {
   pastePlaceholder: string;
   clear: string;
   loadExample: string;
+  example: string;
   replaceExampleConfirmation: string;
   options: string;
   trimWhitespace: string;
