@@ -6,7 +6,7 @@ const related = (pageKey: ToolPageKey, label: string, description: string) =>
 export const frenchContent = {
   siteName: "ListContrast",
   home: {
-    heading: "Comparer deux listes",
+    heading: "Comparer deux listes en ligne",
     description:
       "Comparez deux listes et trouvez immédiatement les différences, correspondances et éléments uniques.",
     privacy: "Le traitement s’effectue localement dans votre navigateur.",
@@ -54,7 +54,7 @@ export const frenchContent = {
   },
   alphabetizeList: {
     page: {
-      heading: "Trier une liste par ordre alphabétique",
+      heading: "Trier une liste par ordre alphabétique en ligne",
       description:
         "Triez des noms, des mots ou toute liste ligne par ligne par ordre alphabétique, de A à Z ou de Z à A.",
       privacy: "Le traitement s’effectue localement dans votre navigateur.",
@@ -163,7 +163,7 @@ export const frenchContent = {
   },
   randomizeList: {
     page: {
-      heading: "Mélanger une liste",
+      heading: "Mélanger une liste en ligne",
       description:
         "Mélangez des noms, des mots ou toute liste ligne par ligne pour obtenir un ordre aléatoire.",
       privacy: "Le traitement s’effectue localement dans votre navigateur.",
@@ -266,7 +266,7 @@ export const frenchContent = {
   },
   removeDuplicateLines: {
     page: {
-      heading: "Supprimer les doublons d’une liste",
+      heading: "Supprimer les lignes en double en ligne",
       description:
         "Supprimez les lignes en double tout en conservant la première occurrence et l’ordre d’origine.",
       privacy: "Le traitement s’effectue localement dans votre navigateur.",

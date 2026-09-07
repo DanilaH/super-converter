@@ -6,7 +6,7 @@ const related = (pageKey: ToolPageKey, label: string, description: string) =>
 export const germanContent = {
   siteName: "ListContrast",
   home: {
-    heading: "Listen vergleichen",
+    heading: "Listen online vergleichen",
     description:
       "Vergleiche zwei Listen und finde Unterschiede, Übereinstimmungen und eindeutige Einträge sofort.",
     privacy: "Die Verarbeitung erfolgt lokal in deinem Browser.",
@@ -54,7 +54,7 @@ export const germanContent = {
   },
   alphabetizeList: {
     page: {
-      heading: "Liste alphabetisch sortieren",
+      heading: "Liste online alphabetisch sortieren",
       description:
         "Sortiere Namen, Wörter oder andere zeilenbasierte Listen alphabetisch von A bis Z oder Z bis A.",
       privacy: "Die Verarbeitung erfolgt lokal in deinem Browser.",
@@ -271,7 +271,7 @@ export const germanContent = {
   },
   removeDuplicateLines: {
     page: {
-      heading: "Duplikate aus Liste entfernen",
+      heading: "Doppelte Zeilen online entfernen",
       description:
         "Entferne doppelte Zeilen und behalte jeweils das erste Vorkommen in der ursprünglichen Reihenfolge.",
       privacy: "Die Verarbeitung erfolgt lokal in deinem Browser.",

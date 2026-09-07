@@ -54,7 +54,7 @@ export const brazilianPortugueseContent = {
   },
   alphabetizeList: {
     page: {
-      heading: "Colocar lista em ordem alfabética",
+      heading: "Colocar lista em ordem alfabética online",
       description:
         "Organize nomes, palavras ou qualquer lista por linhas em ordem alfabética de A a Z ou de Z a A.",
       privacy: "O processamento acontece localmente no seu navegador.",
@@ -162,7 +162,7 @@ export const brazilianPortugueseContent = {
   },
   randomizeList: {
     page: {
-      heading: "Embaralhar lista",
+      heading: "Embaralhar lista online",
       description:
         "Embaralhe nomes, palavras ou qualquer lista por linhas para criar uma nova ordem aleatória.",
       privacy: "O processamento acontece localmente no seu navegador.",
@@ -265,7 +265,7 @@ export const brazilianPortugueseContent = {
   },
   removeDuplicateLines: {
     page: {
-      heading: "Remover linhas duplicadas",
+      heading: "Remover linhas duplicadas online",
       description:
         "Remova linhas repetidas mantendo a primeira ocorrência e a ordem original.",
       privacy: "O processamento acontece localmente no seu navegador.",

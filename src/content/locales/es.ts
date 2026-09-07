@@ -6,7 +6,7 @@ const related = (pageKey: ToolPageKey, label: string, description: string) =>
 export const spanishContent = {
   siteName: "ListContrast",
   home: {
-    heading: "Comparar listas online",
+    heading: "Comparar dos listas online",
     description:
       "Compara dos listas y encuentra diferencias, coincidencias y elementos únicos al instante.",
     privacy: "El procesamiento se realiza localmente en tu navegador.",
@@ -54,7 +54,7 @@ export const spanishContent = {
   },
   alphabetizeList: {
     page: {
-      heading: "Ordenar lista alfabéticamente",
+      heading: "Ordenar una lista alfabéticamente online",
       description:
         "Ordena nombres, palabras o cualquier lista por líneas de A a Z o de Z a A.",
       privacy: "El procesamiento se realiza localmente en tu navegador.",
@@ -164,7 +164,7 @@ export const spanishContent = {
   },
   randomizeList: {
     page: {
-      heading: "Mezclar una lista",
+      heading: "Aleatorizar una lista online",
       description:
         "Reordena nombres, palabras o cualquier lista por líneas en un orden aleatorio.",
       privacy: "El procesamiento se realiza localmente en tu navegador.",
@@ -186,7 +186,7 @@ export const spanishContent = {
       item: "elemento",
       items: "elementos",
       emptyResult: "Pega una lista para crear un orden aleatorio.",
-      readyResult: "Pulsa Mezclar para reordenar la lista actual.",
+      readyResult: "Selecciona Mezclar para reordenar la lista actual.",
       noEffectiveItems: "No quedan elementos con las opciones actuales.",
       copy: "Copiar",
       copied: "Copiado",
@@ -200,7 +200,7 @@ export const spanishContent = {
       howToSteps: [
         "Pega un elemento por línea.",
         "Ajusta los espacios o las líneas vacías si lo necesitas.",
-        "Pulsa Mezclar para generar un nuevo orden aleatorio.",
+        "Selecciona Mezclar para generar un nuevo orden aleatorio.",
         "Vuelve a mezclar o copia y descarga el resultado que quieras conservar.",
       ],
       resultsHeading: "Cómo funciona el orden aleatorio",
@@ -252,7 +252,8 @@ export const spanishContent = {
         },
         {
           question: "¿La lista se mezcla mientras escribo?",
-          answer: "No. Solo se genera un nuevo orden cuando pulsas Mezclar.",
+          answer:
+            "No. Solo se genera un nuevo orden cuando seleccionas Mezclar.",
         },
         {
           question:
@@ -269,7 +270,7 @@ export const spanishContent = {
   },
   removeDuplicateLines: {
     page: {
-      heading: "Eliminar líneas duplicadas",
+      heading: "Eliminar líneas duplicadas online",
       description:
         "Elimina líneas repetidas conservando la primera aparición y el orden original.",
       privacy: "El procesamiento se realiza localmente en tu navegador.",
