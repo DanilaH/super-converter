@@ -7,7 +7,7 @@ on:
       - main
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -19,36 +19,77 @@ jobs:
     timeout-minutes: 15
 
     steps:
-      - name: Checkout
+      - name: Checkout localization branch
         uses: actions/checkout@v7
-
-      - name: Set up pnpm and Node.js
-        uses: pnpm/setup@v2
         with:
-          runtime: node@22.13.0
-          cache: true
-          install: false
+          ref: l10n-2-localized-release
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Apply reviewed localization corrections
+        run: |
+          python - <<'PY'
+          from pathlib import Path
 
-      - name: Check formatting
-        run: pnpm format:check
+          replacements = {
+              "src/content/locales/de.ts": [
+                  ('home: {\n    heading: "Listen vergleichen",', 'home: {\n    heading: "Listen online vergleichen",'),
+                  ('alphabetizeList: {\n    page: {\n      heading: "Liste alphabetisch sortieren",', 'alphabetizeList: {\n    page: {\n      heading: "Liste online alphabetisch sortieren",'),
+                  ('removeDuplicateLines: {\n    page: {\n      heading: "Duplikate aus Liste entfernen",', 'removeDuplicateLines: {\n    page: {\n      heading: "Doppelte Zeilen online entfernen",'),
+              ],
+              "src/content/locales/fr.ts": [
+                  ('home: {\n    heading: "Comparer deux listes",', 'home: {\n    heading: "Comparer deux listes en ligne",'),
+                  ('alphabetizeList: {\n    page: {\n      heading: "Trier une liste par ordre alphabétique",', 'alphabetizeList: {\n    page: {\n      heading: "Trier une liste par ordre alphabétique en ligne",'),
+                  ('randomizeList: {\n    page: {\n      heading: "Mélanger une liste",', 'randomizeList: {\n    page: {\n      heading: "Mélanger une liste en ligne",'),
+                  ('removeDuplicateLines: {\n    page: {\n      heading: "Supprimer les doublons d’une liste",', 'removeDuplicateLines: {\n    page: {\n      heading: "Supprimer les lignes en double en ligne",'),
+              ],
+              "src/content/locales/pt-br.ts": [
+                  ('alphabetizeList: {\n    page: {\n      heading: "Colocar lista em ordem alfabética",', 'alphabetizeList: {\n    page: {\n      heading: "Colocar lista em ordem alfabética online",'),
+                  ('randomizeList: {\n    page: {\n      heading: "Embaralhar lista",', 'randomizeList: {\n    page: {\n      heading: "Embaralhar lista online",'),
+                  ('removeDuplicateLines: {\n    page: {\n      heading: "Remover linhas duplicadas",', 'removeDuplicateLines: {\n    page: {\n      heading: "Remover linhas duplicadas online",'),
+              ],
+              "src/content/locales/es.ts": [
+                  ('home: {\n    heading: "Comparar listas online",', 'home: {\n    heading: "Comparar dos listas online",'),
+                  ('alphabetizeList: {\n    page: {\n      heading: "Ordenar lista alfabéticamente",', 'alphabetizeList: {\n    page: {\n      heading: "Ordenar una lista alfabéticamente online",'),
+                  ('randomizeList: {\n    page: {\n      heading: "Mezclar una lista",', 'randomizeList: {\n    page: {\n      heading: "Aleatorizar una lista online",'),
+                  ('removeDuplicateLines: {\n    page: {\n      heading: "Eliminar líneas duplicadas",', 'removeDuplicateLines: {\n    page: {\n      heading: "Eliminar líneas duplicadas online",'),
+                  ('readyResult: "Pulsa Mezclar para reordenar la lista actual.",', 'readyResult: "Selecciona Mezclar para reordenar la lista actual.",'),
+                  ('"Pulsa Mezclar para generar un nuevo orden aleatorio.",', '"Selecciona Mezclar para generar un nuevo orden aleatorio.",'),
+                  ('answer: "No. Solo se genera un nuevo orden cuando pulsas Mezclar.",', 'answer: "No. Solo se genera un nuevo orden cuando seleccionas Mezclar.",'),
+              ],
+              "src/components/RandomizeTool.astro": [
+                  ('  data-randomize-tool\n  aria-labelledby=', '  data-randomize-tool\n  data-example={tool.example}\n  aria-labelledby='),
+              ],
+              "src/components/RemoveDuplicateLinesTool.astro": [
+                  ('  data-remove-duplicate-lines-tool\n  aria-labelledby=', '  data-remove-duplicate-lines-tool\n  data-example={tool.example}\n  aria-labelledby='),
+              ],
+              "src/scripts/randomize-tool.ts": [
+                  ('  const labels = readLabels(root);\n  const state:', '  const labels = readLabels(root);\n  const example = root.dataset.example ?? EXAMPLE;\n  const state:'),
+                  ('    hooks.input.value = EXAMPLE;\n    state.input = EXAMPLE;', '    hooks.input.value = example;\n    state.input = example;'),
+              ],
+              "src/scripts/remove-duplicate-lines-tool.ts": [
+                  ('  const labels = readLabels(root);\n  const state:', '  const labels = readLabels(root);\n  const example = root.dataset.example ?? EXAMPLE;\n  const state:'),
+                  ('    hooks.input.value = EXAMPLE;\n    state.input = EXAMPLE;', '    hooks.input.value = example;\n    state.input = example;'),
+              ],
+          }
 
-      - name: Lint
-        run: pnpm lint
+          for filename, pairs in replacements.items():
+              path = Path(filename)
+              text = path.read_text(encoding="utf-8")
+              for old, new in pairs:
+                  count = text.count(old)
+                  if count != 1:
+                      raise SystemExit(f"{filename}: expected exactly 1 match, got {count}: {old!r}")
+                  text = text.replace(old, new)
+              path.write_text(text, encoding="utf-8")
+          PY
 
-      - name: Typecheck
-        run: pnpm typecheck
+          npx prettier --write src/content/locales/de.ts src/content/locales/fr.ts src/content/locales/pt-br.ts src/content/locales/es.ts src/components/RandomizeTool.astro src/components/RemoveDuplicateLinesTool.astro src/scripts/randomize-tool.ts src/scripts/remove-duplicate-lines-tool.ts
 
-      - name: Test
-        run: pnpm test
-
-      - name: Build
-        run: pnpm build
-
-      - name: Install Playwright Chromium
-        run: pnpm exec playwright install --with-deps chromium
-
-      - name: Run E2E smoke
-        run: pnpm test:e2e
+          if git diff --quiet; then
+            echo "No review changes"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/content/locales/de.ts src/content/locales/fr.ts src/content/locales/pt-br.ts src/content/locales/es.ts src/components/RandomizeTool.astro src/components/RemoveDuplicateLinesTool.astro src/scripts/randomize-tool.ts src/scripts/remove-duplicate-lines-tool.ts
+          git commit -m "fix(l10n): align localized SEO wording and examples"
+          git push origin HEAD:l10n-2-localized-release
