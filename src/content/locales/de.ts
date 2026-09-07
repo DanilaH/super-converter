@@ -78,7 +78,8 @@ export const germanContent = {
       item: "Eintrag",
       items: "Einträge",
       emptyResult: "Füge eine Liste ein, um das sortierte Ergebnis zu sehen.",
-      noEffectiveItems: "Mit den aktuellen Optionen bleiben keine Einträge übrig.",
+      noEffectiveItems:
+        "Mit den aktuellen Optionen bleiben keine Einträge übrig.",
       copy: "Kopieren",
       copied: "Kopiert",
       download: "Herunterladen",
@@ -149,7 +150,8 @@ export const germanContent = {
             "Ja. Die Sortierung ist zahlenbewusst, daher steht beispielsweise Eintrag 2 vor Eintrag 10.",
         },
         {
-          question: "Kann ich eine Spalte aus Excel oder Google Sheets sortieren?",
+          question:
+            "Kann ich eine Spalte aus Excel oder Google Sheets sortieren?",
           answer:
             "Ja. Kopiere eine Spalte und füge sie mit einem Wert pro Zeile ein.",
         },
@@ -184,9 +186,11 @@ export const germanContent = {
       resultLabel: "Zufällige Reihenfolge",
       item: "Eintrag",
       items: "Einträge",
-      emptyResult: "Füge eine Liste ein, um eine zufällige Reihenfolge zu erzeugen.",
+      emptyResult:
+        "Füge eine Liste ein, um eine zufällige Reihenfolge zu erzeugen.",
       readyResult: "Wähle Mischen, um die aktuelle Liste neu anzuordnen.",
-      noEffectiveItems: "Mit den aktuellen Optionen bleiben keine Einträge übrig.",
+      noEffectiveItems:
+        "Mit den aktuellen Optionen bleiben keine Einträge übrig.",
       copy: "Kopieren",
       copied: "Kopiert",
       download: "Herunterladen",
@@ -213,7 +217,8 @@ export const germanContent = {
         },
         {
           term: "Doppelte Einträge",
-          description: "bleiben als getrennte Vorkommen in der Ausgabe erhalten.",
+          description:
+            "bleiben als getrennte Vorkommen in der Ausgabe erhalten.",
         },
       ],
       commonUsesHeading: "Typische Anwendungen für eine Zufallsreihenfolge",
@@ -254,8 +259,7 @@ export const germanContent = {
         },
         {
           question: "Kann ich Namen aus einer Tabellenkalkulation mischen?",
-          answer:
-            "Ja. Füge eine Spalte mit einem Wert pro Zeile ein.",
+          answer: "Ja. Füge eine Spalte mit einem Wert pro Zeile ein.",
         },
         {
           question: "Wird meine Liste hochgeladen?",
@@ -289,7 +293,8 @@ export const germanContent = {
       item: "Eintrag",
       items: "Einträge",
       emptyResult: "Füge Text oder eine Liste ein, um Duplikate zu entfernen.",
-      noEffectiveItems: "Mit den aktuellen Optionen bleiben keine Zeilen übrig.",
+      noEffectiveItems:
+        "Mit den aktuellen Optionen bleiben keine Zeilen übrig.",
       input: "Eingabe",
       unique: "Eindeutig",
       removed: "Entfernt",
@@ -364,8 +369,7 @@ export const germanContent = {
         },
         {
           question: "Kann ich Duplikate aus einer Tabellen-Spalte entfernen?",
-          answer:
-            "Ja. Füge eine Spalte mit einem Wert pro Zeile ein.",
+          answer: "Ja. Füge eine Spalte mit einem Wert pro Zeile ein.",
         },
         {
           question: "Wird mein Text hochgeladen?",
@@ -399,15 +403,18 @@ export const germanContent = {
       },
       {
         term: "Nur A",
-        description: "Einträge oder Vorkommen aus Liste A ohne Paar in Liste B.",
+        description:
+          "Einträge oder Vorkommen aus Liste A ohne Paar in Liste B.",
       },
       {
         term: "Nur B",
-        description: "Einträge oder Vorkommen aus Liste B ohne Paar in Liste A.",
+        description:
+          "Einträge oder Vorkommen aus Liste B ohne Paar in Liste A.",
       },
       {
         term: "Übereinstimmungen",
-        description: "Einträge in beiden Listen, in der Reihenfolge von Liste A.",
+        description:
+          "Einträge in beiden Listen, in der Reihenfolge von Liste A.",
       },
       {
         term: "Alle",
@@ -580,7 +587,8 @@ export const germanContent = {
       },
       randomizeList: {
         label: "Liste zufällig mischen",
-        description: "Eine Liste auf Wunsch in eine zufällige Reihenfolge bringen.",
+        description:
+          "Eine Liste auf Wunsch in eine zufällige Reihenfolge bringen.",
       },
       removeDuplicateLines: {
         label: "Duplikate entfernen",
@@ -593,24 +601,72 @@ export const germanContent = {
     heading: "Ähnliche Tools",
     byPage: {
       home: [
-        related("alphabetizeList", "Alphabetisch sortieren", "Eine Liste alphabetisch sortieren."),
-        related("randomizeList", "Liste mischen", "Eine Liste zufällig neu anordnen."),
-        related("removeDuplicateLines", "Duplikate entfernen", "Doppelte Zeilen entfernen."),
+        related(
+          "alphabetizeList",
+          "Alphabetisch sortieren",
+          "Eine Liste alphabetisch sortieren.",
+        ),
+        related(
+          "randomizeList",
+          "Liste mischen",
+          "Eine Liste zufällig neu anordnen.",
+        ),
+        related(
+          "removeDuplicateLines",
+          "Duplikate entfernen",
+          "Doppelte Zeilen entfernen.",
+        ),
       ],
       alphabetizeList: [
-        related("home", "Listen vergleichen", "Unterschiede und Übereinstimmungen zwischen zwei Listen finden."),
-        related("randomizeList", "Liste mischen", "Eine Liste zufällig neu anordnen."),
-        related("removeDuplicateLines", "Duplikate entfernen", "Doppelte Zeilen entfernen."),
+        related(
+          "home",
+          "Listen vergleichen",
+          "Unterschiede und Übereinstimmungen zwischen zwei Listen finden.",
+        ),
+        related(
+          "randomizeList",
+          "Liste mischen",
+          "Eine Liste zufällig neu anordnen.",
+        ),
+        related(
+          "removeDuplicateLines",
+          "Duplikate entfernen",
+          "Doppelte Zeilen entfernen.",
+        ),
       ],
       randomizeList: [
-        related("home", "Listen vergleichen", "Unterschiede und Übereinstimmungen zwischen zwei Listen finden."),
-        related("alphabetizeList", "Alphabetisch sortieren", "Eine Liste alphabetisch sortieren."),
-        related("removeDuplicateLines", "Duplikate entfernen", "Doppelte Zeilen entfernen."),
+        related(
+          "home",
+          "Listen vergleichen",
+          "Unterschiede und Übereinstimmungen zwischen zwei Listen finden.",
+        ),
+        related(
+          "alphabetizeList",
+          "Alphabetisch sortieren",
+          "Eine Liste alphabetisch sortieren.",
+        ),
+        related(
+          "removeDuplicateLines",
+          "Duplikate entfernen",
+          "Doppelte Zeilen entfernen.",
+        ),
       ],
       removeDuplicateLines: [
-        related("home", "Listen vergleichen", "Unterschiede und Übereinstimmungen zwischen zwei Listen finden."),
-        related("alphabetizeList", "Alphabetisch sortieren", "Eine Liste alphabetisch sortieren."),
-        related("randomizeList", "Liste mischen", "Eine Liste zufällig neu anordnen."),
+        related(
+          "home",
+          "Listen vergleichen",
+          "Unterschiede und Übereinstimmungen zwischen zwei Listen finden.",
+        ),
+        related(
+          "alphabetizeList",
+          "Alphabetisch sortieren",
+          "Eine Liste alphabetisch sortieren.",
+        ),
+        related(
+          "randomizeList",
+          "Liste mischen",
+          "Eine Liste zufällig neu anordnen.",
+        ),
       ],
     },
   },

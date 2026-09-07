@@ -254,8 +254,7 @@ export const frenchContent = {
         },
         {
           question: "Puis-je mélanger des noms copiés depuis un tableur ?",
-          answer:
-            "Oui. Collez une colonne avec une valeur par ligne.",
+          answer: "Oui. Collez une colonne avec une valeur par ligne.",
         },
         {
           question: "Ma liste est-elle envoyée sur un serveur ?",
@@ -364,8 +363,7 @@ export const frenchContent = {
         },
         {
           question: "Puis-je dédupliquer une colonne de tableur ?",
-          answer:
-            "Oui. Collez une colonne avec une valeur par ligne.",
+          answer: "Oui. Collez une colonne avec une valeur par ligne.",
         },
         {
           question: "Mon texte est-il envoyé sur un serveur ?",
@@ -596,24 +594,72 @@ export const frenchContent = {
     heading: "Outils associés",
     byPage: {
       home: [
-        related("alphabetizeList", "Tri alphabétique", "Trier une liste par ordre alphabétique."),
-        related("randomizeList", "Mélanger une liste", "Réorganiser une liste aléatoirement."),
-        related("removeDuplicateLines", "Supprimer les doublons", "Retirer les lignes répétées."),
+        related(
+          "alphabetizeList",
+          "Tri alphabétique",
+          "Trier une liste par ordre alphabétique.",
+        ),
+        related(
+          "randomizeList",
+          "Mélanger une liste",
+          "Réorganiser une liste aléatoirement.",
+        ),
+        related(
+          "removeDuplicateLines",
+          "Supprimer les doublons",
+          "Retirer les lignes répétées.",
+        ),
       ],
       alphabetizeList: [
-        related("home", "Comparer des listes", "Trouver différences et correspondances entre deux listes."),
-        related("randomizeList", "Mélanger une liste", "Réorganiser une liste aléatoirement."),
-        related("removeDuplicateLines", "Supprimer les doublons", "Retirer les lignes répétées."),
+        related(
+          "home",
+          "Comparer des listes",
+          "Trouver différences et correspondances entre deux listes.",
+        ),
+        related(
+          "randomizeList",
+          "Mélanger une liste",
+          "Réorganiser une liste aléatoirement.",
+        ),
+        related(
+          "removeDuplicateLines",
+          "Supprimer les doublons",
+          "Retirer les lignes répétées.",
+        ),
       ],
       randomizeList: [
-        related("home", "Comparer des listes", "Trouver différences et correspondances entre deux listes."),
-        related("alphabetizeList", "Tri alphabétique", "Trier une liste par ordre alphabétique."),
-        related("removeDuplicateLines", "Supprimer les doublons", "Retirer les lignes répétées."),
+        related(
+          "home",
+          "Comparer des listes",
+          "Trouver différences et correspondances entre deux listes.",
+        ),
+        related(
+          "alphabetizeList",
+          "Tri alphabétique",
+          "Trier une liste par ordre alphabétique.",
+        ),
+        related(
+          "removeDuplicateLines",
+          "Supprimer les doublons",
+          "Retirer les lignes répétées.",
+        ),
       ],
       removeDuplicateLines: [
-        related("home", "Comparer des listes", "Trouver différences et correspondances entre deux listes."),
-        related("alphabetizeList", "Tri alphabétique", "Trier une liste par ordre alphabétique."),
-        related("randomizeList", "Mélanger une liste", "Réorganiser une liste aléatoirement."),
+        related(
+          "home",
+          "Comparer des listes",
+          "Trouver différences et correspondances entre deux listes.",
+        ),
+        related(
+          "alphabetizeList",
+          "Tri alphabétique",
+          "Trier une liste par ordre alphabétique.",
+        ),
+        related(
+          "randomizeList",
+          "Mélanger une liste",
+          "Réorganiser une liste aléatoirement.",
+        ),
       ],
     },
   },

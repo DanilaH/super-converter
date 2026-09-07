@@ -1,5 +1,9 @@
 ---
-import { ACTIVE_LOCALES, LOCALE_CONFIGS, type ActiveLocale } from "@/i18n/locales";
+import {
+  ACTIVE_LOCALES,
+  LOCALE_CONFIGS,
+  type ActiveLocale,
+} from "@/i18n/locales";
 import { routeFor } from "@/i18n/routes";
 import type { PageKey } from "@/i18n/types";
 
@@ -14,7 +18,9 @@ const current = LOCALE_CONFIGS[locale];
 ---
 
 <details class="language-switcher">
-  <summary aria-label={ariaLabel} title={ariaLabel}>{current.shortLabel}</summary>
+  <summary aria-label={ariaLabel} title={ariaLabel}
+    >{current.shortLabel}</summary
+  >
   <nav aria-label={ariaLabel}>
     {
       ACTIVE_LOCALES.map((targetLocale) => {

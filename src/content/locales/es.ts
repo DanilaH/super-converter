@@ -130,7 +130,8 @@ export const spanishContent = {
         "Copiar accede al portapapeles únicamente después de pulsar el botón.",
         "Descargar crea un archivo de texto local únicamente después de pulsar el botón.",
       ],
-      dataLinkLabel: "Consulta la página de Privacidad para ver todos los detalles.",
+      dataLinkLabel:
+        "Consulta la página de Privacidad para ver todos los detalles.",
       faqHeading: "Preguntas frecuentes",
       faqItems: [
         {
@@ -139,7 +140,8 @@ export const spanishContent = {
             "No. Las líneas repetidas se conservan y solo cambian de posición dentro del orden alfabético.",
         },
         {
-          question: "¿Cómo se ordenan letras como ñ y los caracteres acentuados?",
+          question:
+            "¿Cómo se ordenan letras como ñ y los caracteres acentuados?",
           answer:
             "La página usa las reglas de intercalación del navegador para español, incluidas letras y acentos propios del idioma.",
         },
@@ -150,8 +152,7 @@ export const spanishContent = {
         },
         {
           question: "¿Puedo ordenar una columna de Excel o Google Sheets?",
-          answer:
-            "Sí. Copia una columna y pégala con un valor por línea.",
+          answer: "Sí. Copia una columna y pégala con un valor por línea.",
         },
         {
           question: "¿Se sube mi lista a un servidor?",
@@ -213,7 +214,8 @@ export const spanishContent = {
         },
         {
           term: "Elementos repetidos",
-          description: "se mantienen como apariciones separadas en el resultado.",
+          description:
+            "se mantienen como apariciones separadas en el resultado.",
         },
       ],
       commonUsesHeading: "Usos habituales de una lista aleatoria",
@@ -234,7 +236,8 @@ export const spanishContent = {
         "Copiar accede al portapapeles únicamente después de pulsar el botón.",
         "Descargar crea un archivo de texto local únicamente después de pulsar el botón.",
       ],
-      dataLinkLabel: "Consulta la página de Privacidad para ver todos los detalles.",
+      dataLinkLabel:
+        "Consulta la página de Privacidad para ver todos los detalles.",
       faqHeading: "Preguntas frecuentes",
       faqItems: [
         {
@@ -249,13 +252,12 @@ export const spanishContent = {
         },
         {
           question: "¿La lista se mezcla mientras escribo?",
-          answer:
-            "No. Solo se genera un nuevo orden cuando pulsas Mezclar.",
+          answer: "No. Solo se genera un nuevo orden cuando pulsas Mezclar.",
         },
         {
-          question: "¿Puedo mezclar nombres copiados desde una hoja de cálculo?",
-          answer:
-            "Sí. Pega una columna con un valor por línea.",
+          question:
+            "¿Puedo mezclar nombres copiados desde una hoja de cálculo?",
+          answer: "Sí. Pega una columna con un valor por línea.",
         },
         {
           question: "¿Se sube mi lista a un servidor?",
@@ -344,7 +346,8 @@ export const spanishContent = {
         "Ignorar mayúsculas y minúsculas solo cambia la identidad usada para detectar duplicados; se conserva el texto de la primera línea.",
         "Copiar y Descargar exportan el resultado únicamente después de tu acción.",
       ],
-      dataLinkLabel: "Consulta la página de Privacidad para ver todos los detalles.",
+      dataLinkLabel:
+        "Consulta la página de Privacidad para ver todos los detalles.",
       faqHeading: "Preguntas frecuentes",
       faqItems: [
         {
@@ -363,9 +366,9 @@ export const spanishContent = {
             "Sí. La herramienta no ordena la lista; mantiene el orden de las primeras apariciones.",
         },
         {
-          question: "¿Puedo quitar duplicados de una columna de hoja de cálculo?",
-          answer:
-            "Sí. Pega una columna con un valor por línea.",
+          question:
+            "¿Puedo quitar duplicados de una columna de hoja de cálculo?",
+          answer: "Sí. Pega una columna con un valor por línea.",
         },
         {
           question: "¿Se sube mi texto a un servidor?",
@@ -438,7 +441,8 @@ export const spanishContent = {
       "El sitio no guarda tus listas en cookies, localStorage ni sessionStorage.",
       "Las entradas y resultados sin procesar no se incluyen en eventos de analytics ni en registros de la aplicación.",
     ],
-    dataLinkLabel: "Consulta la página de Privacidad para ver todos los detalles.",
+    dataLinkLabel:
+      "Consulta la página de Privacidad para ver todos los detalles.",
     faqHeading: "Preguntas frecuentes",
     faqItems: [
       {
@@ -521,7 +525,8 @@ export const spanishContent = {
   },
   metadata: {
     home: {
-      title: "Comparar listas online – Diferencias y coincidencias | ListContrast",
+      title:
+        "Comparar listas online – Diferencias y coincidencias | ListContrast",
       description:
         "Compara dos listas online para encontrar diferencias, coincidencias y elementos únicos. Gratis y procesado localmente en tu navegador.",
     },
@@ -596,24 +601,72 @@ export const spanishContent = {
     heading: "Herramientas relacionadas",
     byPage: {
       home: [
-        related("alphabetizeList", "Ordenar alfabéticamente", "Ordenar una lista de A a Z o de Z a A."),
-        related("randomizeList", "Mezclar una lista", "Reordenar una lista aleatoriamente."),
-        related("removeDuplicateLines", "Eliminar duplicados", "Quitar líneas repetidas."),
+        related(
+          "alphabetizeList",
+          "Ordenar alfabéticamente",
+          "Ordenar una lista de A a Z o de Z a A.",
+        ),
+        related(
+          "randomizeList",
+          "Mezclar una lista",
+          "Reordenar una lista aleatoriamente.",
+        ),
+        related(
+          "removeDuplicateLines",
+          "Eliminar duplicados",
+          "Quitar líneas repetidas.",
+        ),
       ],
       alphabetizeList: [
-        related("home", "Comparar listas", "Encontrar diferencias y coincidencias entre dos listas."),
-        related("randomizeList", "Mezclar una lista", "Reordenar una lista aleatoriamente."),
-        related("removeDuplicateLines", "Eliminar duplicados", "Quitar líneas repetidas."),
+        related(
+          "home",
+          "Comparar listas",
+          "Encontrar diferencias y coincidencias entre dos listas.",
+        ),
+        related(
+          "randomizeList",
+          "Mezclar una lista",
+          "Reordenar una lista aleatoriamente.",
+        ),
+        related(
+          "removeDuplicateLines",
+          "Eliminar duplicados",
+          "Quitar líneas repetidas.",
+        ),
       ],
       randomizeList: [
-        related("home", "Comparar listas", "Encontrar diferencias y coincidencias entre dos listas."),
-        related("alphabetizeList", "Ordenar alfabéticamente", "Ordenar una lista de A a Z o de Z a A."),
-        related("removeDuplicateLines", "Eliminar duplicados", "Quitar líneas repetidas."),
+        related(
+          "home",
+          "Comparar listas",
+          "Encontrar diferencias y coincidencias entre dos listas.",
+        ),
+        related(
+          "alphabetizeList",
+          "Ordenar alfabéticamente",
+          "Ordenar una lista de A a Z o de Z a A.",
+        ),
+        related(
+          "removeDuplicateLines",
+          "Eliminar duplicados",
+          "Quitar líneas repetidas.",
+        ),
       ],
       removeDuplicateLines: [
-        related("home", "Comparar listas", "Encontrar diferencias y coincidencias entre dos listas."),
-        related("alphabetizeList", "Ordenar alfabéticamente", "Ordenar una lista de A a Z o de Z a A."),
-        related("randomizeList", "Mezclar una lista", "Reordenar una lista aleatoriamente."),
+        related(
+          "home",
+          "Comparar listas",
+          "Encontrar diferencias y coincidencias entre dos listas.",
+        ),
+        related(
+          "alphabetizeList",
+          "Ordenar alfabéticamente",
+          "Ordenar una lista de A a Z o de Z a A.",
+        ),
+        related(
+          "randomizeList",
+          "Mezclar una lista",
+          "Reordenar una lista aleatoriamente.",
+        ),
       ],
     },
   },

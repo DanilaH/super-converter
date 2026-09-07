@@ -13,11 +13,7 @@ import {
 } from "@/i18n/locales";
 import { relatedToolsFor } from "@/i18n/page";
 import { routeFor } from "@/i18n/routes";
-import {
-  PAGE_KEYS,
-  type PageKey,
-  type ToolPageKey,
-} from "@/i18n/types";
+import { PAGE_KEYS, type PageKey, type ToolPageKey } from "@/i18n/types";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 
 interface Props {
@@ -190,7 +186,9 @@ const toolOrder: readonly ToolPageKey[] = [
     pageKey === "about" && (
       <div class="support-page about-page">
         <h1>{content.about.heading}</h1>
-        {content.about.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+        {content.about.paragraphs.map((paragraph) => (
+          <p>{paragraph}</p>
+        ))}
         <p class="tool-link">
           <a
             class="button-link button-link--primary"
@@ -211,7 +209,9 @@ const toolOrder: readonly ToolPageKey[] = [
         {content.privacy.sections.map((section) => (
           <section class="privacy-section">
             <h2>{section.heading}</h2>
-            {section.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+            {section.paragraphs.map((paragraph) => (
+              <p>{paragraph}</p>
+            ))}
           </section>
         ))}
         <p class="tool-link">

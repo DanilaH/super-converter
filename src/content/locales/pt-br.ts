@@ -150,8 +150,7 @@ export const brazilianPortugueseContent = {
         },
         {
           question: "Posso ordenar uma coluna do Excel ou Google Sheets?",
-          answer:
-            "Sim. Copie uma coluna e cole com um valor por linha.",
+          answer: "Sim. Copie uma coluna e cole com um valor por linha.",
         },
         {
           question: "Minha lista é enviada para um servidor?",
@@ -254,8 +253,7 @@ export const brazilianPortugueseContent = {
         },
         {
           question: "Posso embaralhar nomes copiados de uma planilha?",
-          answer:
-            "Sim. Cole uma coluna com um valor por linha.",
+          answer: "Sim. Cole uma coluna com um valor por linha.",
         },
         {
           question: "Minha lista é enviada para um servidor?",
@@ -364,8 +362,7 @@ export const brazilianPortugueseContent = {
         },
         {
           question: "Posso remover duplicados de uma coluna de planilha?",
-          answer:
-            "Sim. Cole uma coluna com um valor por linha.",
+          answer: "Sim. Cole uma coluna com um valor por linha.",
         },
         {
           question: "Meu texto é enviado para um servidor?",
@@ -521,7 +518,8 @@ export const brazilianPortugueseContent = {
   },
   metadata: {
     home: {
-      title: "Comparar listas online – Diferenças e correspondências | ListContrast",
+      title:
+        "Comparar listas online – Diferenças e correspondências | ListContrast",
       description:
         "Compare duas listas online para encontrar diferenças, correspondências e itens exclusivos. Grátis e processado localmente no navegador.",
     },
@@ -587,8 +585,7 @@ export const brazilianPortugueseContent = {
       },
       removeDuplicateLines: {
         label: "Remover linhas duplicadas",
-        description:
-          "Remover linhas repetidas mantendo a primeira ocorrência.",
+        description: "Remover linhas repetidas mantendo a primeira ocorrência.",
       },
     },
   },
@@ -596,24 +593,72 @@ export const brazilianPortugueseContent = {
     heading: "Ferramentas relacionadas",
     byPage: {
       home: [
-        related("alphabetizeList", "Ordem alfabética", "Organizar uma lista alfabeticamente."),
-        related("randomizeList", "Embaralhar lista", "Reorganizar uma lista aleatoriamente."),
-        related("removeDuplicateLines", "Remover duplicados", "Retirar linhas repetidas."),
+        related(
+          "alphabetizeList",
+          "Ordem alfabética",
+          "Organizar uma lista alfabeticamente.",
+        ),
+        related(
+          "randomizeList",
+          "Embaralhar lista",
+          "Reorganizar uma lista aleatoriamente.",
+        ),
+        related(
+          "removeDuplicateLines",
+          "Remover duplicados",
+          "Retirar linhas repetidas.",
+        ),
       ],
       alphabetizeList: [
-        related("home", "Comparar listas", "Encontrar diferenças e correspondências entre duas listas."),
-        related("randomizeList", "Embaralhar lista", "Reorganizar uma lista aleatoriamente."),
-        related("removeDuplicateLines", "Remover duplicados", "Retirar linhas repetidas."),
+        related(
+          "home",
+          "Comparar listas",
+          "Encontrar diferenças e correspondências entre duas listas.",
+        ),
+        related(
+          "randomizeList",
+          "Embaralhar lista",
+          "Reorganizar uma lista aleatoriamente.",
+        ),
+        related(
+          "removeDuplicateLines",
+          "Remover duplicados",
+          "Retirar linhas repetidas.",
+        ),
       ],
       randomizeList: [
-        related("home", "Comparar listas", "Encontrar diferenças e correspondências entre duas listas."),
-        related("alphabetizeList", "Ordem alfabética", "Organizar uma lista alfabeticamente."),
-        related("removeDuplicateLines", "Remover duplicados", "Retirar linhas repetidas."),
+        related(
+          "home",
+          "Comparar listas",
+          "Encontrar diferenças e correspondências entre duas listas.",
+        ),
+        related(
+          "alphabetizeList",
+          "Ordem alfabética",
+          "Organizar uma lista alfabeticamente.",
+        ),
+        related(
+          "removeDuplicateLines",
+          "Remover duplicados",
+          "Retirar linhas repetidas.",
+        ),
       ],
       removeDuplicateLines: [
-        related("home", "Comparar listas", "Encontrar diferenças e correspondências entre duas listas."),
-        related("alphabetizeList", "Ordem alfabética", "Organizar uma lista alfabeticamente."),
-        related("randomizeList", "Embaralhar lista", "Reorganizar uma lista aleatoriamente."),
+        related(
+          "home",
+          "Comparar listas",
+          "Encontrar diferenças e correspondências entre duas listas.",
+        ),
+        related(
+          "alphabetizeList",
+          "Ordem alfabética",
+          "Organizar uma lista alfabeticamente.",
+        ),
+        related(
+          "randomizeList",
+          "Embaralhar lista",
+          "Reorganizar uma lista aleatoriamente.",
+        ),
       ],
     },
   },
