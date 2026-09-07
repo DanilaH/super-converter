@@ -1,4 +1,4 @@
-import type { EditorialContent } from "@/i18n/types";
+import type { EditorialContent } from "../i18n/types";
 
 export type RemoveDuplicateLinesMessages = {
   heading: string;
