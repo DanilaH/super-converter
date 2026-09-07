@@ -14,6 +14,10 @@ vanilla browser APIs
 
 Do not restore the previous Next.js/React architecture.
 
+## Final Localization V1 override
+
+`LOCALIZATION_FINAL_DECISION_2026-09-07.md` is binding for the final locale set, route count and RU decision. It supersedes older four-locale statements that exclude Russian or describe 35 URLs as the final release surface.
+
 ## 2. Mandatory reading order
 
 ```text
@@ -39,7 +43,7 @@ Do not restore the previous Next.js/React architecture.
 
 ```text
 Current routes/release   → CURRENT_STATE.md
-Active localization      → LOCALIZATION_SCOPE_V1.md + LOCALIZATION_LANGUAGE_TARGETING_V1.md + LOCALIZATION_PLAN_REVIEW_V1.md
+Active localization      → LOCALIZATION_FINAL_DECISION_2026-09-07.md + LOCALIZATION_SCOPE_V1.md + LOCALIZATION_LANGUAGE_TARGETING_V1.md + LOCALIZATION_PLAN_REVIEW_V1.md
 Localization evidence    → evidence/seo/localization/2026-09-07/RESEARCH_SUMMARY.md
 Product semantics        → PRODUCT.md
 Interaction              → UX.md
@@ -99,7 +103,7 @@ The existing Compare Lists page on `/` remains stable. The shipped post-MVP expa
 
 These routes are the current shipped English product scope. `CURRENT_STATE.md` records their current indexing/release role.
 
-Localization V1 is separately approved to create equivalent German, French, Spanish, and Brazilian Portuguese versions of these existing pages. Planned localized routes are **not shipped** until the corresponding localization release exists. Never expose navigation links to planned routes before those routes exist in the same merged/releasable codebase.
+Localization V1 is approved to create equivalent German, French, Spanish, Brazilian Portuguese, and Russian versions of these existing pages. Planned localized routes are **not shipped** until the corresponding localization release exists. Never expose navigation links to planned routes before those routes exist in the same merged/releasable codebase.
 
 Add unrelated routes only when a newly assigned delivery issue or other explicitly approved scope requires them.
 
@@ -107,7 +111,7 @@ Add unrelated routes only when a newly assigned delivery issue or other explicit
 
 Follow the explicit out-of-scope list in `LISTCONTRAST_EXPANSION_SCOPE_V1_1.md` for the shipped expansion. In particular: no auth, accounts, backend, database, history, saved data, AI, arbitrary generic text-tool expansion, file-processing suite, dark mode, ads or payments without a new explicit scope decision.
 
-Localization V1 for `de`, `fr`, `es`, and `pt-br` is explicitly approved under `LOCALIZATION_SCOPE_V1.md`. Language targeting is fixed by `LOCALIZATION_LANGUAGE_TARGETING_V1.md`: German and French are generic language versions, Spanish is neutral international Spanish, and Portuguese is explicitly Brazilian (`pt-BR`). Do not introduce `de-DE`, `fr-FR`, `es-ES`, generic `pt`, `pt-PT`, or other regional variants in V1. Russian/Yandex localization is not part of that package and requires separate research/approval. The Instagram export idea remains deferred.
+Localization V1 for `de`, `fr`, `es`, `pt-br`, and `ru` is explicitly approved by the final localization decision together with the implementation scope. Language targeting is fixed by `LOCALIZATION_LANGUAGE_TARGETING_V1.md`: German and French are generic language versions, Spanish is neutral international Spanish, and Portuguese is explicitly Brazilian (`pt-BR`). Do not introduce `de-DE`, `fr-FR`, `es-ES`, generic `pt`, `pt-PT`, or other regional variants in V1. Russian (`ru`) is part of the final package; its search decision is qualitative and does not claim exact Yandex/Wordstat monthly volume. The Instagram export idea remains deferred.
 
 ## 10. Privacy
 
@@ -269,7 +273,7 @@ Localization V1 is the currently approved bounded delivery package:
 
 ```text
 L10N-1 — locale/content/route foundation + English parity; no new indexable URLs
-L10N-2 — DE/FR/ES/PT-BR content + localized routes + locale-aware Alphabetizer + SEO/linking/sitemap + release
+L10N-2 — DE/FR/ES/PT-BR/RU content + localized routes + locale-aware Alphabetizer + SEO/linking/sitemap + release
 ```
 
 `LOCALIZATION_SCOPE_V1.md` is the implementation contract, `LOCALIZATION_LANGUAGE_TARGETING_V1.md` fixes the language-vs-region targeting model, and `LOCALIZATION_PLAN_REVIEW_V1.md` records the independent corrections. `CURRENT_STATE.md` distinguishes planned localized routes from the currently shipped English surface.

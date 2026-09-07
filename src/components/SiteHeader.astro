@@ -1,29 +1,51 @@
 ---
-import { routeFor } from "@/i18n/routes";
+import LanguageSwitcher from "@/components/LanguageSwitcher.astro";
 import type { ActiveLocale } from "@/i18n/locales";
-import type { LocaleContent } from "@/i18n/types";
+import { routeFor } from "@/i18n/routes";
+import type { LocaleContent, PageKey } from "@/i18n/types";
 
 interface Props {
   locale: ActiveLocale;
   content: LocaleContent;
+  pageKey?: PageKey;
 }
 
-const { locale, content } = Astro.props;
+const { locale, content, pageKey } = Astro.props;
 const { header } = content;
 ---
 
 <header class="header">
   <a href={routeFor(locale, "home")} class="wordmark">{content.siteName}</a>
-  <nav class="header-nav" aria-label={header.ariaLabel}>
-    <a href={routeFor(locale, "tools")}>{header.tools}</a>
-    <a href={routeFor(locale, "about")}>{header.about}</a>
-  </nav>
+  <div class="header-actions">
+    <nav class="header-nav" aria-label={header.ariaLabel}>
+      <a href={routeFor(locale, "tools")}>{header.tools}</a>
+      <a href={routeFor(locale, "about")}>{header.about}</a>
+    </nav>
+    {
+      pageKey && (
+        <LanguageSwitcher
+          locale={locale}
+          pageKey={pageKey}
+          ariaLabel={header.language}
+        />
+      )
+    }
+  </div>
 </header>
 
 <style>
+  .header-actions,
   .header-nav {
     display: flex;
     align-items: center;
+  }
+
+  .header-actions {
+    min-width: 0;
+    gap: var(--space-3);
+  }
+
+  .header-nav {
     gap: var(--space-4);
   }
 
@@ -39,6 +61,24 @@ const { header } = content;
     color: var(--color-accent);
     text-decoration: underline;
     text-underline-offset: 4px;
+  }
+
+  @media (max-width: 520px) {
+    .header {
+      flex-wrap: wrap;
+      padding-block: var(--space-1);
+    }
+
+    .header-actions {
+      max-width: 100%;
+      gap: var(--space-2);
+    }
+
+    .header-nav {
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: var(--space-3);
+    }
   }
 
   @media (pointer: coarse) {

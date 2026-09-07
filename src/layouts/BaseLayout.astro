@@ -1,18 +1,21 @@
 ---
+import SiteFooter from "@/components/SiteFooter.astro";
+import SiteHeader from "@/components/SiteHeader.astro";
 import {
   canonicalPathFor,
   isPlaceholderSite,
   resolveSiteOrigin,
   type SiteMetadataKey,
 } from "@/config/site";
-import SiteFooter from "@/components/SiteFooter.astro";
-import SiteHeader from "@/components/SiteHeader.astro";
 import { contentFor } from "@/i18n/content";
 import {
+  ACTIVE_LOCALES,
   DEFAULT_LOCALE,
+  LOCALE_CONFIGS,
   localeConfigFor,
   type ActiveLocale,
 } from "@/i18n/locales";
+import { routeFor } from "@/i18n/routes";
 import "../styles/global.css";
 
 interface Props {
@@ -26,10 +29,19 @@ const metadata = content.metadata[metadataKey];
 const localeConfig = localeConfigFor(locale);
 const site = resolveSiteOrigin(Astro.site);
 const noIndex = metadataKey === "notFound" || isPlaceholderSite(site);
-const canonicalUrl =
-  metadataKey === "notFound"
-    ? null
-    : new URL(canonicalPathFor(metadataKey, locale), site).href;
+const pageKey = metadataKey === "notFound" ? null : metadataKey;
+const canonicalUrl = pageKey
+  ? new URL(canonicalPathFor(pageKey, locale), site).href
+  : null;
+const alternateUrls = pageKey
+  ? ACTIVE_LOCALES.map((targetLocale) => ({
+      hreflang: LOCALE_CONFIGS[targetLocale].hreflang,
+      href: new URL(routeFor(targetLocale, pageKey), site).href,
+    }))
+  : [];
+const xDefaultUrl = pageKey
+  ? new URL(routeFor("en", pageKey), site).href
+  : null;
 const websiteStructuredData =
   locale === "en" && metadataKey === "home"
     ? JSON.stringify({
@@ -49,6 +61,20 @@ const websiteStructuredData =
     <title>{metadata.title}</title>
     <meta name="description" content={metadata.description} />
     {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+    {
+      alternateUrls.map((alternate) => (
+        <link
+          rel="alternate"
+          hreflang={alternate.hreflang}
+          href={alternate.href}
+        />
+      ))
+    }
+    {
+      xDefaultUrl && (
+        <link rel="alternate" hreflang="x-default" href={xDefaultUrl} />
+      )
+    }
     <meta property="og:title" content={metadata.title} />
     <meta property="og:description" content={metadata.description} />
     <meta property="og:type" content="website" />
@@ -67,7 +93,11 @@ const websiteStructuredData =
     }
   </head>
   <body class="shell">
-    <SiteHeader locale={locale} content={content} />
+    <SiteHeader
+      locale={locale}
+      content={content}
+      pageKey={pageKey ?? undefined}
+    />
     <main class="main">
       <slot />
     </main>

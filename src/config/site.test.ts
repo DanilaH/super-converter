@@ -75,7 +75,7 @@ describe("site origin", () => {
     );
   });
 
-  it("maps indexable metadata keys to fixed paths", () => {
+  it("maps default-locale metadata keys to the existing English paths", () => {
     expect(canonicalPathFor("home")).toBe("/");
     expect(canonicalPathFor("alphabetizeList")).toBe("/alphabetize-list");
     expect(canonicalPathFor("randomizeList")).toBe("/randomize-list");
@@ -87,8 +87,10 @@ describe("site origin", () => {
     expect(canonicalPathFor("privacy")).toBe("/privacy");
   });
 
-  it("exposes the exact indexable paths list", () => {
-    expect(INDEXABLE_PATHS).toEqual([
+  it("exposes all 42 approved localized indexable paths", () => {
+    expect(INDEXABLE_PATHS).toHaveLength(42);
+    expect(new Set(INDEXABLE_PATHS).size).toBe(42);
+    expect(INDEXABLE_PATHS.slice(0, 7)).toEqual([
       "/",
       "/alphabetize-list",
       "/randomize-list",
@@ -97,5 +99,7 @@ describe("site origin", () => {
       "/about",
       "/privacy",
     ]);
+    expect(INDEXABLE_PATHS).toContain("/ru/");
+    expect(INDEXABLE_PATHS).toContain("/ru/udalit-dublikaty-strok");
   });
 });

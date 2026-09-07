@@ -5,7 +5,10 @@ import type {
   AlphabetizeOrder,
 } from "../features/alphabetize-list/model/types";
 
-const EXAMPLE = ["Banana", "apple", "Item 10", "Cherry", "item 2"].join("\n");
+const DEFAULT_EXAMPLE = ["Banana", "apple", "Item 10", "Cherry", "item 2"].join(
+  "\n",
+);
+const DEFAULT_COLLATOR_LOCALE = "en";
 const DOWNLOAD_FILENAME = "alphabetized-list.txt";
 
 type ToolState = {
@@ -30,6 +33,11 @@ type Labels = {
   copied: string;
   copyError: string;
   replaceExampleConfirmation: string;
+};
+
+type ToolConfig = {
+  example: string;
+  collatorLocale: string;
 };
 
 type Hooks = {
@@ -74,6 +82,7 @@ function mountRoot(root: HTMLElement): void {
 
   const hooks = findHooks(root);
   const labels = readLabels(root);
+  const config = readConfig(root);
   const state: ToolState = {
     input: hooks.input.value,
     options: {
@@ -87,7 +96,11 @@ function mountRoot(root: HTMLElement): void {
 
   const recompute = (): void => {
     resetCopyFeedback(hooks, labels, state);
-    state.result = alphabetizeList(state.input, state.options);
+    state.result = alphabetizeList(
+      state.input,
+      state.options,
+      config.collatorLocale,
+    );
     render(hooks, labels, state);
   };
 
@@ -125,8 +138,8 @@ function mountRoot(root: HTMLElement): void {
     ) {
       return;
     }
-    hooks.input.value = EXAMPLE;
-    state.input = EXAMPLE;
+    hooks.input.value = config.example;
+    state.input = config.example;
     recompute();
     hooks.input.focus();
   });
@@ -329,6 +342,13 @@ function readLabels(root: HTMLElement): Labels {
     }
   }
   return labels;
+}
+
+function readConfig(root: HTMLElement): ToolConfig {
+  return {
+    example: root.dataset.example ?? DEFAULT_EXAMPLE,
+    collatorLocale: root.dataset.collatorLocale ?? DEFAULT_COLLATOR_LOCALE,
+  };
 }
 
 function readOrder(value: string): AlphabetizeOrder {

@@ -82,6 +82,7 @@ function mountRoot(root: HTMLElement): void {
 
   const hooks = findHooks(root);
   const labels = readLabels(root);
+  const example = root.dataset.example ?? EXAMPLE;
   const state: ToolState = {
     input: hooks.input.value,
     options: {
@@ -133,8 +134,8 @@ function mountRoot(root: HTMLElement): void {
     ) {
       return;
     }
-    hooks.input.value = EXAMPLE;
-    state.input = EXAMPLE;
+    hooks.input.value = example;
+    state.input = example;
     recompute();
     hooks.input.focus();
   });

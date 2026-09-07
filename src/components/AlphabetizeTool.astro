@@ -3,13 +3,16 @@ import type { AlphabetizeMessages } from "@/i18n/types";
 
 interface Props {
   tool: AlphabetizeMessages;
+  collatorLocale: string;
 }
 
-const { tool } = Astro.props;
+const { tool, collatorLocale } = Astro.props;
 ---
 
 <section
   data-alphabetize-tool
+  data-example={tool.example}
+  data-collator-locale={collatorLocale}
   aria-labelledby="alphabetize-tool-heading"
   data-label-item={tool.item}
   data-label-items={tool.items}

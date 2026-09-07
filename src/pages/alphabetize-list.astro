@@ -3,7 +3,7 @@ import AlphabetizeTool from "@/components/AlphabetizeTool.astro";
 import EditorialContent from "@/components/EditorialContent.astro";
 import RelatedTools from "@/components/RelatedTools.astro";
 import { contentFor } from "@/i18n/content";
-import { DEFAULT_LOCALE } from "@/i18n/locales";
+import { DEFAULT_LOCALE, localeConfigFor } from "@/i18n/locales";
 import { relatedToolsFor } from "@/i18n/page";
 import { routeFor } from "@/i18n/routes";
 import BaseLayout from "@/layouts/BaseLayout.astro";
@@ -12,6 +12,7 @@ const locale = DEFAULT_LOCALE;
 const content = contentFor(locale);
 const { page, editorial, tool } = content.alphabetizeList;
 const relatedTools = relatedToolsFor(locale, "alphabetizeList");
+const collatorLocale = localeConfigFor(locale).collatorLocale;
 ---
 
 <BaseLayout metadataKey="alphabetizeList" locale={locale}>
@@ -22,7 +23,7 @@ const relatedTools = relatedToolsFor(locale, "alphabetizeList");
       <span class="privacy">{page.privacy}</span>
     </p>
 
-    <AlphabetizeTool tool={tool} />
+    <AlphabetizeTool tool={tool} collatorLocale={collatorLocale} />
   </div>
 
   <EditorialContent

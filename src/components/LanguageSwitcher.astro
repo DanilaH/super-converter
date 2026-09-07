@@ -1,0 +1,126 @@
+---
+import {
+  ACTIVE_LOCALES,
+  LOCALE_CONFIGS,
+  type ActiveLocale,
+} from "@/i18n/locales";
+import { routeFor } from "@/i18n/routes";
+import type { PageKey } from "@/i18n/types";
+
+interface Props {
+  locale: ActiveLocale;
+  pageKey: PageKey;
+  ariaLabel: string;
+}
+
+const { locale, pageKey, ariaLabel } = Astro.props;
+const current = LOCALE_CONFIGS[locale];
+---
+
+<details class="language-switcher">
+  <summary aria-label={ariaLabel} title={ariaLabel}
+    >{current.shortLabel}</summary
+  >
+  <nav aria-label={ariaLabel}>
+    {
+      ACTIVE_LOCALES.map((targetLocale) => {
+        const config = LOCALE_CONFIGS[targetLocale];
+        return (
+          <a
+            href={routeFor(targetLocale, pageKey)}
+            hreflang={config.hreflang}
+            lang={config.htmlLang}
+            aria-current={targetLocale === locale ? "page" : undefined}
+          >
+            {config.label}
+          </a>
+        );
+      })
+    }
+  </nav>
+</details>
+
+<style>
+  .language-switcher {
+    position: relative;
+    flex: 0 0 auto;
+  }
+
+  .language-switcher summary {
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
+    padding-inline: var(--space-2);
+    border: var(--border-default);
+    border-radius: var(--radius-md);
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-body-secondary);
+    line-height: var(--line-height-body-secondary);
+    font-weight: var(--font-weight-control);
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .language-switcher summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .language-switcher summary:hover,
+  .language-switcher summary:focus-visible {
+    border-color: var(--color-border-strong);
+    color: var(--color-text);
+  }
+
+  .language-switcher summary:focus-visible {
+    outline: var(--focus-outline);
+    outline-offset: var(--focus-outline-offset);
+  }
+
+  .language-switcher nav {
+    position: absolute;
+    z-index: 10;
+    inset-block-start: calc(100% + var(--space-1));
+    inset-inline-end: 0;
+    display: flex;
+    width: max-content;
+    min-width: 180px;
+    max-width: calc(100vw - 2 * var(--container-padding-mobile));
+    flex-direction: column;
+    padding: var(--space-1);
+    border: var(--border-default);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    box-shadow: 0 6px 18px rgb(0 0 0 / 10%);
+  }
+
+  .language-switcher nav a {
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+    padding-inline: var(--space-2);
+    border-radius: var(--radius-sm);
+    color: var(--color-text);
+    font-size: var(--font-size-body-secondary);
+    line-height: var(--line-height-body-secondary);
+    text-decoration: none;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .language-switcher nav a:hover,
+  .language-switcher nav a:focus-visible {
+    background: var(--color-surface-muted);
+    color: var(--color-accent);
+  }
+
+  .language-switcher nav a[aria-current="page"] {
+    font-weight: var(--font-weight-control);
+  }
+
+  @media (pointer: coarse) {
+    .language-switcher summary,
+    .language-switcher nav a {
+      min-height: 44px;
+    }
+  }
+</style>

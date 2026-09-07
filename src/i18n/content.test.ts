@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { ACTIVE_LOCALES } from "./locales";
 import { contentFor } from "./content";
 
 describe("English localization baseline", () => {
@@ -30,7 +31,7 @@ describe("English localization baseline", () => {
     );
   });
 
-  it("preserves support-page metadata and labels", () => {
+  it("preserves support-page metadata and labels while adding language navigation", () => {
     expect(content.metadata.tools.title).toBe("List Tools | ListContrast");
     expect(content.toolsPage.heading).toBe("List tools");
     expect(content.about.heading).toBe("About ListContrast");
@@ -39,6 +40,7 @@ describe("English localization baseline", () => {
       ariaLabel: "Primary",
       tools: "Tools",
       about: "About",
+      language: "Language",
     });
   });
 
@@ -50,5 +52,35 @@ describe("English localization baseline", () => {
     expect(content.privacy.sections[2]?.paragraphs[0]).toContain(
       "does not use advertising scripts",
     );
+  });
+});
+
+describe("localized content", () => {
+  it("provides complete content for every active locale", () => {
+    for (const locale of ACTIVE_LOCALES) {
+      const content = contentFor(locale);
+      expect(content.siteName).toBe("ListContrast");
+      expect(content.home.heading.length).toBeGreaterThan(0);
+      expect(content.alphabetizeList.tool.example.length).toBeGreaterThan(0);
+      expect(content.header.language.length).toBeGreaterThan(0);
+      expect(content.metadata.privacy.description.length).toBeGreaterThan(0);
+    }
+  });
+
+  it("uses the approved Russian acquisition wording", () => {
+    const content = contentFor("ru");
+    expect(content.home.heading).toBe("Сравнить два списка онлайн");
+    expect(content.alphabetizeList.page.heading).toBe(
+      "Сортировать список по алфавиту онлайн",
+    );
+    expect(content.randomizeList.page.heading).toBe("Перемешать список онлайн");
+    expect(content.removeDuplicateLines.page.heading).toBe(
+      "Удалить дубликаты строк онлайн",
+    );
+    expect(content.compare.rows).toBe("стр.");
+    expect(content.compare.items).toBe("элем.");
+    expect(content.alphabetizeList.tool.items).toBe("элем.");
+    expect(content.randomizeList.tool.items).toBe("элем.");
+    expect(content.removeDuplicateLines.tool.items).toBe("элем.");
   });
 });
