@@ -1,6 +1,6 @@
 /* Cross-tool responsive refinements verified in the CL-045 Chromium audit. */
 
-@media (max-width: 379px) {
+@media (max-width: 479px) {
   section[data-alphabetize-tool] .result-toolbar,
   section[data-randomize-tool] .result-toolbar,
   section[data-remove-duplicate-lines-tool] .result-toolbar {
