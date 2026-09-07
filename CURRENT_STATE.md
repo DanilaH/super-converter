@@ -2,13 +2,11 @@
 
 State date: 2026-09-07
 
-This document is the concise source of truth for the **current shipped routes, indexing surface, release state and currently approved delivery scope**. Historical planning/audit documents remain useful for rationale and traceability, but when an older current-state statement conflicts with this file, use this file for the present repository state.
+This document is the concise source of truth for the **current production surface, active release work and indexing expectations**. Historical planning/audit documents remain useful for rationale, but when an older current-state statement conflicts with this file or `LOCALIZATION_FINAL_DECISION_2026-09-07.md`, use the newer documents.
 
 ## Product and stack
 
 ListContrast is a small static browser-side toolkit for line-based list work.
-
-Current stack:
 
 ```text
 Astro
@@ -17,11 +15,11 @@ vanilla browser APIs
 static output
 ```
 
-Compare Lists remains the anchor utility. The four-tool expansion is shipped; do not infer permission to add unrelated tools from the existence of the toolkit.
+Compare Lists remains the anchor utility. Localization does not authorize new tools or broader product semantics.
 
-## Current shipped routes
+## Production state before Localization V1 release
 
-The current production route set is still English-only:
+The public production site is still the existing English surface until the localization release is merged and deployed:
 
 ```text
 /
@@ -42,17 +40,15 @@ Roles:
 - `/tools` — navigation/internal-linking resource;
 - `/about` and `/privacy` — supporting site pages.
 
-All seven routes are currently present in the English indexable surface and production sitemap. A real 404 remains `noindex,nofollow` and has no canonical URL.
+A real 404 remains `noindex,nofollow` and has no canonical URL.
 
-## SEO origin and indexing
+## Canonical origin and preview boundary
 
-The canonical production origin is:
+Production origin:
 
 ```text
 https://listcontrast.com
 ```
-
-The site is live and has begun receiving Google Search Console impressions/click data. Canonical URLs, Open Graph URLs, robots and sitemap output derive from the production origin.
 
 The protected preview is a separate deployment concern. Its external Caddy ingress must continue to require Basic Auth and add:
 
@@ -60,61 +56,82 @@ The protected preview is a separate deployment concern. Its external Caddy ingre
 X-Robots-Tag: noindex, nofollow, noarchive
 ```
 
-Do not treat production canonicals inside the preview build as preview indexability. The ingress-level noindex contract is the preview protection boundary.
+Production canonicals inside a preview build do not make the preview indexable; ingress-level noindex remains the protection boundary.
 
-## Active approved scope — Localization V1
+## Active release — Localization V1 / L10N-2
 
-A four-language localization SEO experiment is now explicitly approved for implementation, but **none of its localized routes are shipped yet**.
-
-Approved new locales:
+The final approved locale set is:
 
 ```text
-de     German / Germany
-fr     French / France
-es     Spanish / Spain
-pt-br  Brazilian Portuguese / Brazil
+en     existing unprefixed English control
+de     generic German
+fr     generic French
+es     neutral international Spanish
+pt-br  Brazilian Portuguese (`pt-BR`)
+ru     generic Russian
 ```
 
-The implementation source of truth is:
+The implementation branch/PR is intended to release all six language surfaces atomically. Each locale has the same seven `PageKey` identities: Compare, Alphabetizer, Randomizer, Dedupe, Tools, About and Privacy.
+
+After the release is actually deployed, expected normal indexable surface:
 
 ```text
-LOCALIZATION_SCOPE_V1.md
+6 locales × 7 pages = 42 canonical/indexable URLs
+7 existing English URLs + 35 localized URLs
 ```
 
-Research evidence and query mapping are recorded in:
+Do **not** report the 42-URL surface as live before production deployment is verified.
+
+The binding final scope/SEO decision is:
 
 ```text
-evidence/seo/localization/2026-09-07/RESEARCH_SUMMARY.md
+LOCALIZATION_FINAL_DECISION_2026-09-07.md
 ```
 
-The localization scope translates/adapts the entire existing seven-page product per locale, including tool UI, editorial content, metadata, navigation, supporting pages and SEO language signals. It does not authorize new tools or product features.
+The older four-locale planning documents remain historical implementation rationale. Their statements that Russian is excluded or that the final surface is 35 URLs are superseded by the final decision above.
 
-Important boundary: the current production indexable surface remains the seven English URLs until Localization V1 is actually implemented and released. Do not report the planned 28 localized URLs as live before that deployment exists.
+## Localization behavior
 
-Russian/Yandex is **not** part of Localization V1. It requires separate research and an explicit follow-up decision.
+Release invariants:
 
-## Localization delivery sequence
+- English paths and search-facing acquisition semantics remain the control;
+- every localized page is statically rendered and self-canonical;
+- equivalent pages emit reciprocal `hreflang` for `en`, `de`, `fr`, `es`, `pt-BR`, `ru`, plus `x-default` to English;
+- only the explicit crawlable language switcher crosses locale boundaries;
+- internal navigation otherwise remains inside the active locale;
+- no automatic IP/browser-language redirects;
+- no runtime i18n dependency or translation service;
+- Alphabetizer uses locale-aware `Intl.Collator` (`en`, `de`, `fr`, `es`, `pt-BR`, `ru`);
+- localized visible examples come from locale content rather than English browser-script constants;
+- privacy/product behavior stays equivalent to English.
 
-The approved plan deliberately separates architecture risk from SEO route exposure:
+Russian is a qualitative localization bet. Exact Yandex/Wordstat monthly volume is not claimed. The approved RU acquisition wording is recorded in `LOCALIZATION_FINAL_DECISION_2026-09-07.md` and the final localization handoff.
+
+## Research correctness backlog
+
+A real research-runner correctness issue was discovered: `research.market`, `googleHl` and `googleGl` do not guarantee the Keyword Surfer extension's own selected country. The extension market must be verified independently, and stale market-specific values can remain in cache for roughly seven days.
+
+Future locale research therefore requires a market preflight that verifies Keyword Surfer against `research.market` and fails closed on mismatch, plus an isolated cache for market-correction runs. This belongs to the SEO Research Runner backlog; it is not a ListContrast runtime feature.
+
+## Delivery sequence
 
 ```text
-L10N-1 — locale/content/route foundation + English parity, no new indexable URLs
-L10N-2 — DE/FR/ES/PT-BR content + localized routes + locale-aware Alphabetizer + hreflang/sitemap + release
+L10N-1 — locale/content/route foundation + English parity; no new indexable URLs
+L10N-2 — DE/FR/ES/PT-BR/RU content + localized routes + locale-aware Alphabetizer + SEO/linking/sitemap + release
 ```
 
-Do not expose partially translated/indexable locale routes between these packages.
+Do not expose a partial public locale set between these packages unless a real release blocker forces a new explicit decision.
 
 ## Documentation precedence
 
-For current repository state, use this order:
+For present repository/release state use this order:
 
-1. `CURRENT_STATE.md` — current shipped routes, indexing surface and active delivery snapshot;
-2. `LOCALIZATION_SCOPE_V1.md` — approved localization implementation contract while that work is active;
-3. `evidence/seo/localization/2026-09-07/RESEARCH_SUMMARY.md` — localization demand/query evidence;
-4. domain-specific source of truth (`PRODUCT.md`, `UX.md`, `DESIGN.md`, `LISTCONTRAST_EXPANSION_SCOPE_V1_1.md`, `SEO.md`, `ARCHITECTURE.md`, `ANALYTICS.md`);
-5. current assigned GitHub Issue / explicitly approved task;
-6. historical planning and audit documents for rationale/traceability.
+1. `CURRENT_STATE.md` — current production/release snapshot;
+2. `LOCALIZATION_FINAL_DECISION_2026-09-07.md` — final Localization V1 locale/count/query decision;
+3. `LOCALIZATION_SCOPE_V1.md`, `LOCALIZATION_LANGUAGE_TARGETING_V1.md`, `LOCALIZATION_PLAN_REVIEW_V1.md` — historical/implementation rationale where not superseded;
+4. `evidence/seo/localization/2026-09-07/RESEARCH_SUMMARY.md` — original four-run evidence, interpreted with the later Runner/Surfer correction;
+5. domain-specific source of truth (`PRODUCT.md`, `UX.md`, `DESIGN.md`, `LISTCONTRAST_EXPANSION_SCOPE_V1_1.md`, `SEO.md`, `ARCHITECTURE.md`, `ANALYTICS.md`);
+6. current assigned GitHub Issue / explicitly approved task;
+7. older planning/audit documents for rationale and traceability.
 
-`SEO.md`, `LAUNCH_PLAN.md`, `IMPLEMENTATION_PLAN.md` and `RELEASE_AUDIT.md` contain historical MVP/pre-expansion material. Do not use an older route count, placeholder origin, old “remaining package” statement, or old “localization deferred” statement to override the current snapshot above.
-
-Operational production commands and live acceptance checks remain in `deploy/vps/PRODUCTION.md`; update that runbook if Localization V1 changes the expected sitemap/indexable route count at release time.
+Operational production commands and live acceptance checks are in `deploy/vps/PRODUCTION.md`; its localization release gate must expect 42 sitemap URLs after L10N-2 is deployed.
