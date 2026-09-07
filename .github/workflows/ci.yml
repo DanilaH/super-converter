@@ -7,7 +7,7 @@ on:
       - main
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -19,10 +19,8 @@ jobs:
     timeout-minutes: 15
 
     steps:
-      - name: Checkout localization branch
+      - name: Checkout
         uses: actions/checkout@v7
-        with:
-          ref: l10n-2-localized-release
 
       - name: Set up pnpm and Node.js
         uses: pnpm/setup@v2
@@ -34,112 +32,23 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Apply final review corrections
-        run: |
-          python - <<'PY'
-          from pathlib import Path
+      - name: Check formatting
+        run: pnpm format:check
 
-          def replace(path_name, old, new, expected=1):
-              path = Path(path_name)
-              text = path.read_text(encoding="utf-8")
-              count = text.count(old)
-              if count != expected:
-                  raise SystemExit(f"{path_name}: expected {expected} matches, got {count}: {old!r}")
-              path.write_text(text.replace(old, new), encoding="utf-8")
+      - name: Lint
+        run: pnpm lint
 
-          # Russian has more than two plural forms while the current tiny UI renderer
-          # is intentionally binary. Keep natural singulars for 1 and use compact,
-          # invariant abbreviations for all non-singular counters.
-          replace("src/content/locales/ru.ts", '    rows: "строки",', '    rows: "стр.",')
-          replace("src/content/locales/ru.ts", '    items: "элементов",', '    items: "элем.",', 4)
+      - name: Typecheck
+        run: pnpm typecheck
 
-          replace(
-              "src/i18n/content.test.ts",
-              '    expect(content.removeDuplicateLines.page.heading).toBe(\n      "Удалить дубликаты строк онлайн",\n    );\n',
-              '    expect(content.removeDuplicateLines.page.heading).toBe(\n      "Удалить дубликаты строк онлайн",\n    );\n    expect(content.compare.rows).toBe("стр.");\n    expect(content.compare.items).toBe("элем.");\n    expect(content.alphabetizeList.tool.items).toBe("элем.");\n    expect(content.randomizeList.tool.items).toBe("элем.");\n    expect(content.removeDuplicateLines.tool.items).toBe("элем.");\n',
-          )
+      - name: Test
+        run: pnpm test
 
-          agents = Path("AGENTS.md")
-          text = agents.read_text(encoding="utf-8")
-          marker = "## 2. Mandatory reading order\n"
-          note = (
-              "## Final Localization V1 override\n\n"
-              "`LOCALIZATION_FINAL_DECISION_2026-09-07.md` is binding for the final locale set, route count and RU decision. "
-              "It supersedes older four-locale statements that exclude Russian or describe 35 URLs as the final release surface.\n\n"
-          )
-          if note not in text:
-              if marker not in text:
-                  raise SystemExit("AGENTS.md: mandatory reading marker missing")
-              text = text.replace(marker, note + marker, 1)
-          text = text.replace(
-              "Active localization      → LOCALIZATION_SCOPE_V1.md + LOCALIZATION_LANGUAGE_TARGETING_V1.md + LOCALIZATION_PLAN_REVIEW_V1.md",
-              "Active localization      → LOCALIZATION_FINAL_DECISION_2026-09-07.md + LOCALIZATION_SCOPE_V1.md + LOCALIZATION_LANGUAGE_TARGETING_V1.md + LOCALIZATION_PLAN_REVIEW_V1.md",
-              1,
-          )
-          text = text.replace(
-              "Localization V1 is separately approved to create equivalent German, French, Spanish, and Brazilian Portuguese versions of these existing pages.",
-              "Localization V1 is approved to create equivalent German, French, Spanish, Brazilian Portuguese, and Russian versions of these existing pages.",
-              1,
-          )
-          text = text.replace(
-              "Localization V1 for `de`, `fr`, `es`, and `pt-br` is explicitly approved under `LOCALIZATION_SCOPE_V1.md`.",
-              "Localization V1 for `de`, `fr`, `es`, `pt-br`, and `ru` is explicitly approved by the final localization decision together with the implementation scope.",
-              1,
-          )
-          text = text.replace(
-              "Russian/Yandex localization is not part of that package and requires separate research/approval.",
-              "Russian (`ru`) is part of the final package; its search decision is qualitative and does not claim exact Yandex/Wordstat monthly volume.",
-              1,
-          )
-          text = text.replace(
-              "L10N-2 — DE/FR/ES/PT-BR content + localized routes + locale-aware Alphabetizer + SEO/linking/sitemap + release",
-              "L10N-2 — DE/FR/ES/PT-BR/RU content + localized routes + locale-aware Alphabetizer + SEO/linking/sitemap + release",
-              1,
-          )
-          agents.write_text(text, encoding="utf-8")
+      - name: Build
+        run: pnpm build
 
-          prod = Path("deploy/vps/PRODUCTION.md")
-          body = prod.read_text(encoding="utf-8")
-          old = '''INDEXABLE_HTML=(
-            dist/index.html
-            dist/alphabetize-list/index.html
-            dist/randomize-list/index.html
-            dist/remove-duplicate-lines/index.html
-            dist/tools/index.html
-            dist/about/index.html
-            dist/privacy/index.html
-          )'''
-          new = '''mapfile -t INDEXABLE_HTML < <(find dist -type f -name index.html | sort)
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
 
-          if [ "${#INDEXABLE_HTML[@]}" -ne 42 ]; then
-            echo "Expected 42 indexable HTML pages, found ${#INDEXABLE_HTML[@]}" >&2
-            exit 1
-          fi'''
-          if old not in body:
-              raise SystemExit("deploy/vps/PRODUCTION.md: expected seven-page generated-output block missing")
-          body = body.replace(old, new, 1)
-          body = body.replace("- all seven indexable routes have no noindex directive;", "- all 42 indexable routes have no noindex directive;", 1)
-          body = body.replace("- sitemap contains exactly the seven routes listed in `CURRENT_STATE.md`.", "- sitemap contains exactly the 42 canonical routes defined by the final localization route matrix.", 1)
-          body = body.replace("- all seven shipped apex routes return `200`;", "- the seven English control routes above return `200`; all 42 canonical sitemap URLs must also pass the sitemap-wide check below;", 1)
-          body = body.replace("- sitemap has exactly the seven production `<loc>` values from\n  `CURRENT_STATE.md`;", "- sitemap has exactly 42 production `<loc>` values from the final localization route matrix;", 1)
-
-          browser_marker = "Then verify in a browser:\n"
-          sitemap_check = '''Verify the complete localization surface from the live sitemap:\n\n```bash\nSITEMAP_URLS=$(curl -fsS https://listcontrast.com/sitemap.xml | \\\n  grep -oE '<loc>[^<]+' | sed 's#<loc>##')\n\nCOUNT=$(printf '%s\\n' "$SITEMAP_URLS" | sed '/^$/d' | wc -l)\n[ "$COUNT" -eq 42 ] || { echo "Expected 42 sitemap URLs, got $COUNT" >&2; exit 1; }\n\nwhile IFS= read -r url; do\n  [ -n "$url" ] || continue\n  curl -fsS -o /dev/null -w "$url -> %{http_code}\\n" "$url"\ndone <<EOF\n$SITEMAP_URLS\nEOF\n```\n\nExpected: all 42 canonical URLs return `200`.\n\n'''
-          if sitemap_check not in body:
-              if browser_marker not in body:
-                  raise SystemExit("deploy/vps/PRODUCTION.md: browser marker missing")
-              body = body.replace(browser_marker, sitemap_check + browser_marker, 1)
-          prod.write_text(body, encoding="utf-8")
-          PY
-
-          pnpm exec prettier --write \
-            src/content/locales/ru.ts \
-            src/i18n/content.test.ts \
-            AGENTS.md \
-            deploy/vps/PRODUCTION.md
-
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add src/content/locales/ru.ts src/i18n/content.test.ts AGENTS.md deploy/vps/PRODUCTION.md
-          git commit -m "fix(l10n): close final localization review"
-          git push origin HEAD:l10n-2-localized-release
+      - name: Run E2E smoke
+        run: pnpm test:e2e
