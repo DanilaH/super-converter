@@ -33,7 +33,10 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Check formatting
-        run: pnpm format:check
+        run: |
+          pnpm exec prettier --write src/components/LanguageSwitcher.astro src/content/locales/de.ts src/content/locales/es.ts src/content/locales/fr.ts src/content/locales/pt-br.ts src/content/locales/ru.ts 'src/pages/[...localized].astro'
+          git diff -- src/components/LanguageSwitcher.astro src/content/locales/de.ts src/content/locales/es.ts src/content/locales/fr.ts src/content/locales/pt-br.ts src/content/locales/ru.ts 'src/pages/[...localized].astro'
+          exit 1
 
       - name: Lint
         run: pnpm lint
