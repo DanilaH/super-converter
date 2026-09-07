@@ -1,5 +1,9 @@
 import { alphabetizeListContent } from "../content/alphabetize-list";
 import { englishContent } from "../content/en";
+import { germanContent } from "../content/locales/de";
+import { spanishContent } from "../content/locales/es";
+import { frenchContent } from "../content/locales/fr";
+import { brazilianPortugueseContent } from "../content/locales/pt-br";
 import { randomizeListContent } from "../content/randomize-list";
 import { removeDuplicateLinesContent } from "../content/remove-duplicate-lines";
 import type { ActiveLocale } from "./locales";
@@ -33,9 +37,31 @@ const related = (pageKey: ToolPageKey, label: string, description: string) =>
 
 export const englishLocaleContent = {
   ...englishContent,
-  alphabetizeList: alphabetizeListContent,
-  randomizeList: randomizeListContent,
-  removeDuplicateLines: removeDuplicateLinesContent,
+  header: {
+    ...englishContent.header,
+    language: "Language",
+  },
+  alphabetizeList: {
+    ...alphabetizeListContent,
+    tool: {
+      ...alphabetizeListContent.tool,
+      example: "Banana\napple\nItem 10\nCherry\nitem 2",
+    },
+  },
+  randomizeList: {
+    ...randomizeListContent,
+    tool: {
+      ...randomizeListContent.tool,
+      example: "Alpha\nBravo\nCharlie\nDelta\nEcho",
+    },
+  },
+  removeDuplicateLines: {
+    ...removeDuplicateLinesContent,
+    tool: {
+      ...removeDuplicateLinesContent.tool,
+      example: "Apple\nBanana\nApple\nCherry\nbanana",
+    },
+  },
   toolsPage: {
     heading: "List tools",
     intro:
@@ -120,6 +146,10 @@ export const englishLocaleContent = {
 
 const ACTIVE_CONTENT = {
   en: englishLocaleContent,
+  de: germanContent,
+  fr: frenchContent,
+  es: spanishContent,
+  "pt-br": brazilianPortugueseContent,
 } as const satisfies Record<ActiveLocale, LocaleContent>;
 
 export function contentFor(locale: ActiveLocale): LocaleContent {
