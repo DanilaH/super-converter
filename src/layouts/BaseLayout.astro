@@ -1,5 +1,4 @@
 ---
-import { englishContent } from "@/content/en";
 import {
   canonicalPathFor,
   isPlaceholderSite,
@@ -8,33 +7,42 @@ import {
 } from "@/config/site";
 import SiteFooter from "@/components/SiteFooter.astro";
 import SiteHeader from "@/components/SiteHeader.astro";
+import { contentFor } from "@/i18n/content";
+import {
+  DEFAULT_LOCALE,
+  localeConfigFor,
+  type ActiveLocale,
+} from "@/i18n/locales";
 import "../styles/global.css";
 
 interface Props {
   metadataKey: SiteMetadataKey;
+  locale?: ActiveLocale;
 }
 
-const { metadataKey } = Astro.props;
-const metadata = englishContent.metadata[metadataKey];
+const { metadataKey, locale = DEFAULT_LOCALE } = Astro.props;
+const content = contentFor(locale);
+const metadata = content.metadata[metadataKey];
+const localeConfig = localeConfigFor(locale);
 const site = resolveSiteOrigin(Astro.site);
 const noIndex = metadataKey === "notFound" || isPlaceholderSite(site);
 const canonicalUrl =
   metadataKey === "notFound"
     ? null
-    : new URL(canonicalPathFor(metadataKey), site).href;
+    : new URL(canonicalPathFor(metadataKey, locale), site).href;
 const websiteStructuredData =
-  metadataKey === "home"
+  locale === "en" && metadataKey === "home"
     ? JSON.stringify({
         "@context": "https://schema.org",
         "@type": "WebSite",
         url: new URL("/", site).href,
-        name: englishContent.siteName,
+        name: content.siteName,
       })
     : null;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={localeConfig.htmlLang}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -45,7 +53,7 @@ const websiteStructuredData =
     <meta property="og:description" content={metadata.description} />
     <meta property="og:type" content="website" />
     {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
-    <meta property="og:site_name" content={englishContent.siteName} />
+    <meta property="og:site_name" content={content.siteName} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     {noIndex && <meta name="robots" content="noindex,nofollow" />}
     {
@@ -59,10 +67,10 @@ const websiteStructuredData =
     }
   </head>
   <body class="shell">
-    <SiteHeader />
+    <SiteHeader locale={locale} content={content} />
     <main class="main">
       <slot />
     </main>
-    <SiteFooter />
+    <SiteFooter locale={locale} content={content} />
   </body>
 </html>
