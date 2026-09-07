@@ -7,7 +7,7 @@ on:
       - main
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -19,10 +19,8 @@ jobs:
     timeout-minutes: 15
 
     steps:
-      - name: Checkout localization branch
+      - name: Checkout
         uses: actions/checkout@v7
-        with:
-          ref: l10n-2-localized-release
 
       - name: Set up pnpm and Node.js
         uses: pnpm/setup@v2
@@ -34,15 +32,23 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Format localization E2E and push
-        run: |
-          pnpm exec prettier --write e2e/localization.spec.ts
-          if git diff --quiet; then
-            echo "No formatting changes"
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add e2e/localization.spec.ts
-          git commit -m "style(l10n): format localization e2e"
-          git push origin HEAD:l10n-2-localized-release
+      - name: Check formatting
+        run: pnpm format:check
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Run E2E smoke
+        run: pnpm test:e2e
