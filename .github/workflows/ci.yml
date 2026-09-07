@@ -24,6 +24,16 @@ jobs:
         with:
           ref: l10n-2-localized-release
 
+      - name: Set up pnpm and Node.js
+        uses: pnpm/setup@v2
+        with:
+          runtime: node@22.13.0
+          cache: true
+          install: false
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
       - name: Apply reviewed localization corrections
         run: |
           python - <<'PY'
@@ -82,7 +92,7 @@ jobs:
               path.write_text(text, encoding="utf-8")
           PY
 
-          npx prettier --write src/content/locales/de.ts src/content/locales/fr.ts src/content/locales/pt-br.ts src/content/locales/es.ts src/components/RandomizeTool.astro src/components/RemoveDuplicateLinesTool.astro src/scripts/randomize-tool.ts src/scripts/remove-duplicate-lines-tool.ts
+          pnpm exec prettier --write src/content/locales/de.ts src/content/locales/fr.ts src/content/locales/pt-br.ts src/content/locales/es.ts src/components/RandomizeTool.astro src/components/RemoveDuplicateLinesTool.astro src/scripts/randomize-tool.ts src/scripts/remove-duplicate-lines-tool.ts
 
           if git diff --quiet; then
             echo "No review changes"
