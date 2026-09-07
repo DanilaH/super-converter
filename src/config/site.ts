@@ -1,6 +1,6 @@
-import { DEFAULT_LOCALE, type Locale } from "@/i18n/locales";
-import { activeIndexablePaths, routeFor } from "@/i18n/routes";
-import type { MetadataKey, PageKey } from "@/i18n/types";
+import { DEFAULT_LOCALE, type Locale } from "../i18n/locales";
+import { activeIndexablePaths, routeFor } from "../i18n/routes";
+import type { MetadataKey, PageKey } from "../i18n/types";
 
 export const INDEXABLE_PATHS = activeIndexablePaths();
 
