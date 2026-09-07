@@ -8,7 +8,7 @@ This file records the final implementation decision after the initial four-local
 
 ```text
 en     existing English control
- de    German, language-targeted
+de     German, language-targeted
 fr     French, language-targeted
 es     neutral international Spanish
 pt-br  Brazilian Portuguese (`pt-BR`)
