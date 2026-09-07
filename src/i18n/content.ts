@@ -27,6 +27,12 @@ const englishToolItems = {
   { label: string; description: string }
 >;
 
+const related = (
+  pageKey: ToolPageKey,
+  label: string,
+  description: string,
+) => ({ pageKey, label, description }) as const;
+
 export const englishLocaleContent = {
   ...englishContent,
   alphabetizeList: alphabetizeListContent,
@@ -41,20 +47,59 @@ export const englishLocaleContent = {
   },
   relatedTools: {
     heading: "Related tools",
-    items: {
-      ...englishToolItems,
-      alphabetizeList: {
-        ...englishToolItems.alphabetizeList,
-        description: "Sort a list alphabetically.",
-      },
-      randomizeList: {
-        ...englishToolItems.randomizeList,
-        description: "Shuffle a list into a random order.",
-      },
-      removeDuplicateLines: {
-        ...englishToolItems.removeDuplicateLines,
-        description: "Keep the first occurrence of repeated lines.",
-      },
+    byPage: {
+      home: [
+        related("alphabetizeList", "Alphabetizer", "Sort a list alphabetically."),
+        related("randomizeList", "List Randomizer", "Shuffle a list into a random order."),
+        related(
+          "removeDuplicateLines",
+          "Remove Duplicate Lines",
+          "Keep the first occurrence of repeated lines.",
+        ),
+      ],
+      alphabetizeList: [
+        related(
+          "home",
+          "Compare Lists",
+          "Find differences, matches and unique values between two lists.",
+        ),
+        related("randomizeList", "List Randomizer", "Shuffle a list into a random order."),
+        related(
+          "removeDuplicateLines",
+          "Remove Duplicate Lines",
+          "Keep the first occurrence of repeated lines.",
+        ),
+      ],
+      randomizeList: [
+        related(
+          "home",
+          "Compare Lists",
+          "Find differences, matches and unique values between two lists.",
+        ),
+        related(
+          "alphabetizeList",
+          "Alphabetizer",
+          "Sort a list alphabetically in A–Z or Z–A order.",
+        ),
+        related(
+          "removeDuplicateLines",
+          "Remove Duplicate Lines",
+          "Keep the first occurrence of repeated lines.",
+        ),
+      ],
+      removeDuplicateLines: [
+        related(
+          "home",
+          "Compare Lists",
+          "Find differences, matches and unique values between two lists.",
+        ),
+        related(
+          "alphabetizeList",
+          "Alphabetizer",
+          "Sort a list alphabetically in A–Z or Z–A order.",
+        ),
+        related("randomizeList", "List Randomizer", "Shuffle a list into a random order."),
+      ],
     },
   },
 } satisfies LocaleContent;
