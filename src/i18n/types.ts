@@ -223,10 +223,7 @@ export type RemoveDuplicateLinesPageContent = {
 };
 
 export type ToolPageKey =
-  | "home"
-  | "alphabetizeList"
-  | "randomizeList"
-  | "removeDuplicateLines";
+  "home" | "alphabetizeList" | "randomizeList" | "removeDuplicateLines";
 
 export type RelatedToolItem = {
   pageKey: ToolPageKey;
