@@ -70,4 +70,16 @@ describe("alphabetizeList", () => {
     expect(result.items).toHaveLength(3);
     expect(new Set(result.items)).toEqual(new Set(["Яблоко", "Äpfel", "東京"]));
   });
+
+  it("accepts locale-specific collation for Russian", () => {
+    expect(
+      alphabetizeList("Яблоко\nАрбуз\nБорис\nВишня", DEFAULTS, "ru").items,
+    ).toEqual(["Арбуз", "Борис", "Вишня", "Яблоко"]);
+  });
+
+  it("accepts locale-specific collation for Spanish", () => {
+    expect(
+      alphabetizeList("niño\nnube\nnaranja", DEFAULTS, "es").items,
+    ).toEqual(["naranja", "niño", "nube"]);
+  });
 });
