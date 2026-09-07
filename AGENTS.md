@@ -20,25 +20,26 @@ Do not restore the previous Next.js/React architecture.
 1. PRODUCT.md
 2. CURRENT_STATE.md
 3. LOCALIZATION_SCOPE_V1.md (while Localization V1 is active)
-4. LOCALIZATION_PLAN_REVIEW_V1.md (while Localization V1 is active)
-5. UX.md
-6. DESIGN.md
-7. LISTCONTRAST_EXPANSION_SCOPE_V1_1.md
-8. SEO.md
-9. ARCHITECTURE.md
-10. ANALYTICS.md
-11. STACK_CHANGE.md
-12. LAUNCH_PLAN.md
-13. IMPLEMENTATION_PLAN.md
-14. AGENTS.md
-15. the assigned GitHub Issue / explicitly approved task
+4. LOCALIZATION_LANGUAGE_TARGETING_V1.md (while Localization V1 is active)
+5. LOCALIZATION_PLAN_REVIEW_V1.md (while Localization V1 is active)
+6. UX.md
+7. DESIGN.md
+8. LISTCONTRAST_EXPANSION_SCOPE_V1_1.md
+9. SEO.md
+10. ARCHITECTURE.md
+11. ANALYTICS.md
+12. STACK_CHANGE.md
+13. LAUNCH_PLAN.md
+14. IMPLEMENTATION_PLAN.md
+15. AGENTS.md
+16. the assigned GitHub Issue / explicitly approved task
 ```
 
 ## 3. Source-of-truth hierarchy
 
 ```text
 Current routes/release   → CURRENT_STATE.md
-Active localization      → LOCALIZATION_SCOPE_V1.md + LOCALIZATION_PLAN_REVIEW_V1.md
+Active localization      → LOCALIZATION_SCOPE_V1.md + LOCALIZATION_LANGUAGE_TARGETING_V1.md + LOCALIZATION_PLAN_REVIEW_V1.md
 Localization evidence    → evidence/seo/localization/2026-09-07/RESEARCH_SUMMARY.md
 Product semantics        → PRODUCT.md
 Interaction              → UX.md
@@ -53,7 +54,7 @@ Task execution           → assigned Issue / explicitly approved scope
 Stack revision           → STACK_CHANGE.md
 ```
 
-`CURRENT_STATE.md` supersedes older current-state statements about route count, placeholder origin, indexing surface, remaining delivery packages, or deferred localization. Historical planning and audit documents remain evidence/rationale; do not rewrite history by treating them as the latest repository snapshot. Report real contradictions before coding around them.
+`CURRENT_STATE.md` supersedes older current-state statements about route count, placeholder origin, indexing surface, remaining delivery packages, or deferred localization. `LOCALIZATION_LANGUAGE_TARGETING_V1.md` supersedes older localization wording when it conflicts on language-vs-region targeting. Historical planning and audit documents remain evidence/rationale; do not rewrite history by treating them as the latest repository snapshot. Report real contradictions before coding around them.
 
 ## 4. Goal
 
@@ -106,7 +107,7 @@ Add unrelated routes only when a newly assigned delivery issue or other explicit
 
 Follow the explicit out-of-scope list in `LISTCONTRAST_EXPANSION_SCOPE_V1_1.md` for the shipped expansion. In particular: no auth, accounts, backend, database, history, saved data, AI, arbitrary generic text-tool expansion, file-processing suite, dark mode, ads or payments without a new explicit scope decision.
 
-Localization V1 for `de`, `fr`, `es`, and `pt-br` is explicitly approved under `LOCALIZATION_SCOPE_V1.md`. Russian/Yandex localization is not part of that package and requires separate research/approval. The Instagram export idea remains deferred.
+Localization V1 for `de`, `fr`, `es`, and `pt-br` is explicitly approved under `LOCALIZATION_SCOPE_V1.md`. Language targeting is fixed by `LOCALIZATION_LANGUAGE_TARGETING_V1.md`: German and French are generic language versions, Spanish is neutral international Spanish, and Portuguese is explicitly Brazilian (`pt-BR`). Do not introduce `de-DE`, `fr-FR`, `es-ES`, generic `pt`, `pt-PT`, or other regional variants in V1. Russian/Yandex localization is not part of that package and requires separate research/approval. The Instagram export idea remains deferred.
 
 ## 10. Privacy
 
@@ -158,7 +159,7 @@ All         → A then unseen B
 Differences → Only A then Only B
 ```
 
-Alphabetizer intentionally sorts with the collation contract defined by the shipped expansion. During Localization V1, preserve English behavior and make the collator locale-aware for localized pages as required by `LOCALIZATION_SCOPE_V1.md`. Randomizer intentionally changes order only after explicit Randomize action. Dedupe preserves first-occurrence order.
+Alphabetizer intentionally sorts with the collation contract defined by the shipped expansion. During Localization V1, preserve English behavior and make the collator locale-aware for localized pages as required by `LOCALIZATION_SCOPE_V1.md` and `LOCALIZATION_LANGUAGE_TARGETING_V1.md`. Randomizer intentionally changes order only after explicit Randomize action. Dedupe preserves first-occurrence order.
 
 ## 16. Client interaction
 
@@ -202,7 +203,7 @@ CSS custom properties + Astro scoped styles + small global tokens/base styleshee
 
 ## 23. Dependency policy
 
-Every runtime dependency needs a real reason. Prefer platform APIs (`Intl.Collator`, `Map`, `Set`, Clipboard, Blob, DOM`).
+Every runtime dependency needs a real reason. Prefer platform APIs (`Intl.Collator`, `Map`, `Set`, Clipboard, Blob, DOM).
 
 Localization V1 does not justify a third-party i18n package unless a concrete blocker is demonstrated first.
 
@@ -212,7 +213,7 @@ Each confirmed intent family maps to one canonical acquisition page. Do not crea
 
 `/tools` is a navigation/internal-linking resource, not a fabricated generic SEO opportunity. Keep route registry/indexable paths, metadata, canonical paths and sitemap synchronized with actually implemented routes. Use `CURRENT_STATE.md` for the current route/origin/indexability snapshot instead of old MVP route counts in historical sections of `SEO.md`.
 
-For Localization V1 follow `LOCALIZATION_SCOPE_V1.md`: separate crawlable locale URLs, self canonicals, correct page language, reciprocal hreflang, locale-local internal links, and no automatic geo/browser-language redirects. Preserve current English search-facing content during the localization foundation package.
+For Localization V1 follow `LOCALIZATION_SCOPE_V1.md` plus `LOCALIZATION_LANGUAGE_TARGETING_V1.md`: separate crawlable locale URLs, self canonicals, correct page language, reciprocal hreflang, locale-local internal links, and no automatic geo/browser-language redirects. Preserve current English search-facing content during the localization foundation package. DE/FR/ES remain language-only hreflang targets; PT-BR remains region-specific.
 
 ## 25. Analytics
 
@@ -271,7 +272,7 @@ L10N-1 — locale/content/route foundation + English parity; no new indexable UR
 L10N-2 — DE/FR/ES/PT-BR content + localized routes + locale-aware Alphabetizer + SEO/linking/sitemap + release
 ```
 
-`LOCALIZATION_SCOPE_V1.md` is the implementation contract and `LOCALIZATION_PLAN_REVIEW_V1.md` records the independent corrections. `CURRENT_STATE.md` distinguishes planned localized routes from the currently shipped English surface.
+`LOCALIZATION_SCOPE_V1.md` is the implementation contract, `LOCALIZATION_LANGUAGE_TARGETING_V1.md` fixes the language-vs-region targeting model, and `LOCALIZATION_PLAN_REVIEW_V1.md` records the independent corrections. `CURRENT_STATE.md` distinguishes planned localized routes from the currently shipped English surface.
 
 No unrelated expansion package is standing. Maintenance/hardening outside the approved localization work exists only when explicitly assigned.
 
