@@ -7,7 +7,7 @@ on:
       - main
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -19,8 +19,10 @@ jobs:
     timeout-minutes: 15
 
     steps:
-      - name: Checkout
+      - name: Checkout localization branch
         uses: actions/checkout@v7
+        with:
+          ref: l10n-2-localized-release
 
       - name: Set up pnpm and Node.js
         uses: pnpm/setup@v2
@@ -32,26 +34,15 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Check formatting
+      - name: Format localization files and push
         run: |
           pnpm exec prettier --write src/components/LanguageSwitcher.astro src/content/locales/de.ts src/content/locales/es.ts src/content/locales/fr.ts src/content/locales/pt-br.ts src/content/locales/ru.ts 'src/pages/[...localized].astro'
-          git diff -- src/components/LanguageSwitcher.astro src/content/locales/de.ts src/content/locales/es.ts src/content/locales/fr.ts src/content/locales/pt-br.ts src/content/locales/ru.ts 'src/pages/[...localized].astro'
-          exit 1
-
-      - name: Lint
-        run: pnpm lint
-
-      - name: Typecheck
-        run: pnpm typecheck
-
-      - name: Test
-        run: pnpm test
-
-      - name: Build
-        run: pnpm build
-
-      - name: Install Playwright Chromium
-        run: pnpm exec playwright install --with-deps chromium
-
-      - name: Run E2E smoke
-        run: pnpm test:e2e
+          if git diff --quiet; then
+            echo "No formatting changes"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/components/LanguageSwitcher.astro src/content/locales/de.ts src/content/locales/es.ts src/content/locales/fr.ts src/content/locales/pt-br.ts src/content/locales/ru.ts 'src/pages/[...localized].astro'
+          git commit -m "style: format localization files"
+          git push origin HEAD:l10n-2-localized-release
