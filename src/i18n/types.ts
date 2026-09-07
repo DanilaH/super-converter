@@ -229,20 +229,26 @@ export type ToolPageKey =
   | "removeDuplicateLines";
 
 export type RelatedToolItem = {
+  pageKey: ToolPageKey;
   label: string;
   description: string;
 };
 
 export type RelatedToolsContent = {
   heading: string;
-  items: Record<ToolPageKey, RelatedToolItem>;
+  byPage: Record<ToolPageKey, readonly RelatedToolItem[]>;
+};
+
+export type ToolsPageItem = {
+  label: string;
+  description: string;
 };
 
 export type ToolsPageContent = {
   heading: string;
   intro: string;
   ariaLabel: string;
-  items: Record<ToolPageKey, RelatedToolItem>;
+  items: Record<ToolPageKey, ToolsPageItem>;
 };
 
 export type LocaleContent = {
