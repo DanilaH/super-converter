@@ -1,7 +1,11 @@
 ---
-import { randomizeListContent } from "@/content/randomize-list";
+import type { RandomizeMessages } from "@/i18n/types";
 
-const { tool } = randomizeListContent;
+interface Props {
+  tool: RandomizeMessages;
+}
+
+const { tool } = Astro.props;
 ---
 
 <section
