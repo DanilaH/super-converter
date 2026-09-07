@@ -51,8 +51,7 @@ jobs:
           # is intentionally binary. Keep natural singulars for 1 and use compact,
           # invariant abbreviations for all non-singular counters.
           replace("src/content/locales/ru.ts", '    rows: "строки",', '    rows: "стр.",')
-          replace("src/content/locales/ru.ts", '    items: "элементов",', '    items: "элем.",')
-          replace("src/content/locales/ru.ts", '      items: "элементов",', '      items: "элем.",', 3)
+          replace("src/content/locales/ru.ts", '    items: "элементов",', '    items: "элем.",', 4)
 
           replace(
               "src/i18n/content.test.ts",
