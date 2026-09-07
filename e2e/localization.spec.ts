@@ -19,6 +19,7 @@ type LocaleExpectation = {
   code: string;
   htmlLang: string;
   hreflang: string;
+  collatorLocale: string;
   routes: readonly RouteExpectation[];
 };
 
@@ -27,6 +28,7 @@ const LOCALES: readonly LocaleExpectation[] = [
     code: "en",
     htmlLang: "en",
     hreflang: "en",
+    collatorLocale: "en",
     routes: [
       { pageKey: "home", path: "/", heading: "Compare Lists Online" },
       {
@@ -53,6 +55,7 @@ const LOCALES: readonly LocaleExpectation[] = [
     code: "de",
     htmlLang: "de",
     hreflang: "de",
+    collatorLocale: "de",
     routes: [
       { pageKey: "home", path: "/de/", heading: "Listen online vergleichen" },
       {
@@ -79,6 +82,7 @@ const LOCALES: readonly LocaleExpectation[] = [
     code: "fr",
     htmlLang: "fr",
     hreflang: "fr",
+    collatorLocale: "fr",
     routes: [
       {
         pageKey: "home",
@@ -109,6 +113,7 @@ const LOCALES: readonly LocaleExpectation[] = [
     code: "es",
     htmlLang: "es",
     hreflang: "es",
+    collatorLocale: "es",
     routes: [
       {
         pageKey: "home",
@@ -139,6 +144,7 @@ const LOCALES: readonly LocaleExpectation[] = [
     code: "pt-br",
     htmlLang: "pt-BR",
     hreflang: "pt-BR",
+    collatorLocale: "pt-BR",
     routes: [
       { pageKey: "home", path: "/pt-br/", heading: "Comparar listas online" },
       {
@@ -165,6 +171,7 @@ const LOCALES: readonly LocaleExpectation[] = [
     code: "ru",
     htmlLang: "ru",
     hreflang: "ru",
+    collatorLocale: "ru",
     routes: [
       {
         pageKey: "home",
@@ -263,6 +270,13 @@ test("publishes the complete 42-route localization matrix with reciprocal SEO si
 
       if (route.heading) {
         await expect(page.locator("h1")).toHaveText(route.heading);
+      }
+
+      if (route.pageKey === "alphabetizeList") {
+        await expect(page.locator("[data-alphabetize-tool]")).toHaveAttribute(
+          "data-collator-locale",
+          locale.collatorLocale,
+        );
       }
 
       if (route.pageKey === "home") {
