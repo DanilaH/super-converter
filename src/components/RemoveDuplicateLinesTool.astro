@@ -1,7 +1,11 @@
 ---
-import { removeDuplicateLinesContent } from "@/content/remove-duplicate-lines";
+import type { RemoveDuplicateLinesMessages } from "@/i18n/types";
 
-const { tool } = removeDuplicateLinesContent;
+interface Props {
+  tool: RemoveDuplicateLinesMessages;
+}
+
+const { tool } = Astro.props;
 ---
 
 <section

@@ -1,7 +1,11 @@
 ---
-import { alphabetizeListContent } from "@/content/alphabetize-list";
+import type { AlphabetizeMessages } from "@/i18n/types";
 
-const { tool } = alphabetizeListContent;
+interface Props {
+  tool: AlphabetizeMessages;
+}
+
+const { tool } = Astro.props;
 ---
 
 <section

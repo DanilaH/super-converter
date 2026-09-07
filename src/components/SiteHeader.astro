@@ -1,14 +1,22 @@
 ---
-import { englishContent } from "@/content/en";
+import { routeFor } from "@/i18n/routes";
+import type { ActiveLocale } from "@/i18n/locales";
+import type { LocaleContent } from "@/i18n/types";
 
-const { header } = englishContent;
+interface Props {
+  locale: ActiveLocale;
+  content: LocaleContent;
+}
+
+const { locale, content } = Astro.props;
+const { header } = content;
 ---
 
 <header class="header">
-  <a href="/" class="wordmark">{englishContent.siteName}</a>
+  <a href={routeFor(locale, "home")} class="wordmark">{content.siteName}</a>
   <nav class="header-nav" aria-label={header.ariaLabel}>
-    <a href="/tools">{header.tools}</a>
-    <a href="/about">{header.about}</a>
+    <a href={routeFor(locale, "tools")}>{header.tools}</a>
+    <a href={routeFor(locale, "about")}>{header.about}</a>
   </nav>
 </header>
 

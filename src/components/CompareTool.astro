@@ -1,8 +1,12 @@
 ---
-import { englishContent } from "@/content/en";
 import { DEFAULT_COMPARE_OPTIONS } from "@/features/compare-lists/model/defaults";
+import type { CompareMessages } from "@/i18n/types";
 
-const { compare } = englishContent;
+interface Props {
+  compare: CompareMessages;
+}
+
+const { compare } = Astro.props;
 const options = DEFAULT_COMPARE_OPTIONS;
 
 const resultViews = [

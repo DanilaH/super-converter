@@ -1,16 +1,23 @@
 ---
-import { englishContent } from "@/content/en";
+import { contentFor } from "@/i18n/content";
+import { DEFAULT_LOCALE } from "@/i18n/locales";
+import { routeFor } from "@/i18n/routes";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 
-const { about } = englishContent;
+const locale = DEFAULT_LOCALE;
+const content = contentFor(locale);
+const { about } = content;
 ---
 
-<BaseLayout metadataKey="about">
+<BaseLayout metadataKey="about" locale={locale}>
   <div class="about">
     <h1>{about.heading}</h1>
     {about.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
     <p class="tool-link">
-      <a class="button-link button-link--primary" href="/tools">
+      <a
+        class="button-link button-link--primary"
+        href={routeFor(locale, "tools")}
+      >
         {about.toolLinkLabel}
       </a>
     </p>

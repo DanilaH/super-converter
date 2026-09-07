@@ -1,11 +1,15 @@
 ---
-import { englishContent } from "@/content/en";
+import { contentFor } from "@/i18n/content";
+import { DEFAULT_LOCALE } from "@/i18n/locales";
+import { routeFor } from "@/i18n/routes";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 
-const { privacy } = englishContent;
+const locale = DEFAULT_LOCALE;
+const content = contentFor(locale);
+const { privacy } = content;
 ---
 
-<BaseLayout metadataKey="privacy">
+<BaseLayout metadataKey="privacy" locale={locale}>
   <div class="privacy">
     <h1>{privacy.heading}</h1>
     <p class="intro">{privacy.intro}</p>
@@ -22,7 +26,9 @@ const { privacy } = englishContent;
     }
 
     <p class="tool-link">
-      <a class="button-link" href="/tools">{privacy.toolLinkLabel}</a>
+      <a class="button-link" href={routeFor(locale, "tools")}>
+        {privacy.toolLinkLabel}
+      </a>
     </p>
   </div>
 </BaseLayout>

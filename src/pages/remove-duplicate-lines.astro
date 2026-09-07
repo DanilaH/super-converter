@@ -2,13 +2,19 @@
 import EditorialContent from "@/components/EditorialContent.astro";
 import RelatedTools from "@/components/RelatedTools.astro";
 import RemoveDuplicateLinesTool from "@/components/RemoveDuplicateLinesTool.astro";
-import { removeDuplicateLinesContent } from "@/content/remove-duplicate-lines";
+import { contentFor } from "@/i18n/content";
+import { DEFAULT_LOCALE } from "@/i18n/locales";
+import { relatedToolsFor } from "@/i18n/page";
+import { routeFor } from "@/i18n/routes";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 
-const { page, editorial } = removeDuplicateLinesContent;
+const locale = DEFAULT_LOCALE;
+const content = contentFor(locale);
+const { page, editorial, tool } = content.removeDuplicateLines;
+const relatedTools = relatedToolsFor(locale, "removeDuplicateLines");
 ---
 
-<BaseLayout metadataKey="removeDuplicateLines">
+<BaseLayout metadataKey="removeDuplicateLines" locale={locale}>
   <div class="intro">
     <h1>{page.heading}</h1>
     <p class="description">
@@ -16,30 +22,14 @@ const { page, editorial } = removeDuplicateLinesContent;
       <span class="privacy">{page.privacy}</span>
     </p>
 
-    <RemoveDuplicateLinesTool />
+    <RemoveDuplicateLinesTool tool={tool} />
   </div>
 
-  <EditorialContent content={editorial} />
-  <RelatedTools
-    tools={[
-      {
-        href: "/",
-        label: "Compare Lists",
-        description:
-          "Find differences, matches and unique values between two lists.",
-      },
-      {
-        href: "/alphabetize-list",
-        label: "Alphabetizer",
-        description: "Sort a list alphabetically in A–Z or Z–A order.",
-      },
-      {
-        href: "/randomize-list",
-        label: "List Randomizer",
-        description: "Shuffle a list into a random order.",
-      },
-    ]}
+  <EditorialContent
+    content={editorial}
+    privacyHref={routeFor(locale, "privacy")}
   />
+  <RelatedTools heading={content.relatedTools.heading} tools={relatedTools} />
 </BaseLayout>
 
 <style>

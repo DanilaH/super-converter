@@ -6,16 +6,17 @@ type RelatedTool = {
 };
 
 interface Props {
+  heading: string;
   tools: readonly RelatedTool[];
 }
 
-const { tools } = Astro.props;
+const { heading, tools } = Astro.props;
 ---
 
 {
   tools.length > 0 && (
     <nav class="related-tools" aria-labelledby="related-tools-heading">
-      <h2 id="related-tools-heading">Related tools</h2>
+      <h2 id="related-tools-heading">{heading}</h2>
       <ul>
         {tools.map((tool) => (
           <li>

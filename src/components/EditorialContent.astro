@@ -1,11 +1,12 @@
 ---
-import type { EditorialContent as EditorialContentData } from "@/content/en";
+import type { EditorialContent as EditorialContentData } from "@/i18n/types";
 
 interface Props {
   content: EditorialContentData;
+  privacyHref: string;
 }
 
-const { content: editorial } = Astro.props;
+const { content: editorial, privacyHref } = Astro.props;
 ---
 
 <div class="editorial">
@@ -46,7 +47,7 @@ const { content: editorial } = Astro.props;
       {editorial.dataItems.map((item) => <li>{item}</li>)}
     </ul>
     <p>
-      <a href="/privacy">{editorial.dataLinkLabel}</a>
+      <a href={privacyHref}>{editorial.dataLinkLabel}</a>
     </p>
   </section>
 
