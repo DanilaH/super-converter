@@ -195,9 +195,14 @@ const LOCALES: readonly LocaleExpectation[] = [
 
 const EXPECTED_HREFLANGS = ["de", "en", "es", "fr", "pt-BR", "ru", "x-default"];
 
-function routeFor(localeCode: string, pageKey: RouteIdentity): RouteExpectation {
+function routeFor(
+  localeCode: string,
+  pageKey: RouteIdentity,
+): RouteExpectation {
   const locale = LOCALES.find((candidate) => candidate.code === localeCode);
-  const route = locale?.routes.find((candidate) => candidate.pageKey === pageKey);
+  const route = locale?.routes.find(
+    (candidate) => candidate.pageKey === pageKey,
+  );
   if (!route) {
     throw new Error(`Missing ${localeCode}/${pageKey} route in E2E contract`);
   }
@@ -207,7 +212,10 @@ function routeFor(localeCode: string, pageKey: RouteIdentity): RouteExpectation 
 test("publishes the complete 42-route localization matrix with reciprocal SEO signals", async ({
   page,
 }, testInfo) => {
-  test.skip(testInfo.project.name !== "desktop-chromium", "matrix contract runs once");
+  test.skip(
+    testInfo.project.name !== "desktop-chromium",
+    "matrix contract runs once",
+  );
 
   expect(LOCALES.flatMap((locale) => locale.routes)).toHaveLength(42);
 
@@ -216,7 +224,10 @@ test("publishes the complete 42-route localization matrix with reciprocal SEO si
       const response = await page.goto(route.path);
       expect(response?.status(), `${locale.code} ${route.path}`).toBe(200);
 
-      await expect(page.locator("html")).toHaveAttribute("lang", locale.htmlLang);
+      await expect(page.locator("html")).toHaveAttribute(
+        "lang",
+        locale.htmlLang,
+      );
       await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
         "href",
         new URL(route.path, "https://listcontrast.com").href,
@@ -236,7 +247,8 @@ test("publishes the complete 42-route localization matrix with reciprocal SEO si
         page.locator('link[rel="alternate"][hreflang="x-default"]'),
       ).toHaveAttribute(
         "href",
-        new URL(routeFor("en", route.pageKey).path, "https://listcontrast.com").href,
+        new URL(routeFor("en", route.pageKey).path, "https://listcontrast.com")
+          .href,
       );
 
       const currentLanguageLink = page.locator(
@@ -244,7 +256,10 @@ test("publishes the complete 42-route localization matrix with reciprocal SEO si
       );
       await expect(currentLanguageLink).toHaveCount(1);
       await expect(currentLanguageLink).toHaveAttribute("href", route.path);
-      await expect(currentLanguageLink).toHaveAttribute("hreflang", locale.hreflang);
+      await expect(currentLanguageLink).toHaveAttribute(
+        "hreflang",
+        locale.hreflang,
+      );
 
       if (route.heading) {
         await expect(page.locator("h1")).toHaveText(route.heading);
@@ -261,7 +276,10 @@ test("publishes the complete 42-route localization matrix with reciprocal SEO si
 test("wires Russian browser behavior to localized examples and collation", async ({
   page,
 }, testInfo) => {
-  test.skip(testInfo.project.name !== "desktop-chromium", "behavior contract runs once");
+  test.skip(
+    testInfo.project.name !== "desktop-chromium",
+    "behavior contract runs once",
+  );
 
   await page.goto("/ru/sortirovat-spisok-po-alfavitu");
   await expect(page.locator("[data-alphabetize-tool]")).toHaveAttribute(
@@ -269,18 +287,20 @@ test("wires Russian browser behavior to localized examples and collation", async
     "ru",
   );
   await page.locator("[data-alphabetize-tool] [data-load-example]").click();
-  await expect(page.locator("[data-alphabetize-tool] [data-list-input]")).toHaveValue(
-    "Ёлка\nАрбуз\nЯблоко\nБерёза\nЭлемент 10\nЭлемент 2",
-  );
+  await expect(
+    page.locator("[data-alphabetize-tool] [data-list-input]"),
+  ).toHaveValue("Ёлка\nАрбуз\nЯблоко\nБерёза\nЭлемент 10\nЭлемент 2");
 
   await page.goto("/ru/peremeshat-spisok");
   await page.locator("[data-randomize-tool] [data-load-example]").click();
-  await expect(page.locator("[data-randomize-tool] [data-list-input]")).toHaveValue(
-    "Анна\nБорис\nВера\nГлеб\nДарья",
-  );
+  await expect(
+    page.locator("[data-randomize-tool] [data-list-input]"),
+  ).toHaveValue("Анна\nБорис\nВера\nГлеб\nДарья");
 
   await page.goto("/ru/udalit-dublikaty-strok");
-  await page.locator("[data-remove-duplicate-lines-tool] [data-load-example]").click();
+  await page
+    .locator("[data-remove-duplicate-lines-tool] [data-load-example]")
+    .click();
   await expect(
     page.locator("[data-remove-duplicate-lines-tool] [data-list-input]"),
   ).toHaveValue("Москва\nКазань\nМосква\nПермь\nказань");
@@ -289,7 +309,10 @@ test("wires Russian browser behavior to localized examples and collation", async
 test("keeps the localized language switcher usable without narrow-page overflow", async ({
   page,
 }, testInfo) => {
-  test.skip(testInfo.project.name !== "mobile-chromium", "narrow-layout contract runs once");
+  test.skip(
+    testInfo.project.name !== "mobile-chromium",
+    "narrow-layout contract runs once",
+  );
 
   await page.goto("/ru/sortirovat-spisok-po-alfavitu");
 
@@ -299,7 +322,9 @@ test("keeps the localized language switcher usable without narrow-page overflow"
   await expect(page.locator(".language-switcher nav a")).toHaveCount(6);
 
   const hasHorizontalOverflow = await page.evaluate(
-    () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
+    () =>
+      document.documentElement.scrollWidth >
+      document.documentElement.clientWidth,
   );
   expect(hasHorizontalOverflow).toBe(false);
 });
