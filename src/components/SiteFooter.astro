@@ -1,18 +1,28 @@
 ---
-import { englishContent } from "@/content/en";
+import type { ActiveLocale } from "@/i18n/locales";
+import { routeFor } from "@/i18n/routes";
+import type { LocaleContent } from "@/i18n/types";
 
-const { footer } = englishContent;
+interface Props {
+  locale: ActiveLocale;
+  content: LocaleContent;
+}
+
+const { locale, content } = Astro.props;
+const { footer } = content;
 ---
 
 <footer class="footer">
-  <span class="footer-name">{englishContent.siteName}</span>
+  <span class="footer-name">{content.siteName}</span>
   <nav class="footer-nav" aria-label={footer.ariaLabel}>
-    <a href="/">{footer.compareLists}</a>
-    <a href="/alphabetize-list">{footer.alphabetizer}</a>
-    <a href="/randomize-list">{footer.randomizer}</a>
-    <a href="/remove-duplicate-lines">{footer.duplicateLines}</a>
-    <a href="/about">{footer.about}</a>
-    <a href="/privacy">{footer.privacy}</a>
+    <a href={routeFor(locale, "home")}>{footer.compareLists}</a>
+    <a href={routeFor(locale, "alphabetizeList")}>{footer.alphabetizer}</a>
+    <a href={routeFor(locale, "randomizeList")}>{footer.randomizer}</a>
+    <a href={routeFor(locale, "removeDuplicateLines")}>
+      {footer.duplicateLines}
+    </a>
+    <a href={routeFor(locale, "about")}>{footer.about}</a>
+    <a href={routeFor(locale, "privacy")}>{footer.privacy}</a>
   </nav>
 </footer>
 
