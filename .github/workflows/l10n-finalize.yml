@@ -1,0 +1,257 @@
+name: Localization finalizer
+
+on:
+  push:
+    branches:
+      - l10n-2-localized-release
+
+permissions:
+  contents: write
+
+concurrency:
+  group: localization-finalizer
+  cancel-in-progress: true
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout release branch
+        uses: actions/checkout@v7
+        with:
+          ref: l10n-2-localized-release
+
+      - name: Set up pnpm and Node.js
+        uses: pnpm/setup@v2
+        with:
+          runtime: node@22.13.0
+          cache: true
+          install: false
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Apply final review fixes
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          def replace_exact(path_name: str, old: str, new: str, expected: int = 1) -> None:
+              path = Path(path_name)
+              text = path.read_text(encoding="utf-8")
+              count = text.count(old)
+              if count != expected:
+                  raise SystemExit(f"{path_name}: expected {expected} matches, got {count}: {old!r}")
+              path.write_text(text.replace(old, new), encoding="utf-8")
+
+          # RU uses a binary singular/plural renderer. Keep singular labels for 1,
+          # but use invariant compact abbreviations for all non-singular counts so
+          # 0/2/5 do not render grammatically incorrect Russian forms.
+          replace_exact(
+              "src/content/locales/ru.ts",
+              '    rows: "строки",',
+              '    rows: "стр.",',
+          )
+          replace_exact(
+              "src/content/locales/ru.ts",
+              '      items: "элементов",',
+              '      items: "элем.",',
+              expected=3,
+          )
+          replace_exact(
+              "src/content/locales/ru.ts",
+              '    items: "элементов",',
+              '    items: "элем.",',
+          )
+
+          # Lock the RU counter decision into the content contract tests.
+          replace_exact(
+              "src/i18n/content.test.ts",
+              '    expect(content.removeDuplicateLines.page.heading).toBe(\n      "Удалить дубликаты строк онлайн",\n    );\n',
+              '    expect(content.removeDuplicateLines.page.heading).toBe(\n      "Удалить дубликаты строк онлайн",\n    );\n    expect(content.compare.rows).toBe("стр.");\n    expect(content.compare.items).toBe("элем.");\n    expect(content.alphabetizeList.tool.items).toBe("элем.");\n    expect(content.randomizeList.tool.items).toBe("элем.");\n    expect(content.removeDuplicateLines.tool.items).toBe("элем.");\n',
+          )
+
+          # Make the final decision document explicit in the coding-agent contract.
+          agents = Path("AGENTS.md")
+          text = agents.read_text(encoding="utf-8")
+          marker = "## 2. Mandatory reading order\n"
+          note = (
+              "## Final Localization V1 override\n\n"
+              "`LOCALIZATION_FINAL_DECISION_2026-09-07.md` is binding for the final locale set, "
+              "route count and RU decision. It supersedes older four-locale statements that exclude "
+              "Russian or describe 35 URLs as the final released surface.\n\n"
+          )
+          if note not in text:
+              if marker not in text:
+                  raise SystemExit("AGENTS.md: mandatory reading marker missing")
+              text = text.replace(marker, note + marker, 1)
+          replacements = [
+              (
+                  "Active localization      → LOCALIZATION_SCOPE_V1.md + LOCALIZATION_LANGUAGE_TARGETING_V1.md + LOCALIZATION_PLAN_REVIEW_V1.md",
+                  "Active localization      → LOCALIZATION_FINAL_DECISION_2026-09-07.md + LOCALIZATION_SCOPE_V1.md + LOCALIZATION_LANGUAGE_TARGETING_V1.md + LOCALIZATION_PLAN_REVIEW_V1.md",
+              ),
+              (
+                  "Localization V1 is separately approved to create equivalent German, French, Spanish, and Brazilian Portuguese versions of these existing pages.",
+                  "Localization V1 is approved to create equivalent German, French, Spanish, Brazilian Portuguese, and Russian versions of these existing pages.",
+              ),
+              (
+                  "Localization V1 for `de`, `fr`, `es`, and `pt-br` is explicitly approved under `LOCALIZATION_SCOPE_V1.md`.",
+                  "Localization V1 for `de`, `fr`, `es`, `pt-br`, and `ru` is explicitly approved by `LOCALIZATION_FINAL_DECISION_2026-09-07.md` together with the implementation scope.",
+              ),
+              (
+                  "Russian/Yandex localization is not part of that package and requires separate research/approval.",
+                  "Russian (`ru`) is part of the final package; its search decision is qualitative and does not claim exact Yandex/Wordstat monthly volume.",
+              ),
+              (
+                  "L10N-2 — DE/FR/ES/PT-BR content + localized routes + locale-aware Alphabetizer + SEO/linking/sitemap + release",
+                  "L10N-2 — DE/FR/ES/PT-BR/RU content + localized routes + locale-aware Alphabetizer + SEO/linking/sitemap + release",
+              ),
+          ]
+          for old, new in replacements:
+              if old not in text:
+                  raise SystemExit(f"AGENTS.md: missing expected text: {old!r}")
+              text = text.replace(old, new, 1)
+          agents.write_text(text, encoding="utf-8")
+
+          # Preserve historical planning documents but make the final override visible.
+          historical_notes = {
+              "LOCALIZATION_SCOPE_V1.md": (
+                  "> **Final scope update (2026-09-07):** Russian (`ru`) was approved after this four-locale plan. "
+                  "`LOCALIZATION_FINAL_DECISION_2026-09-07.md` supersedes statements below that exclude RU or set "
+                  "the final surface to 35 URLs. Final release target: 6 language surfaces × 7 pages = **42 URLs**.\n\n"
+              ),
+              "LOCALIZATION_LANGUAGE_TARGETING_V1.md": (
+                  "> **Final targeting update (2026-09-07):** Russian (`ru`) is now included as a language-targeted "
+                  "locale with `/ru/`, `lang=ru`, `hreflang=ru`, and `Intl` collation `ru`. See "
+                  "`LOCALIZATION_FINAL_DECISION_2026-09-07.md`; it supersedes the five-locale table below.\n\n"
+              ),
+              "LOCALIZATION_PLAN_REVIEW_V1.md": (
+                  "> **Historical review note:** this review predates the later Russian approval. Its 28-new/35-total "
+                  "URL figures and RU-deferred statements are superseded by `LOCALIZATION_FINAL_DECISION_2026-09-07.md`. "
+                  "Final release target: **35 localized + 7 English = 42 URLs**.\n\n"
+              ),
+          }
+          for filename, note_text in historical_notes.items():
+              path = Path(filename)
+              body = path.read_text(encoding="utf-8")
+              if note_text not in body:
+                  first_newline = body.find("\n")
+                  if first_newline < 0:
+                      raise SystemExit(f"{filename}: malformed document")
+                  body = body[: first_newline + 1] + "\n" + note_text + body[first_newline + 1 :]
+                  path.write_text(body, encoding="utf-8")
+
+          # Correct the old evidence summary so nobody trusts the now-known Surfer market assumption.
+          research = Path("evidence/seo/localization/2026-09-07/RESEARCH_SUMMARY.md")
+          body = research.read_text(encoding="utf-8")
+          research_note = (
+              "> **Later correctness update:** this file summarizes the original four discovery runs. The final handoff "
+              "later proved that Keyword Surfer keeps its own UI-selected market; `research.market`/`googleHl`/`googleGl` "
+              "do not guarantee that market. Use `LOCALIZATION_FINAL_DECISION_2026-09-07.md` for the final locale decision "
+              "and Runner preflight requirement. Russian was subsequently approved as a qualitative localization bet.\n\n"
+          )
+          if research_note not in body:
+              first_newline = body.find("\n")
+              body = body[: first_newline + 1] + "\n" + research_note + body[first_newline + 1 :]
+          old = "- Surfer search-volume observations are still market-configured and useful as demand signals."
+          new = "- Keyword Surfer volume must not be assumed to match the requested market unless the extension's own selected country was verified; contaminated market values can also survive in cache."
+          if old in body:
+              body = body.replace(old, new, 1)
+          old_tail = (
+              "Russian/Yandex was discussed separately but is **not present in these four supplied research runs**. "
+              "Do not silently add Russian to Localization V1. The architecture should make another locale cheap to add later, "
+              "but RU requires its own Russian/Yandex discovery and an explicit follow-up decision."
+          )
+          new_tail = (
+              "Russian/Yandex is not present in the four discovery runs summarized above. It was researched later and approved "
+              "as a **qualitative YES** with no exact Yandex/Wordstat monthly-volume claim. The final locale/count decision is "
+              "recorded in `LOCALIZATION_FINAL_DECISION_2026-09-07.md`."
+          )
+          if old_tail in body:
+              body = body.replace(old_tail, new_tail, 1)
+          research.write_text(body, encoding="utf-8")
+
+          # Production runbook: verify the generated/live localization surface, not only the seven English control URLs.
+          prod = Path("deploy/vps/PRODUCTION.md")
+          body = prod.read_text(encoding="utf-8")
+          old_array = '''INDEXABLE_HTML=(
+            dist/index.html
+            dist/alphabetize-list/index.html
+            dist/randomize-list/index.html
+            dist/remove-duplicate-lines/index.html
+            dist/tools/index.html
+            dist/about/index.html
+            dist/privacy/index.html
+          )'''
+          new_array = '''mapfile -t INDEXABLE_HTML < <(find dist -type f -name index.html | sort)
+
+          if [ "${#INDEXABLE_HTML[@]}" -ne 42 ]; then
+            echo "Expected 42 indexable HTML pages, found ${#INDEXABLE_HTML[@]}" >&2
+            exit 1
+          fi'''
+          if old_array not in body:
+              raise SystemExit("PRODUCTION.md: indexable array block changed unexpectedly")
+          body = body.replace(old_array, new_array, 1)
+          body = body.replace(
+              "- all seven indexable routes have no noindex directive;",
+              "- all 42 indexable routes have no noindex directive;",
+          )
+          body = body.replace(
+              "- sitemap contains exactly the seven routes listed in `CURRENT_STATE.md`.",
+              "- sitemap contains exactly the 42 canonical routes defined by the localization route registry and `CURRENT_STATE.md`.",
+          )
+          body = body.replace(
+              "- all seven shipped apex routes return `200`;",
+              "- the seven English control routes above return `200`; the sitemap-wide check below must also prove every localized canonical URL returns `200`;",
+          )
+          body = body.replace(
+              "- sitemap has exactly the seven production `<loc>` values from\n  `CURRENT_STATE.md`;",
+              "- sitemap has exactly 42 production `<loc>` values from the final localization route matrix;",
+          )
+          public_marker = "Then verify in a browser:\n"
+          public_check = '''Verify every canonical URL exposed by the production sitemap, not only the English control subset:
+
+```bash
+SITEMAP_URLS=$(curl -fsS https://listcontrast.com/sitemap.xml | \\
+  grep -oE '<loc>[^<]+' | sed 's#<loc>##')
+
+COUNT=$(printf '%s\\n' "$SITEMAP_URLS" | sed '/^$/d' | wc -l)
+[ "$COUNT" -eq 42 ] || { echo "Expected 42 sitemap URLs, got $COUNT" >&2; exit 1; }
+
+while IFS= read -r url; do
+  [ -n "$url" ] || continue
+  curl -fsS -o /dev/null -w "$url -> %{http_code}\\n" "$url"
+done <<EOF
+$SITEMAP_URLS
+EOF
+```
+
+Expected: 42 URLs, every one returns `200`.
+
+'''
+          if public_check not in body:
+              if public_marker not in body:
+                  raise SystemExit("PRODUCTION.md: browser verification marker missing")
+              body = body.replace(public_marker, public_check + public_marker, 1)
+          prod.write_text(body, encoding="utf-8")
+          PY
+
+          pnpm exec prettier --write \
+            src/content/locales/ru.ts \
+            src/i18n/content.test.ts \
+            AGENTS.md \
+            LOCALIZATION_SCOPE_V1.md \
+            LOCALIZATION_LANGUAGE_TARGETING_V1.md \
+            LOCALIZATION_PLAN_REVIEW_V1.md \
+            evidence/seo/localization/2026-09-07/RESEARCH_SUMMARY.md \
+            deploy/vps/PRODUCTION.md
+
+          # Delete this one-shot writer before committing so release CI stays read-only.
+          rm .github/workflows/l10n-finalize.yml
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "fix(l10n): close final localization review"
+          git push origin HEAD:l10n-2-localized-release
