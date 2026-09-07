@@ -1,7 +1,7 @@
-import { alphabetizeListContent } from "@/content/alphabetize-list";
-import { englishContent } from "@/content/en";
-import { randomizeListContent } from "@/content/randomize-list";
-import { removeDuplicateLinesContent } from "@/content/remove-duplicate-lines";
+import { alphabetizeListContent } from "../content/alphabetize-list";
+import { englishContent } from "../content/en";
+import { randomizeListContent } from "../content/randomize-list";
+import { removeDuplicateLinesContent } from "../content/remove-duplicate-lines";
 import type { ActiveLocale } from "./locales";
 import type { LocaleContent, ToolPageKey } from "./types";
 
