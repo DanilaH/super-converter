@@ -9,7 +9,7 @@ import BaseLayout from "@/layouts/BaseLayout.astro";
 
 const locale = DEFAULT_LOCALE;
 const content = contentFor(locale);
-const { page, editorial } = content.alphabetizeList;
+const { page, editorial, tool } = content.alphabetizeList;
 const relatedTools = relatedToolsFor(locale, "alphabetizeList");
 ---
 
@@ -21,7 +21,7 @@ const relatedTools = relatedToolsFor(locale, "alphabetizeList");
       <span class="privacy">{page.privacy}</span>
     </p>
 
-    <AlphabetizeTool />
+    <AlphabetizeTool tool={tool} />
   </div>
 
   <EditorialContent content={editorial} />
