@@ -8,7 +8,8 @@ import type { LocaleContent, ToolPageKey } from "./types";
 const englishToolItems = {
   home: {
     label: "Compare Lists",
-    description: "Find differences, matches and unique values between two lists.",
+    description:
+      "Find differences, matches and unique values between two lists.",
   },
   alphabetizeList: {
     label: "Alphabetizer",
@@ -27,11 +28,8 @@ const englishToolItems = {
   { label: string; description: string }
 >;
 
-const related = (
-  pageKey: ToolPageKey,
-  label: string,
-  description: string,
-) => ({ pageKey, label, description }) as const;
+const related = (pageKey: ToolPageKey, label: string, description: string) =>
+  ({ pageKey, label, description }) as const;
 
 export const englishLocaleContent = {
   ...englishContent,
@@ -49,8 +47,16 @@ export const englishLocaleContent = {
     heading: "Related tools",
     byPage: {
       home: [
-        related("alphabetizeList", "Alphabetizer", "Sort a list alphabetically."),
-        related("randomizeList", "List Randomizer", "Shuffle a list into a random order."),
+        related(
+          "alphabetizeList",
+          "Alphabetizer",
+          "Sort a list alphabetically.",
+        ),
+        related(
+          "randomizeList",
+          "List Randomizer",
+          "Shuffle a list into a random order.",
+        ),
         related(
           "removeDuplicateLines",
           "Remove Duplicate Lines",
@@ -63,7 +69,11 @@ export const englishLocaleContent = {
           "Compare Lists",
           "Find differences, matches and unique values between two lists.",
         ),
-        related("randomizeList", "List Randomizer", "Shuffle a list into a random order."),
+        related(
+          "randomizeList",
+          "List Randomizer",
+          "Shuffle a list into a random order.",
+        ),
         related(
           "removeDuplicateLines",
           "Remove Duplicate Lines",
@@ -98,7 +108,11 @@ export const englishLocaleContent = {
           "Alphabetizer",
           "Sort a list alphabetically in A–Z or Z–A order.",
         ),
-        related("randomizeList", "List Randomizer", "Shuffle a list into a random order."),
+        related(
+          "randomizeList",
+          "List Randomizer",
+          "Shuffle a list into a random order.",
+        ),
       ],
     },
   },
