@@ -71,15 +71,59 @@ describe("alphabetizeList", () => {
     expect(new Set(result.items)).toEqual(new Set(["Яблоко", "Äpfel", "東京"]));
   });
 
-  it("accepts locale-specific collation for Russian", () => {
-    expect(
-      alphabetizeList("Яблоко\nАрбуз\nБорис\nВишня", DEFAULTS, "ru").items,
-    ).toEqual(["Арбуз", "Борис", "Вишня", "Яблоко"]);
-  });
+  const localizedFixtures = [
+    {
+      locale: "de",
+      input: "Apfel\nÄrger\nÖl\nÜber\nEintrag 10\nEintrag 2",
+      expected: ["Apfel", "Ärger", "Eintrag 2", "Eintrag 10", "Öl", "Über"],
+    },
+    {
+      locale: "fr",
+      input: "École\nÉclair\nÉtude\nOrange\nÉlément 10\nÉlément 2",
+      expected: [
+        "Éclair",
+        "École",
+        "Élément 2",
+        "Élément 10",
+        "Étude",
+        "Orange",
+      ],
+    },
+    {
+      locale: "es",
+      input: "Árbol\nNaranja\nNiño\nZorro\nElemento 10\nElemento 2",
+      expected: [
+        "Árbol",
+        "Elemento 2",
+        "Elemento 10",
+        "Naranja",
+        "Niño",
+        "Zorro",
+      ],
+    },
+    {
+      locale: "pt-BR",
+      input: "Ação\nÁrvore\nBanana\nCafé\nItem 10\nItem 2",
+      expected: ["Ação", "Árvore", "Banana", "Café", "Item 2", "Item 10"],
+    },
+    {
+      locale: "ru",
+      input: "Ёлка\nАрбуз\nЯблоко\nБерёза\nЭлемент 10\nЭлемент 2",
+      expected: [
+        "Арбуз",
+        "Берёза",
+        "Ёлка",
+        "Элемент 2",
+        "Элемент 10",
+        "Яблоко",
+      ],
+    },
+  ] as const;
 
-  it("accepts locale-specific collation for Spanish", () => {
-    expect(
-      alphabetizeList("niño\nnube\nnaranja", DEFAULTS, "es").items,
-    ).toEqual(["naranja", "niño", "nube"]);
-  });
+  it.each(localizedFixtures)(
+    "uses $locale collation for localized accents, letters and numeric text",
+    ({ locale, input, expected }) => {
+      expect(alphabetizeList(input, DEFAULTS, locale).items).toEqual(expected);
+    },
+  );
 });
