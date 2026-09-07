@@ -64,15 +64,12 @@ pnpm test:e2e
 Inspect the generated production SEO output:
 
 ```bash
-INDEXABLE_HTML=(
-  dist/index.html
-  dist/alphabetize-list/index.html
-  dist/randomize-list/index.html
-  dist/remove-duplicate-lines/index.html
-  dist/tools/index.html
-  dist/about/index.html
-  dist/privacy/index.html
-)
+mapfile -t INDEXABLE_HTML < <(find dist -type f -name index.html | sort)
+
+if [ "${#INDEXABLE_HTML[@]}" -ne 42 ]; then
+  echo "Expected 42 indexable HTML pages, found ${#INDEXABLE_HTML[@]}" >&2
+  exit 1
+fi
 
 rg -n 'https://listcontrast\.com' \
   "${INDEXABLE_HTML[@]}" \
@@ -95,10 +92,10 @@ rg -n 'noindex,nofollow' dist/404.html
 Expected:
 
 - canonical and Open Graph URLs use only `https://listcontrast.com`;
-- all seven indexable routes have no noindex directive;
+- all 42 indexable routes have no noindex directive;
 - 404 remains `noindex,nofollow` and has no canonical or `og:url`;
 - robots allows crawling and references the production sitemap;
-- sitemap contains exactly the seven routes listed in `CURRENT_STATE.md`.
+- sitemap contains exactly the 42 canonical routes defined by the final localization route matrix.
 
 Do not commit `dist/`.
 
@@ -246,13 +243,32 @@ curl -sSI https://www.listcontrast.com/a-test-path
 
 Expected:
 
-- all seven shipped apex routes return `200`;
+- the seven English control routes above return `200`; all 42 canonical sitemap URLs must also pass the sitemap-wide check below;
 - unknown apex route returns `404`;
 - `www` permanently redirects to
   `https://listcontrast.com/a-test-path`;
 - no Basic Auth challenge on production;
 - no `X-Robots-Tag: noindex` on production;
 - preview still returns `401` without credentials.
+
+Verify the complete localization surface from the live sitemap:
+
+```bash
+SITEMAP_URLS=$(curl -fsS https://listcontrast.com/sitemap.xml | \
+  grep -oE '<loc>[^<]+' | sed 's#<loc>##')
+
+COUNT=$(printf '%s\n' "$SITEMAP_URLS" | sed '/^$/d' | wc -l)
+[ "$COUNT" -eq 42 ] || { echo "Expected 42 sitemap URLs, got $COUNT" >&2; exit 1; }
+
+while IFS= read -r url; do
+  [ -n "$url" ] || continue
+  curl -fsS -o /dev/null -w "$url -> %{http_code}\n" "$url"
+done <<EOF
+$SITEMAP_URLS
+EOF
+```
+
+Expected: all 42 canonical URLs return `200`.
 
 Then verify in a browser:
 
@@ -290,8 +306,7 @@ Required:
 
 - robots contains `Allow: /` and
   `Sitemap: https://listcontrast.com/sitemap.xml`;
-- sitemap has exactly the seven production `<loc>` values from
-  `CURRENT_STATE.md`;
+- sitemap has exactly 42 production `<loc>` values from the final localization route matrix;
 - each indexable page has a self-canonical and production `og:url`;
 - indexable pages contain no noindex;
 - live 404 contains `noindex,nofollow` and no canonical/`og:url`;

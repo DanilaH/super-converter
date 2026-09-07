@@ -77,5 +77,10 @@ describe("localized content", () => {
     expect(content.removeDuplicateLines.page.heading).toBe(
       "Удалить дубликаты строк онлайн",
     );
+    expect(content.compare.rows).toBe("стр.");
+    expect(content.compare.items).toBe("элем.");
+    expect(content.alphabetizeList.tool.items).toBe("элем.");
+    expect(content.randomizeList.tool.items).toBe("элем.");
+    expect(content.removeDuplicateLines.tool.items).toBe("элем.");
   });
 });
