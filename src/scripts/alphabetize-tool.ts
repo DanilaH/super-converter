@@ -5,6 +5,10 @@ import type {
   AlphabetizeOrder,
 } from "../features/alphabetize-list/model/types";
 
+const DEFAULT_EXAMPLE = ["Banana", "apple", "Item 10", "Cherry", "item 2"].join(
+  "\n",
+);
+const DEFAULT_COLLATOR_LOCALE = "en";
 const DOWNLOAD_FILENAME = "alphabetized-list.txt";
 
 type ToolState = {
@@ -341,15 +345,10 @@ function readLabels(root: HTMLElement): Labels {
 }
 
 function readConfig(root: HTMLElement): ToolConfig {
-  const example = root.dataset.example ?? "";
-  const collatorLocale = root.dataset.collatorLocale ?? "";
-  if (example === "") {
-    throw new Error("AlphabetizeTool: missing required example");
-  }
-  if (collatorLocale === "") {
-    throw new Error("AlphabetizeTool: missing required collator locale");
-  }
-  return { example, collatorLocale };
+  return {
+    example: root.dataset.example ?? DEFAULT_EXAMPLE,
+    collatorLocale: root.dataset.collatorLocale ?? DEFAULT_COLLATOR_LOCALE,
+  };
 }
 
 function readOrder(value: string): AlphabetizeOrder {
