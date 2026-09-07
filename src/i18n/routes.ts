@@ -47,6 +47,15 @@ export const ROUTES = {
     about: "/pt-br/sobre",
     privacy: "/pt-br/privacidade",
   },
+  ru: {
+    home: "/ru/",
+    alphabetizeList: "/ru/sortirovat-spisok-po-alfavitu",
+    randomizeList: "/ru/peremeshat-spisok",
+    removeDuplicateLines: "/ru/udalit-dublikaty-strok",
+    tools: "/ru/instrumenty",
+    about: "/ru/o-proekte",
+    privacy: "/ru/konfidencialnost",
+  },
 } as const satisfies Record<Locale, Record<PageKey, string>>;
 
 export function routeFor(locale: Locale, pageKey: PageKey): string {
