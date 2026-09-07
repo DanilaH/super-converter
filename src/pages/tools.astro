@@ -1,33 +1,39 @@
 ---
+import { contentFor } from "@/i18n/content";
+import { DEFAULT_LOCALE } from "@/i18n/locales";
+import { routeFor } from "@/i18n/routes";
+import type { ToolPageKey } from "@/i18n/types";
 import BaseLayout from "@/layouts/BaseLayout.astro";
+
+const locale = DEFAULT_LOCALE;
+const content = contentFor(locale);
+const { toolsPage } = content;
+const toolOrder: readonly ToolPageKey[] = [
+  "home",
+  "alphabetizeList",
+  "randomizeList",
+  "removeDuplicateLines",
+];
 ---
 
-<BaseLayout metadataKey="tools">
+<BaseLayout metadataKey="tools" locale={locale}>
   <div class="tools-page">
-    <h1>List tools</h1>
-    <p class="intro">
-      Focused browser tools for comparing, sorting, randomizing and cleaning
-      line-based lists.
-    </p>
+    <h1>{toolsPage.heading}</h1>
+    <p class="intro">{toolsPage.intro}</p>
 
-    <nav aria-label="Available list tools">
+    <nav aria-label={toolsPage.ariaLabel}>
       <ul class="tool-list">
-        <li>
-          <a href="/">Compare Lists</a>
-          <p>Find differences, matches and unique values between two lists.</p>
-        </li>
-        <li>
-          <a href="/alphabetize-list">Alphabetizer</a>
-          <p>Sort a list alphabetically in A–Z or Z–A order.</p>
-        </li>
-        <li>
-          <a href="/randomize-list">List Randomizer</a>
-          <p>Shuffle a line-based list into a random order on demand.</p>
-        </li>
-        <li>
-          <a href="/remove-duplicate-lines">Remove Duplicate Lines</a>
-          <p>Remove repeated lines while keeping the first occurrence.</p>
-        </li>
+        {
+          toolOrder.map((pageKey) => {
+            const item = toolsPage.items[pageKey];
+            return (
+              <li>
+                <a href={routeFor(locale, pageKey)}>{item.label}</a>
+                <p>{item.description}</p>
+              </li>
+            );
+          })
+        }
       </ul>
     </nav>
   </div>
