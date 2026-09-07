@@ -2,13 +2,18 @@
 import CompareTool from "@/components/CompareTool.astro";
 import EditorialContent from "@/components/EditorialContent.astro";
 import RelatedTools from "@/components/RelatedTools.astro";
-import { englishContent } from "@/content/en";
+import { contentFor } from "@/i18n/content";
+import { DEFAULT_LOCALE } from "@/i18n/locales";
+import { relatedToolsFor } from "@/i18n/page";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 
-const { home } = englishContent;
+const locale = DEFAULT_LOCALE;
+const content = contentFor(locale);
+const { home } = content;
+const relatedTools = relatedToolsFor(locale, "home");
 ---
 
-<BaseLayout metadataKey="home">
+<BaseLayout metadataKey="home" locale={locale}>
   <div class="intro">
     <h1>{home.heading}</h1>
     <p class="description">
@@ -19,26 +24,8 @@ const { home } = englishContent;
     <CompareTool />
   </div>
 
-  <EditorialContent content={englishContent.editorial} />
-  <RelatedTools
-    tools={[
-      {
-        href: "/alphabetize-list",
-        label: "Alphabetizer",
-        description: "Sort a list alphabetically.",
-      },
-      {
-        href: "/randomize-list",
-        label: "List Randomizer",
-        description: "Shuffle a list into a random order.",
-      },
-      {
-        href: "/remove-duplicate-lines",
-        label: "Remove Duplicate Lines",
-        description: "Keep the first occurrence of repeated lines.",
-      },
-    ]}
-  />
+  <EditorialContent content={content.editorial} />
+  <RelatedTools heading={content.relatedTools.heading} tools={relatedTools} />
 </BaseLayout>
 
 <style>
