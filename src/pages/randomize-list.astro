@@ -9,7 +9,7 @@ import BaseLayout from "@/layouts/BaseLayout.astro";
 
 const locale = DEFAULT_LOCALE;
 const content = contentFor(locale);
-const { page, editorial } = content.randomizeList;
+const { page, editorial, tool } = content.randomizeList;
 const relatedTools = relatedToolsFor(locale, "randomizeList");
 ---
 
@@ -21,7 +21,7 @@ const relatedTools = relatedToolsFor(locale, "randomizeList");
       <span class="privacy">{page.privacy}</span>
     </p>
 
-    <RandomizeTool />
+    <RandomizeTool tool={tool} />
   </div>
 
   <EditorialContent content={editorial} />
