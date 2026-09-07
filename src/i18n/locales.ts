@@ -1,11 +1,11 @@
-export type Locale = "en" | "de" | "fr" | "es" | "pt-br";
+export type Locale = "en" | "de" | "fr" | "es" | "pt-br" | "ru";
 
 export type LocaleConfig = {
-  htmlLang: "en" | "de" | "fr" | "es" | "pt-BR";
-  hreflang: "en" | "de" | "fr" | "es" | "pt-BR";
+  htmlLang: "en" | "de" | "fr" | "es" | "pt-BR" | "ru";
+  hreflang: "en" | "de" | "fr" | "es" | "pt-BR" | "ru";
   label: string;
   shortLabel: string;
-  collatorLocale: "en" | "de" | "fr" | "es" | "pt-BR";
+  collatorLocale: "en" | "de" | "fr" | "es" | "pt-BR" | "ru";
 };
 
 export const LOCALE_CONFIGS = {
@@ -44,6 +44,13 @@ export const LOCALE_CONFIGS = {
     shortLabel: "PT-BR",
     collatorLocale: "pt-BR",
   },
+  ru: {
+    htmlLang: "ru",
+    hreflang: "ru",
+    label: "Русский",
+    shortLabel: "RU",
+    collatorLocale: "ru",
+  },
 } as const satisfies Record<Locale, LocaleConfig>;
 
 // Localization V1 releases every approved locale atomically.
@@ -53,6 +60,7 @@ export const ACTIVE_LOCALES = [
   "fr",
   "es",
   "pt-br",
+  "ru",
 ] as const satisfies readonly Locale[];
 export type ActiveLocale = (typeof ACTIVE_LOCALES)[number];
 
