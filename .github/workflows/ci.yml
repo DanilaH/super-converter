@@ -32,6 +32,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Show localization formatting diff
+        run: |
+          pnpm exec prettier --write src/i18n/content.ts src/i18n/types.ts
+          git diff -- src/i18n/content.ts src/i18n/types.ts
+          exit 1
+
       - name: Check formatting
         run: pnpm format:check
 
