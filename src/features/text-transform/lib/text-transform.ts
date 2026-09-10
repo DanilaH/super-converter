@@ -33,6 +33,7 @@ export function removeLineBreaks(
   if (!options.keepParagraphs) {
     const lines = normalized
       .split("\n")
+      .filter((line) => line.trim() !== "")
       .map((line) => prepareLine(line, options.trimEachLine));
     return normalizeOutputSpaces(
       lines.join(options.replacement),
