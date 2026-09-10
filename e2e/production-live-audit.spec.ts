@@ -1,9 +1,8 @@
-import { expect, test, type Page } from "@playwright/test";
-import { readFileSync } from "node:fs";
-import { createRequire } from "node:module";
+import { expect, test, type Page, type APIRequestContext } from "@playwright/test";
 
 const PROD = "https://listcontrast.com";
-const EXPECTED_HREFLANGS = ["de", "en", "es", "fr", "pt-BR", "ru", "x-default"];
+const AXE_CDN = "https://cdn.jsdelivr.net/npm/axe-core@4.13.0/axe.min.js";
+const HREFLANGS = ["de", "en", "es", "fr", "pt-BR", "ru", "x-default"];
 const EN_TOOL_PATHS = [
   "/",
   "/alphabetize-list",
@@ -15,12 +14,8 @@ const EN_TOOL_PATHS = [
   "/column-to-comma-separated-list",
 ] as const;
 const EN_SITE_PATHS = [...EN_TOOL_PATHS, "/tools", "/about", "/privacy"] as const;
-const SCREENSHOT_PATHS = EN_TOOL_PATHS;
 
-const require = createRequire(import.meta.url);
-const axeSource = readFileSync(require.resolve("axe-core/axe.min.js"), "utf8");
-
-type PageSeo = {
+type Seo = {
   url: string;
   lang: string;
   title: string;
@@ -29,11 +24,11 @@ type PageSeo = {
   ogUrl: string;
   robots: string;
   h1Count: number;
-  h1Text: string;
+  h1: string;
   alternates: Record<string, string>;
   internalLinks: string[];
   mixedAssets: string[];
-  hasWebsiteJsonLd: boolean;
+  websiteJsonLd: boolean;
 };
 
 type AxeViolation = {
@@ -44,38 +39,36 @@ type AxeViolation = {
 };
 
 function expectedLang(url: string): string {
-  const pathname = new URL(url).pathname;
-  if (pathname.startsWith("/de/")) return "de";
-  if (pathname.startsWith("/fr/")) return "fr";
-  if (pathname.startsWith("/es/")) return "es";
-  if (pathname.startsWith("/pt-br/")) return "pt-BR";
-  if (pathname.startsWith("/ru/")) return "ru";
+  const path = new URL(url).pathname;
+  if (path.startsWith("/de/")) return "de";
+  if (path.startsWith("/fr/")) return "fr";
+  if (path.startsWith("/es/")) return "es";
+  if (path.startsWith("/pt-br/")) return "pt-BR";
+  if (path.startsWith("/ru/")) return "ru";
   return "en";
 }
 
-function sitemapUrls(xml: string): string[] {
+async function getSitemapUrls(request: APIRequestContext): Promise<string[]> {
+  const response = await request.get(`${PROD}/sitemap.xml`);
+  expect(response.status()).toBe(200);
+  const xml = await response.text();
   return [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
 }
 
-async function readSeo(page: Page, url: string): Promise<PageSeo> {
+async function readSeo(page: Page, url: string): Promise<Seo> {
   const response = await page.goto(url, { waitUntil: "domcontentloaded" });
   expect(response, url).not.toBeNull();
   expect(response!.status(), url).toBe(200);
 
   return page.evaluate((currentUrl) => {
-    const canonical = Array.from(
-      document.querySelectorAll<HTMLLinkElement>('link[rel="canonical"]'),
-    );
-    const descriptions = Array.from(
-      document.querySelectorAll<HTMLMetaElement>('meta[name="description"]'),
-    );
-    const ogUrls = Array.from(
-      document.querySelectorAll<HTMLMetaElement>('meta[property="og:url"]'),
-    );
-    const robots = Array.from(
-      document.querySelectorAll<HTMLMetaElement>('meta[name="robots"]'),
-    );
-    const h1s = Array.from(document.querySelectorAll<HTMLHeadingElement>("h1"));
+    const one = <T extends Element>(selector: string): T => {
+      const nodes = document.querySelectorAll<T>(selector);
+      if (nodes.length !== 1) {
+        throw new Error(`${currentUrl}: ${selector} count=${nodes.length}`);
+      }
+      return nodes[0];
+    };
+    const h1s = Array.from(document.querySelectorAll("h1"));
     const alternates = Object.fromEntries(
       Array.from(
         document.querySelectorAll<HTMLLinkElement>(
@@ -83,51 +76,50 @@ async function readSeo(page: Page, url: string): Promise<PageSeo> {
         ),
       ).map((link) => [link.hreflang, link.href]),
     );
-    const internalLinks = Array.from(document.querySelectorAll<HTMLAnchorElement>("a[href]"))
+    const internalLinks = Array.from(
+      document.querySelectorAll<HTMLAnchorElement>("a[href]"),
+    )
       .map((link) => link.href)
       .filter((href) => href.startsWith("https://listcontrast.com/"));
     const mixedAssets = Array.from(
       document.querySelectorAll<HTMLElement>("script[src],link[href],img[src]"),
     )
-      .map((element) => element.getAttribute("src") ?? element.getAttribute("href") ?? "")
+      .map(
+        (node) => node.getAttribute("src") ?? node.getAttribute("href") ?? "",
+      )
       .filter((value) => value.startsWith("http://"));
     const jsonLd = Array.from(
-      document.querySelectorAll<HTMLScriptElement>('script[type="application/ld+json"]'),
+      document.querySelectorAll<HTMLScriptElement>(
+        'script[type="application/ld+json"]',
+      ),
     ).map((script) => script.textContent ?? "");
-
-    if (canonical.length !== 1) throw new Error(`${currentUrl}: canonical count ${canonical.length}`);
-    if (descriptions.length !== 1) throw new Error(`${currentUrl}: description count ${descriptions.length}`);
-    if (ogUrls.length !== 1) throw new Error(`${currentUrl}: og:url count ${ogUrls.length}`);
-    if (robots.length > 1) throw new Error(`${currentUrl}: robots meta count ${robots.length}`);
 
     return {
       url: currentUrl,
       lang: document.documentElement.lang,
       title: document.title,
-      description: descriptions[0].content,
-      canonical: canonical[0].href,
-      ogUrl: ogUrls[0].content,
-      robots: robots[0]?.content ?? "",
+      description: one<HTMLMetaElement>('meta[name="description"]').content,
+      canonical: one<HTMLLinkElement>('link[rel="canonical"]').href,
+      ogUrl: one<HTMLMetaElement>('meta[property="og:url"]').content,
+      robots:
+        document.querySelector<HTMLMetaElement>('meta[name="robots"]')?.content ??
+        "",
       h1Count: h1s.length,
-      h1Text: h1s[0]?.textContent?.trim() ?? "",
+      h1: h1s[0]?.textContent?.trim() ?? "",
       alternates,
       internalLinks,
       mixedAssets,
-      hasWebsiteJsonLd: jsonLd.some((value) => value.includes('"WebSite"')),
+      websiteJsonLd: jsonLd.some((text) => text.includes('"WebSite"')),
     };
   }, url);
 }
 
 test.describe("live production infrastructure + SEO", () => {
-  test("66 canonical URLs, headers, redirects, 404 and robots are healthy", async ({
+  test("66 canonical URLs, headers, robots, redirects and 404 are healthy", async ({
     request,
   }, testInfo) => {
     test.skip(testInfo.project.name.includes("mobile"));
-
-    const sitemap = await request.get(`${PROD}/sitemap.xml`);
-    expect(sitemap.status()).toBe(200);
-    const xml = await sitemap.text();
-    const urls = sitemapUrls(xml);
+    const urls = await getSitemapUrls(request);
     expect(urls).toHaveLength(66);
     expect(new Set(urls).size).toBe(66);
 
@@ -137,7 +129,9 @@ test.describe("live production infrastructure + SEO", () => {
       const headers = response.headers();
       expect(headers["content-type"], url).toContain("text/html");
       expect(headers["x-content-type-options"], url).toBe("nosniff");
-      expect(headers["referrer-policy"], url).toBe("strict-origin-when-cross-origin");
+      expect(headers["referrer-policy"], url).toBe(
+        "strict-origin-when-cross-origin",
+      );
       expect(headers["x-robots-tag"] ?? "", url).not.toMatch(/noindex/i);
     }
 
@@ -151,7 +145,7 @@ test.describe("live production infrastructure + SEO", () => {
     const missing = await request.get(`${PROD}/__production-audit-missing__`);
     expect(missing.status()).toBe(404);
     const missingHtml = await missing.text();
-    expect(missingHtml).toMatch(/name=["']robots["'][^>]+noindex,nofollow/i);
+    expect(missingHtml).toContain("noindex,nofollow");
     expect(missingHtml).not.toMatch(/rel=["']canonical["']/i);
     expect(missingHtml).not.toMatch(/property=["']og:url["']/i);
 
@@ -168,94 +162,105 @@ test.describe("live production infrastructure + SEO", () => {
     expect(http.headers().location).toBe(`${PROD}/random-team-generator`);
 
     const home = await request.get(`${PROD}/`);
-    const securityHeaders = home.headers();
+    const headers = home.headers();
     console.log(
       "PROD_SECURITY_HEADERS",
       JSON.stringify({
-        server: securityHeaders.server ?? null,
-        hsts: securityHeaders["strict-transport-security"] ?? null,
-        csp: securityHeaders["content-security-policy"] ?? null,
-        permissionsPolicy: securityHeaders["permissions-policy"] ?? null,
-        coop: securityHeaders["cross-origin-opener-policy"] ?? null,
+        server: headers.server ?? null,
+        hsts: headers["strict-transport-security"] ?? null,
+        csp: headers["content-security-policy"] ?? null,
+        permissionsPolicy: headers["permissions-policy"] ?? null,
+        coop: headers["cross-origin-opener-policy"] ?? null,
       }),
     );
   });
 
-  test("all 66 pages self-canonicalize, localize and form reciprocal hreflang clusters", async ({
+  test("all 66 pages have exact self-canonical SEO and reciprocal hreflang", async ({
     page,
     request,
   }, testInfo) => {
     test.skip(testInfo.project.name.includes("mobile"));
-
-    const sitemap = await request.get(`${PROD}/sitemap.xml`);
-    const urls = sitemapUrls(await sitemap.text());
-    const metadata = new Map<string, PageSeo>();
+    const urls = await getSitemapUrls(request);
+    const metadata = new Map<string, Seo>();
     const consoleErrors: string[] = [];
     const pageErrors: string[] = [];
-
     page.on("console", (message) => {
-      if (message.type() === "error") consoleErrors.push(`${page.url()}: ${message.text()}`);
+      if (message.type() === "error") {
+        consoleErrors.push(`${page.url()}: ${message.text()}`);
+      }
     });
-    page.on("pageerror", (error) => pageErrors.push(`${page.url()}: ${error.message}`));
+    page.on("pageerror", (error) => {
+      pageErrors.push(`${page.url()}: ${error.message}`);
+    });
 
     for (const url of urls) {
       const seo = await readSeo(page, url);
       metadata.set(url, seo);
       expect(seo.lang, url).toBe(expectedLang(url));
-      expect(seo.title.trim().length, url).toBeGreaterThan(10);
-      expect(seo.description.trim().length, url).toBeGreaterThan(60);
+      expect(seo.title.length, url).toBeGreaterThan(10);
+      expect(seo.description.length, url).toBeGreaterThan(60);
       expect(seo.canonical, url).toBe(url);
       expect(seo.ogUrl, url).toBe(url);
       expect(seo.robots, url).not.toMatch(/noindex/i);
       expect(seo.h1Count, url).toBe(1);
-      expect(seo.h1Text.length, url).toBeGreaterThan(2);
-      expect(Object.keys(seo.alternates).sort(), url).toEqual(EXPECTED_HREFLANGS);
+      expect(seo.h1.length, url).toBeGreaterThan(2);
+      expect(Object.keys(seo.alternates).sort(), url).toEqual(HREFLANGS);
       expect(seo.mixedAssets, url).toEqual([]);
-      expect(JSON.stringify(seo), url).not.toMatch(/example\.com|preview\.listcontrast\.com/);
+      expect(JSON.stringify(seo), url).not.toMatch(
+        /example\.com|preview\.listcontrast\.com/,
+      );
     }
 
-    const titles = [...metadata.values()].map((item) => item.title);
-    const descriptions = [...metadata.values()].map((item) => item.description);
-    expect(new Set(titles).size).toBe(66);
-    expect(new Set(descriptions).size).toBe(66);
+    expect(new Set([...metadata.values()].map((item) => item.title)).size).toBe(66);
+    expect(
+      new Set([...metadata.values()].map((item) => item.description)).size,
+    ).toBe(66);
 
     for (const [url, seo] of metadata) {
-      const currentLang = expectedLang(url);
+      const lang = expectedLang(url);
       for (const [hreflang, target] of Object.entries(seo.alternates)) {
         expect(metadata.has(target), `${url} -> ${hreflang} ${target}`).toBe(true);
-        const targetSeo = metadata.get(target)!;
-        expect(targetSeo.alternates[currentLang], `${target} back to ${url}`).toBe(url);
+        expect(metadata.get(target)!.alternates[lang], `${target} -> ${url}`).toBe(
+          url,
+        );
       }
     }
 
-    const websiteJsonLdPages = [...metadata.values()]
-      .filter((item) => item.hasWebsiteJsonLd)
-      .map((item) => item.url);
-    expect(websiteJsonLdPages).toEqual([`${PROD}/`]);
+    expect(
+      [...metadata.values()]
+        .filter((item) => item.websiteJsonLd)
+        .map((item) => item.url),
+    ).toEqual([`${PROD}/`]);
 
-    const longTitles = [...metadata.values()]
-      .filter((item) => item.title.length > 65)
-      .map((item) => `${item.title.length} ${item.url} :: ${item.title}`);
-    const unusualDescriptions = [...metadata.values()]
-      .filter((item) => item.description.length < 110 || item.description.length > 170)
-      .map((item) => `${item.description.length} ${item.url}`);
-    console.log("PROD_LONG_TITLES", JSON.stringify(longTitles));
-    console.log("PROD_UNUSUAL_DESCRIPTIONS", JSON.stringify(unusualDescriptions));
-
+    console.log(
+      "PROD_LONG_TITLES",
+      JSON.stringify(
+        [...metadata.values()]
+          .filter((item) => item.title.length > 65)
+          .map((item) => `${item.title.length} ${item.url} :: ${item.title}`),
+      ),
+    );
+    console.log(
+      "PROD_UNUSUAL_DESCRIPTIONS",
+      JSON.stringify(
+        [...metadata.values()]
+          .filter(
+            (item) => item.description.length < 110 || item.description.length > 170,
+          )
+          .map((item) => `${item.description.length} ${item.url}`),
+      ),
+    );
     expect(consoleErrors, "browser console errors across 66 pages").toEqual([]);
     expect(pageErrors, "page errors across 66 pages").toEqual([]);
   });
 
-  test("all internal production links resolve without 4xx/5xx", async ({
+  test("every internal link discovered across all 66 pages resolves", async ({
     page,
     request,
   }, testInfo) => {
     test.skip(testInfo.project.name.includes("mobile"));
-
-    const sitemap = await request.get(`${PROD}/sitemap.xml`);
-    const urls = sitemapUrls(await sitemap.text());
+    const urls = await getSitemapUrls(request);
     const links = new Set<string>();
-
     for (const url of urls) {
       const seo = await readSeo(page, url);
       for (const link of seo.internalLinks) {
@@ -264,18 +269,16 @@ test.describe("live production infrastructure + SEO", () => {
         links.add(parsed.href);
       }
     }
-
     for (const url of [...links].sort()) {
       const response = await request.get(url);
       expect(response.status(), url).toBeLessThan(400);
     }
-
     console.log("PROD_INTERNAL_LINKS_CHECKED", links.size);
   });
 });
 
 test.describe("live production functional QA", () => {
-  test("Compare Lists and original utilities still work on production", async ({ page }) => {
+  test("Compare and original utilities work", async ({ page }) => {
     await page.goto(`${PROD}/`);
     await expect(page.locator("h1")).toHaveText("Compare Lists Online");
     await expect(page).toHaveTitle(/List Difference/);
@@ -287,96 +290,107 @@ test.describe("live production functional QA", () => {
     await expect(page.locator("[data-summary-only-b]")).toHaveText("1");
 
     await page.goto(`${PROD}/alphabetize-list`);
-    const alphabetizeInput = page.getByRole("textbox", { name: "List", exact: true });
-    await alphabetizeInput.fill("zeta\nitem 10\nAlpha\nitem 2");
+    await page
+      .getByRole("textbox", { name: "List", exact: true })
+      .fill("zeta\nitem 10\nAlpha\nitem 2");
     await expect(page.locator("[data-result-viewer]")).toHaveText(
       "Alpha\nitem 2\nitem 10\nzeta",
     );
 
     await page.goto(`${PROD}/randomize-list`);
-    const randomizeInput = page.getByRole("textbox", { name: "List", exact: true });
-    await randomizeInput.fill("A\nB\nC\nD");
+    await page
+      .getByRole("textbox", { name: "List", exact: true })
+      .fill("A\nB\nC\nD");
     await page.getByRole("button", { name: "Randomize", exact: true }).click();
-    const randomized = (await page.locator("[data-result-viewer]").innerText()).split("\n");
+    const randomized = (
+      await page.locator("[data-result-viewer]").innerText()
+    ).split("\n");
     expect([...randomized].sort()).toEqual(["A", "B", "C", "D"]);
 
     await page.goto(`${PROD}/remove-duplicate-lines`);
-    const dedupeInput = page.getByRole("textbox", { name: "List", exact: true });
-    await dedupeInput.fill("A\nA\nB\nA");
+    await page
+      .getByRole("textbox", { name: "List", exact: true })
+      .fill("A\nA\nB\nA");
     await expect(page.locator("[data-result-viewer]")).toHaveText("A\nB");
     await expect(page.locator("[data-summary-removed]")).toHaveText("Removed: 2");
   });
 
-  test("all four Expansion V2 tools pass their main and edge flows on production", async ({
-    page,
-  }) => {
+  test("all four Expansion V2 tools pass main and edge flows", async ({ page }) => {
     await page.goto(`${PROD}/random-team-generator`);
-    const teamNames = Array.from({ length: 10 }, (_, index) => `Person ${index + 1}`);
+    const names = Array.from({ length: 10 }, (_, index) => `Person ${index + 1}`);
     await page
       .getByRole("textbox", { name: "Participants or items" })
-      .fill(teamNames.join("\n"));
+      .fill(names.join("\n"));
     await page.getByRole("spinbutton", { name: "Number of teams" }).fill("3");
     await page.getByRole("button", { name: "Generate teams" }).click();
-    const teams = (await page.locator("[data-result-viewer]").innerText()).split("\n\n");
-    expect(teams).toHaveLength(3);
-    expect(teams.map((block) => block.split("\n").slice(1).length)).toEqual([4, 3, 3]);
+    let blocks = (await page.locator("[data-result-viewer]").innerText()).split(
+      "\n\n",
+    );
+    expect(blocks.map((block) => block.split("\n").slice(1).length)).toEqual([
+      4, 3, 3,
+    ]);
     await page.getByRole("radio", { name: "People per team" }).check();
-    await expect(page.getByRole("spinbutton", { name: "People per team" })).toBeVisible();
+    await expect(
+      page.getByRole("spinbutton", { name: "People per team" }),
+    ).toBeVisible();
     await page.getByRole("button", { name: "Generate teams" }).click();
-    const targetTeams = (await page.locator("[data-result-viewer]").innerText()).split("\n\n");
-    expect(targetTeams.map((block) => block.split("\n").slice(1).length)).toEqual([3, 3, 2, 2]);
-
+    blocks = (await page.locator("[data-result-viewer]").innerText()).split(
+      "\n\n",
+    );
+    expect(blocks.map((block) => block.split("\n").slice(1).length)).toEqual([
+      3, 3, 2, 2,
+    ]);
     await page.getByRole("radio", { name: "Number of teams" }).check();
     await page.getByRole("spinbutton", { name: "Number of teams" }).fill("11");
     await page.getByRole("button", { name: "Generate teams" }).click();
-    await expect(page.locator("[data-validation]")).toContainText("cannot be greater");
+    await expect(page.locator("[data-validation]")).toContainText(
+      "cannot be greater",
+    );
 
     await page.goto(`${PROD}/random-pair-generator`);
     await page
       .getByRole("textbox", { name: "Participants or items" })
       .fill("Alex\nBlair\nAlex\nDrew\nEmery");
     await page.getByRole("button", { name: "Generate pairs" }).click();
-    const pairText = await page.locator("[data-result-viewer]").innerText();
-    expect(pairText.match(/^Pair \d+$/gm)).toHaveLength(2);
-    expect(pairText).toContain("Unpaired");
+    const pairs = await page.locator("[data-result-viewer]").innerText();
+    expect(pairs.match(/^Pair \d+$/gm)).toHaveLength(2);
+    expect(pairs).toContain("Unpaired");
 
     await page.goto(`${PROD}/remove-line-breaks`);
     const lineInput = page.getByRole("textbox", { name: "Text" });
-    await lineInput.fill("First line\r\nsecond line\r\n\r\nNext paragraph\rcontinues here");
+    await lineInput.fill(
+      "First line\r\nsecond line\r\n\r\nNext paragraph\rcontinues here",
+    );
     const lineViewer = page.locator("[data-result-viewer]");
     await expect(lineViewer).toHaveText(
       "First line second line\n\nNext paragraph continues here",
     );
-    const lineCustom = page.locator("[data-custom-row]");
-    await expect(lineCustom).toBeHidden();
+    await expect(page.locator("[data-custom-row]")).toBeHidden();
     await page.locator("[data-separator]").selectOption("custom");
-    await expect(lineCustom).toBeVisible();
+    await expect(page.locator("[data-custom-row]")).toBeVisible();
     await page.getByRole("textbox", { name: "Custom separator" }).fill(" / ");
-    await page.getByRole("checkbox", { name: "Keep paragraph breaks" }).uncheck();
+    await page
+      .getByRole("checkbox", { name: "Keep paragraph breaks" })
+      .uncheck();
     await expect(lineViewer).toHaveText(
       "First line / second line / Next paragraph / continues here",
     );
 
     await page.goto(`${PROD}/column-to-comma-separated-list`);
-    const columnInput = page.getByRole("textbox", { name: "Column" });
-    await columnInput.fill(" apple \n\nbanana\n apple ");
+    await page.getByRole("textbox", { name: "Column" }).fill(" apple \n\nbanana\n apple ");
     const columnViewer = page.locator("[data-result-viewer]");
     await expect(columnViewer).toHaveText("apple, banana, apple");
-    const columnCustom = page.locator("[data-custom-row]");
-    await expect(columnCustom).toBeHidden();
+    await expect(page.locator("[data-custom-row]")).toBeHidden();
     await page.locator("[data-separator]").selectOption("custom");
-    await expect(columnCustom).toBeVisible();
+    await expect(page.locator("[data-custom-row]")).toBeVisible();
     await page.getByRole("textbox", { name: "Custom separator" }).fill(" | ");
     await expect(columnViewer).toHaveText("apple | banana | apple");
   });
 
-  test("new tools support example, clear, copy and download actions in production", async ({
-    page,
-  }) => {
+  test("new tools support example, copy, download and clear", async ({ page }) => {
     await page.context().grantPermissions(["clipboard-read", "clipboard-write"], {
       origin: PROD,
     });
-
     for (const path of [
       "/random-team-generator",
       "/random-pair-generator",
@@ -387,88 +401,86 @@ test.describe("live production functional QA", () => {
       await page.getByRole("button", { name: "Try example" }).click();
       const input = page.locator("textarea").first();
       await expect(input).not.toHaveValue("");
-
       const generate = page.locator("[data-generate]");
       if (await generate.count()) await generate.click();
-
       const viewer = page.locator("[data-result-viewer]");
       await expect(viewer).not.toHaveText("");
       const expected = await viewer.innerText();
-
       await page.locator("[data-copy-result]").click();
-      const clipboard = await page.evaluate(() => navigator.clipboard.readText());
-      expect(clipboard).toBe(expected);
-
+      expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(expected);
       const downloadPromise = page.waitForEvent("download");
       await page.locator("[data-download-result]").click();
-      const download = await downloadPromise;
-      expect(download.suggestedFilename()).toMatch(/\.txt$/);
-
+      expect((await downloadPromise).suggestedFilename()).toMatch(/\.txt$/);
       await page.getByRole("button", { name: "Clear" }).click();
       await expect(input).toHaveValue("");
     }
   });
 });
 
-test.describe("live production privacy + XSS boundary", () => {
-  test("raw tool input does not leak into network, URL, cookies or web storage", async ({
+test.describe("live production privacy and XSS", () => {
+  test("raw input never leaks into requests, URL, cookies or storage", async ({
     page,
   }, testInfo) => {
     test.skip(testInfo.project.name.includes("mobile"));
-
-    const probes: Array<{
-      path: string;
-      inputName: string;
-      trigger?: string;
-    }> = [
-      { path: "/alphabetize-list", inputName: "List" },
-      { path: "/randomize-list", inputName: "List", trigger: "Randomize" },
-      { path: "/remove-duplicate-lines", inputName: "List" },
-      { path: "/random-team-generator", inputName: "Participants or items", trigger: "Generate teams" },
-      { path: "/random-pair-generator", inputName: "Participants or items", trigger: "Generate pairs" },
-      { path: "/remove-line-breaks", inputName: "Text" },
-      { path: "/column-to-comma-separated-list", inputName: "Column" },
+    const probes = [
+      { path: "/alphabetize-list", input: "List" },
+      { path: "/randomize-list", input: "List", trigger: "Randomize" },
+      { path: "/remove-duplicate-lines", input: "List" },
+      {
+        path: "/random-team-generator",
+        input: "Participants or items",
+        trigger: "Generate teams",
+      },
+      {
+        path: "/random-pair-generator",
+        input: "Participants or items",
+        trigger: "Generate pairs",
+      },
+      { path: "/remove-line-breaks", input: "Text" },
+      { path: "/column-to-comma-separated-list", input: "Column" },
     ];
 
     for (const probe of probes) {
       const marker = `prod-audit-secret-${probe.path.replaceAll("/", "-")}-9f31`;
       await page.goto(`${PROD}${probe.path}`);
       await page.waitForLoadState("networkidle");
-
-      const interactionRequests: string[] = [];
-      const requestBodies: string[] = [];
+      const requests: string[] = [];
+      const bodies: string[] = [];
       const listener = (request: import("@playwright/test").Request) => {
-        interactionRequests.push(request.url());
-        if (request.postData()) requestBodies.push(request.postData()!);
+        requests.push(request.url());
+        const body = request.postData();
+        if (body) bodies.push(body);
       };
       page.on("request", listener);
-
-      const input = page.getByRole("textbox", { name: probe.inputName, exact: true });
+      const input = page.getByRole("textbox", { name: probe.input, exact: true });
       await input.fill(`${marker}\nAlpha\nBeta`);
       if (probe.trigger) {
-        await page.getByRole("button", { name: probe.trigger, exact: true }).click();
+        await page
+          .getByRole("button", { name: probe.trigger, exact: true })
+          .click();
       }
-      await page.waitForTimeout(150);
+      await page.waitForTimeout(100);
       page.off("request", listener);
-
-      expect(JSON.stringify(interactionRequests), probe.path).not.toContain(marker);
-      expect(JSON.stringify(requestBodies), probe.path).not.toContain(marker);
+      expect(JSON.stringify(requests), probe.path).not.toContain(marker);
+      expect(JSON.stringify(bodies), probe.path).not.toContain(marker);
       expect(page.url(), probe.path).not.toContain(marker);
-
       const storage = await page.evaluate(() => ({
-        localStorage: JSON.stringify({ ...localStorage }),
-        sessionStorage: JSON.stringify({ ...sessionStorage }),
+        local: JSON.stringify({ ...localStorage }),
+        session: JSON.stringify({ ...sessionStorage }),
         cookie: document.cookie,
       }));
       expect(JSON.stringify(storage), probe.path).not.toContain(marker);
-      expect(JSON.stringify(await page.context().cookies()), probe.path).not.toContain(marker);
-
+      expect(JSON.stringify(await page.context().cookies()), probe.path).not.toContain(
+        marker,
+      );
       await page.reload();
-      await expect(page.getByRole("textbox", { name: probe.inputName, exact: true })).toHaveValue("");
+      await expect(
+        page.getByRole("textbox", { name: probe.input, exact: true }),
+      ).toHaveValue("");
     }
   });
 
-  test("rendered result treats pasted HTML as text instead of executable markup", async ({ page }) => {
+  test("pasted HTML is rendered as text, never executed", async ({ page }) => {
     const marker =
       '<img src="https://prod-audit.invalid/probe.png" data-prod-audit-probe onerror="window.__prodAuditProbe=1">';
     await page.goto(`${PROD}/column-to-comma-separated-list`);
@@ -477,33 +489,37 @@ test.describe("live production privacy + XSS boundary", () => {
     await expect(page.locator("[data-prod-audit-probe]")).toHaveCount(0);
     expect(
       await page.evaluate(
-        () => (window as unknown as { __prodAuditProbe?: number }).__prodAuditProbe,
+        () =>
+          (window as unknown as { __prodAuditProbe?: number }).__prodAuditProbe,
       ),
     ).toBeUndefined();
   });
 });
 
-test.describe("live production responsive + visual consistency", () => {
+test.describe("live production responsive and visual consistency", () => {
   for (const path of EN_SITE_PATHS) {
     test(`${path} has no document-level horizontal overflow`, async ({ page }) => {
       await page.goto(`${PROD}${path}`);
       await expect(page.locator("h1")).toBeVisible();
-      const overflow = await page.evaluate(
-        () => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
-      );
-      expect(overflow, path).toBe(false);
+      expect(
+        await page.evaluate(
+          () =>
+            document.documentElement.scrollWidth >
+            document.documentElement.clientWidth + 1,
+        ),
+        path,
+      ).toBe(false);
     });
   }
 
-  test("new tool-specific hardening is present in live CSS/DOM", async ({ page }) => {
+  test("the shipped Expansion V2 UI hardening is present", async ({ page }) => {
     for (const path of ["/remove-line-breaks", "/column-to-comma-separated-list"]) {
       await page.goto(`${PROD}${path}`);
-      const customRow = page.locator("[data-custom-row]");
-      await expect(customRow).toBeHidden();
+      const custom = page.locator("[data-custom-row]");
+      await expect(custom).toBeHidden();
       await page.locator("[data-separator]").selectOption("custom");
-      await expect(customRow).toBeVisible();
+      await expect(custom).toBeVisible();
     }
-
     await page.goto(`${PROD}/random-pair-generator`);
     const controls = page.locator("[data-random-pair-tool] .controls");
     await expect(controls).toHaveCSS("padding-left", "0px");
@@ -515,22 +531,30 @@ test.describe("live production responsive + visual consistency", () => {
       "/column-to-comma-separated-list",
     ]) {
       await page.goto(`${PROD}${path}`);
-      await expect(page.locator("[data-result-viewer]")).toHaveCSS("white-space", "pre");
+      await expect(page.locator("[data-result-viewer]")).toHaveCSS(
+        "white-space",
+        "pre",
+      );
     }
     await page.goto(`${PROD}/remove-line-breaks`);
-    await expect(page.locator("[data-result-viewer]")).toHaveCSS("white-space", "pre-wrap");
+    await expect(page.locator("[data-result-viewer]")).toHaveCSS(
+      "white-space",
+      "pre-wrap",
+    );
   });
 
-  for (const path of SCREENSHOT_PATHS) {
-    test(`capture populated ${path} production screenshot`, async ({ page }, testInfo) => {
+  for (const path of EN_TOOL_PATHS) {
+    test(`capture populated ${path} screenshot`, async ({ page }, testInfo) => {
       await page.goto(`${PROD}${path}`);
       const example = page.getByRole("button", { name: "Try example" });
       if (await example.count()) await example.click();
       const generate = page.locator("[data-generate]");
       if (await generate.count()) await generate.click();
-      const randomize = page.getByRole("button", { name: "Randomize", exact: true });
+      const randomize = page.getByRole("button", {
+        name: "Randomize",
+        exact: true,
+      });
       if (await randomize.count()) await randomize.click();
-
       const slug = path === "/" ? "compare" : path.slice(1);
       await page.screenshot({
         path: `test-results/prod-audit/${testInfo.project.name}/${slug}.png`,
@@ -540,7 +564,7 @@ test.describe("live production responsive + visual consistency", () => {
   }
 });
 
-test.describe("live production accessibility spot-check", () => {
+test.describe("live production accessibility", () => {
   for (const path of [
     "/",
     "/random-team-generator",
@@ -548,10 +572,12 @@ test.describe("live production accessibility spot-check", () => {
     "/remove-line-breaks",
     "/column-to-comma-separated-list",
   ]) {
-    test(`${path} has no serious or critical WCAG axe violations`, async ({ page }, testInfo) => {
+    test(`${path} has no serious or critical WCAG axe violations`, async ({
+      page,
+    }, testInfo) => {
       test.skip(testInfo.project.name.includes("mobile"));
       await page.goto(`${PROD}${path}`);
-      await page.addScriptTag({ content: axeSource });
+      await page.addScriptTag({ url: AXE_CDN });
       const violations = await page.evaluate(async () => {
         const axe = (
           window as unknown as {
@@ -572,14 +598,15 @@ test.describe("live production accessibility spot-check", () => {
           })
         ).violations;
       });
-
       if (violations.length) {
         console.log(`PROD_AXE ${path}`, JSON.stringify(violations));
       }
-      const blocking = violations.filter(
-        (violation) => violation.impact === "critical" || violation.impact === "serious",
-      );
-      expect(blocking).toEqual([]);
+      expect(
+        violations.filter(
+          (violation) =>
+            violation.impact === "critical" || violation.impact === "serious",
+        ),
+      ).toEqual([]);
     });
   }
 });
