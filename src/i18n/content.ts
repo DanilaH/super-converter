@@ -38,6 +38,49 @@ const related = (pageKey: ToolPageKey, label: string, description: string) =>
 
 export const englishLocaleContent = {
   ...englishContent,
+  home: {
+    ...englishContent.home,
+    description:
+      "Compare two lists to find list differences, matches, unique items, intersection and union — instantly in your browser.",
+  },
+  editorial: {
+    ...englishContent.editorial,
+    resultsHeading: "List comparison results explained",
+    resultsIntro:
+      "The tabs show the same list comparison from different angles and keep the original list order. With Remove duplicates enabled, the outputs correspond to familiar set operations; with duplicates retained, repeated occurrences are matched as a multiset instead.",
+    resultsItems: [
+      {
+        term: "Differences",
+        description:
+          "items that remain in only one list; with duplicates removed, this is the symmetric difference.",
+      },
+      {
+        term: "Only A",
+        description:
+          "items or occurrences from List A with no pair in List B; with duplicates removed, this corresponds to A − B.",
+      },
+      {
+        term: "Only B",
+        description:
+          "items or occurrences from List B with no pair in List A; with duplicates removed, this corresponds to B − A.",
+      },
+      {
+        term: "Matches",
+        description:
+          "items found in both lists, shown in List A order; with duplicates removed, this is the intersection.",
+      },
+      {
+        term: "All",
+        description:
+          "List A followed by values from List B not already represented; with duplicates removed, this is the union of the two lists.",
+      },
+    ],
+    commonUsesItems: [
+      ...englishContent.editorial.commonUsesItems,
+      "exports from two systems when you need to find missing records",
+      "old and new inventory, URL or keyword exports during reconciliation",
+    ],
+  },
   header: {
     ...englishContent.header,
     language: "Language",
@@ -61,6 +104,14 @@ export const englishLocaleContent = {
     tool: {
       ...removeDuplicateLinesContent.tool,
       example: "Apple\nBanana\nApple\nCherry\nbanana",
+    },
+  },
+  metadata: {
+    ...englishContent.metadata,
+    home: {
+      title: "Compare Lists Online — List Difference & Matches | ListContrast",
+      description:
+        "Compare two lists online to find list differences, matches, unique items, intersection and union. Free, private, and processed locally in your browser.",
     },
   },
   toolsPage: {

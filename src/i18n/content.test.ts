@@ -5,12 +5,35 @@ import { contentFor } from "./content";
 describe("English localization baseline", () => {
   const content = contentFor("en");
 
-  it("preserves acquisition titles and headings", () => {
+  it("uses the approved Expansion V2 homepage acquisition copy", () => {
     expect(content.metadata.home.title).toBe(
-      "Compare Two Lists Online — Find Differences & Matches",
+      "Compare Lists Online — List Difference & Matches | ListContrast",
     );
+    expect(content.metadata.home.description).toContain("list differences");
     expect(content.home.heading).toBe("Compare Lists Online");
+    expect(content.home.description).toContain("Compare two lists");
+    expect(content.home.description).toContain("intersection and union");
+  });
 
+  it("keeps mathematical result terminology conditional on deduplicated mode", () => {
+    expect(content.editorial.resultsHeading).toBe(
+      "List comparison results explained",
+    );
+    expect(content.editorial.resultsIntro).toContain(
+      "With Remove duplicates enabled",
+    );
+    expect(content.editorial.resultsIntro).toContain("multiset");
+    expect(
+      content.editorial.resultsItems.find((item) => item.term === "Matches")
+        ?.description,
+    ).toContain("with duplicates removed, this is the intersection");
+    expect(
+      content.editorial.resultsItems.find((item) => item.term === "All")
+        ?.description,
+    ).toContain("with duplicates removed, this is the union");
+  });
+
+  it("preserves the shipped acquisition titles and headings for existing secondary tools", () => {
     expect(content.metadata.alphabetizeList.title).toBe(
       "Alphabetizer — Alphabetize a List Online | ListContrast",
     );
@@ -31,7 +54,7 @@ describe("English localization baseline", () => {
     );
   });
 
-  it("preserves support-page metadata and labels while adding language navigation", () => {
+  it("preserves support-page metadata and labels", () => {
     expect(content.metadata.tools.title).toBe("List Tools | ListContrast");
     expect(content.toolsPage.heading).toBe("List tools");
     expect(content.about.heading).toBe("About ListContrast");
