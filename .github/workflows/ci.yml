@@ -52,3 +52,12 @@ jobs:
 
       - name: Run E2E smoke
         run: pnpm test:e2e
+
+      - name: Upload temporary production audit screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-audit-${{ github.run_id }}
+          path: test-results/prod-audit
+          if-no-files-found: ignore
+          retention-days: 1
