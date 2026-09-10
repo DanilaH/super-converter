@@ -88,6 +88,16 @@
   background: var(--color-surface-muted);
 }
 
+.expansion-tool[data-random-pair-tool] .controls {
+  justify-content: flex-end;
+  padding: 0;
+  background: transparent;
+}
+
+.expansion-tool[data-random-pair-tool] .validation-message {
+  display: none;
+}
+
 .expansion-tool fieldset {
   min-width: 0;
   margin: 0;
@@ -126,6 +136,10 @@
   grid-template-columns: minmax(0, 1fr) minmax(120px, 180px);
   align-items: center;
   gap: var(--space-2);
+}
+
+.expansion-tool .custom-control[hidden] {
+  display: none;
 }
 
 .expansion-tool input[type="number"],
@@ -205,6 +219,11 @@
   font-family: var(--font-mono);
   font-size: var(--font-size-result-data);
   line-height: var(--line-height-result-data);
+  white-space: pre;
+  overflow-wrap: normal;
+}
+
+.expansion-tool[data-remove-line-breaks-tool] .viewer {
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
