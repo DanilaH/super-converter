@@ -14,65 +14,53 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  lighthouse-production-audit:
+  quality:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
 
     steps:
-      - name: Check live compression, caching and TLS certificate
-        run: |
-          echo '=== RESPONSE HEADERS ==='
-          curl -sS --compressed -D - -o /dev/null https://listcontrast.com/ | sed -n '1,30p'
-          echo '=== CERTIFICATE ==='
-          echo | openssl s_client -connect listcontrast.com:443 -servername listcontrast.com 2>/dev/null | openssl x509 -noout -subject -issuer -dates
+      - name: Checkout
+        uses: actions/checkout@v7
 
-      - name: Run Lighthouse on representative production pages
-        run: |
-          set -euo pipefail
-          mkdir -p /tmp/lighthouse
-          for entry in \
-            'home https://listcontrast.com/' \
-            'team https://listcontrast.com/random-team-generator' \
-            'lines https://listcontrast.com/remove-line-breaks'; do
-            name="${entry%% *}"
-            url="${entry#* }"
-            npx -y lighthouse "$url" \
-              --quiet \
-              --chrome-flags='--headless=new --no-sandbox' \
-              --output=json \
-              --output-path="/tmp/lighthouse/${name}-mobile.json" \
-              --only-categories=performance,accessibility,best-practices,seo
-            npx -y lighthouse "$url" \
-              --quiet \
-              --chrome-flags='--headless=new --no-sandbox' \
-              --preset=desktop \
-              --output=json \
-              --output-path="/tmp/lighthouse/${name}-desktop.json" \
-              --only-categories=performance,accessibility,best-practices,seo
-          done
+      - name: Set up pnpm and Node.js
+        uses: pnpm/setup@v2
+        with:
+          runtime: node@22.13.0
+          cache: true
+          install: false
 
-          node <<'NODE'
-          const fs = require('node:fs');
-          for (const file of fs.readdirSync('/tmp/lighthouse').sort()) {
-            const report = JSON.parse(fs.readFileSync(`/tmp/lighthouse/${file}`, 'utf8'));
-            const c = report.categories;
-            const a = report.audits;
-            const result = {
-              file,
-              scores: {
-                performance: Math.round(c.performance.score * 100),
-                accessibility: Math.round(c.accessibility.score * 100),
-                bestPractices: Math.round(c['best-practices'].score * 100),
-                seo: Math.round(c.seo.score * 100),
-              },
-              metrics: {
-                fcpMs: Math.round(a['first-contentful-paint'].numericValue),
-                lcpMs: Math.round(a['largest-contentful-paint'].numericValue),
-                tbtMs: Math.round(a['total-blocking-time'].numericValue),
-                cls: Number(a['cumulative-layout-shift'].numericValue.toFixed(3)),
-                speedIndexMs: Math.round(a['speed-index'].numericValue),
-              },
-            };
-            console.log('PROD_LIGHTHOUSE', JSON.stringify(result));
-          }
-          NODE
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Format temporary audit harness
+        run: pnpm exec prettier --write e2e/production-live-audit.spec.ts
+
+      - name: Check formatting
+        run: pnpm format:check
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Run E2E smoke
+        run: pnpm test:e2e
+
+      - name: Upload temporary production audit screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-audit-${{ github.run_id }}
+          path: test-results/prod-audit
+          if-no-files-found: ignore
+          retention-days: 1
