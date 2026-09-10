@@ -1,0 +1,102 @@
+---
+import type { ColumnToCommaMessages } from "@/i18n/types";
+
+interface Props {
+  tool: ColumnToCommaMessages;
+}
+
+const { tool } = Astro.props;
+---
+
+<section
+  class="expansion-tool"
+  data-column-to-comma-tool
+  data-example={tool.example}
+  data-label-item={tool.item}
+  data-label-items={tool.items}
+  data-label-empty-result={tool.emptyResult}
+  data-label-copy={tool.copy}
+  data-label-copied={tool.copied}
+  data-label-copy-error={tool.copyError}
+  data-label-replace-example-confirmation={tool.replaceExampleConfirmation}
+  aria-labelledby="column-to-comma-tool-heading"
+>
+  <h2 id="column-to-comma-tool-heading" class="visually-hidden">{tool.heading}</h2>
+
+  <div class="input-section">
+    <div class="input-toolbar">
+      <label for="column-to-comma-input">{tool.listLabel}</label>
+      <div class="input-actions">
+        <button type="button" class="example-button" data-load-example disabled>
+          {tool.loadExample}
+        </button>
+        <button type="button" class="text-button" data-clear-list disabled>
+          {tool.clear}
+        </button>
+      </div>
+    </div>
+    <textarea
+      id="column-to-comma-input"
+      data-list-input
+      rows="10"
+      placeholder={tool.pastePlaceholder}
+      spellcheck="false"></textarea>
+  </div>
+
+  <div class="controls">
+    <fieldset class="options">
+      <legend class="control-label">{tool.options}</legend>
+      <div class="option-row">
+        <label class="option">
+          <input type="checkbox" data-option-trim-whitespace checked />
+          {tool.trimWhitespace}
+        </label>
+        <label class="option">
+          <input type="checkbox" data-option-ignore-empty-lines checked />
+          {tool.ignoreEmptyLines}
+        </label>
+      </div>
+      <label class="value-control">
+        <span>{tool.separator}</span>
+        <select data-separator>
+          <option value="commaSpace" selected>{tool.separatorCommaSpace}</option>
+          <option value="comma">{tool.separatorComma}</option>
+          <option value="semicolon">{tool.separatorSemicolon}</option>
+          <option value="pipe">{tool.separatorPipe}</option>
+          <option value="tab">{tool.separatorTab}</option>
+          <option value="custom">{tool.separatorCustom}</option>
+        </select>
+      </label>
+      <label class="custom-control" data-custom-row hidden>
+        <span>{tool.customSeparator}</span>
+        <input type="text" data-custom-separator disabled />
+      </label>
+    </fieldset>
+  </div>
+
+  <section class="result-section" aria-label={tool.resultLabel}>
+    <div class="result-toolbar">
+      <p class="result-title">
+        <span>{tool.resultLabel}</span>
+        <span aria-hidden="true">·</span>
+        <span data-result-count>0 {tool.items}</span>
+      </p>
+      <div class="result-actions">
+        <button type="button" class="action" data-copy-result disabled>{tool.copy}</button>
+        <button type="button" class="action" data-download-result disabled>{tool.download}</button>
+      </div>
+    </div>
+    <div class="viewer-shell">
+      <p data-empty-result>{tool.emptyResult}</p>
+      <pre class="viewer" data-result-viewer tabindex="0" hidden></pre>
+    </div>
+    <p class="local-feedback" data-local-feedback role="status" aria-live="polite" aria-atomic="true"></p>
+  </section>
+
+  <noscript><p class="noscript">{tool.noscript}</p></noscript>
+</section>
+
+<script>
+  import { mountColumnToCommaTool } from "../scripts/column-to-comma-tool";
+  mountColumnToCommaTool();
+</script>
