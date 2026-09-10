@@ -1,0 +1,130 @@
+---
+import type { RandomTeamMessages } from "@/i18n/types";
+
+interface Props {
+  tool: RandomTeamMessages;
+}
+
+const { tool } = Astro.props;
+---
+
+<section
+  class="expansion-tool"
+  data-random-team-tool
+  data-example={tool.example}
+  data-label-participant={tool.participant}
+  data-label-participants={tool.participants}
+  data-label-generate={tool.generate}
+  data-label-reroll={tool.reroll}
+  data-label-team={tool.team}
+  data-label-empty-result={tool.emptyResult}
+  data-label-invalid-value={tool.invalidValue}
+  data-label-too-many-teams={tool.tooManyTeams}
+  data-label-copy={tool.copy}
+  data-label-copied={tool.copied}
+  data-label-copy-error={tool.copyError}
+  data-label-replace-example-confirmation={tool.replaceExampleConfirmation}
+  aria-labelledby="random-team-tool-heading"
+>
+  <h2 id="random-team-tool-heading" class="visually-hidden">{tool.heading}</h2>
+
+  <div class="input-section">
+    <div class="input-toolbar">
+      <label for="random-team-input">{tool.listLabel}</label>
+      <div class="input-actions">
+        <button type="button" class="example-button" data-load-example disabled>
+          {tool.loadExample}
+        </button>
+        <button type="button" class="text-button" data-clear-list disabled>
+          {tool.clear}
+        </button>
+      </div>
+    </div>
+    <textarea
+      id="random-team-input"
+      data-list-input
+      rows="10"
+      placeholder={tool.pastePlaceholder}
+      spellcheck="false"></textarea>
+  </div>
+
+  <div class="controls">
+    <fieldset class="options">
+      <legend class="control-label">{tool.modeLabel}</legend>
+      <div class="choice-row">
+        <label class="choice">
+          <input
+            type="radio"
+            name="team-mode"
+            value="teamCount"
+            data-mode="teamCount"
+            checked
+          />
+          {tool.numberOfTeams}
+        </label>
+        <label class="choice">
+          <input
+            type="radio"
+            name="team-mode"
+            value="targetSize"
+            data-mode="targetSize"
+          />
+          {tool.peoplePerTeam}
+        </label>
+      </div>
+      <label class="value-control">
+        <span>{tool.valueLabel}</span>
+        <input
+          type="number"
+          min="1"
+          step="1"
+          value="2"
+          data-group-value
+          inputmode="numeric"
+        />
+      </label>
+      <p class="validation-message" data-validation aria-live="polite"></p>
+    </fieldset>
+
+    <button type="button" class="primary-action" data-generate disabled>
+      {tool.generate}
+    </button>
+  </div>
+
+  <section class="result-section" aria-label={tool.resultLabel}>
+    <div class="result-toolbar">
+      <p class="result-title">
+        <span>{tool.resultLabel}</span>
+        <span aria-hidden="true">·</span>
+        <span data-result-count>0 {tool.participants}</span>
+      </p>
+      <div class="result-actions">
+        <button type="button" class="action" data-copy-result disabled
+          >{tool.copy}</button
+        >
+        <button type="button" class="action" data-download-result disabled
+          >{tool.download}</button
+        >
+      </div>
+    </div>
+    <div class="viewer-shell">
+      <p data-empty-result>{tool.emptyResult}</p>
+      <pre class="viewer" data-result-viewer tabindex="0" hidden></pre>
+    </div>
+    <p
+      class="local-feedback"
+      data-local-feedback
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+    >
+    </p>
+  </section>
+
+  <noscript><p class="noscript">{tool.noscript}</p></noscript>
+</section>
+
+<script>
+  import { mountRandomTeamTool } from "../scripts/random-team-tool";
+  mountRandomTeamTool();
+</script>

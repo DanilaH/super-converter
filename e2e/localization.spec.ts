@@ -7,7 +7,11 @@ type RouteIdentity =
   | "removeDuplicateLines"
   | "tools"
   | "about"
-  | "privacy";
+  | "privacy"
+  | "randomTeamGenerator"
+  | "randomPairGenerator"
+  | "removeLineBreaks"
+  | "columnToCommaSeparatedList";
 
 type RouteExpectation = {
   pageKey: RouteIdentity;
@@ -49,6 +53,26 @@ const LOCALES: readonly LocaleExpectation[] = [
       { pageKey: "tools", path: "/tools" },
       { pageKey: "about", path: "/about" },
       { pageKey: "privacy", path: "/privacy" },
+      {
+        pageKey: "randomTeamGenerator",
+        path: "/random-team-generator",
+        heading: "Random Team & Group Generator",
+      },
+      {
+        pageKey: "randomPairGenerator",
+        path: "/random-pair-generator",
+        heading: "Random Pair Generator",
+      },
+      {
+        pageKey: "removeLineBreaks",
+        path: "/remove-line-breaks",
+        heading: "Remove Line Breaks",
+      },
+      {
+        pageKey: "columnToCommaSeparatedList",
+        path: "/column-to-comma-separated-list",
+        heading: "Column to Comma Separated List",
+      },
     ],
   },
   {
@@ -76,6 +100,26 @@ const LOCALES: readonly LocaleExpectation[] = [
       { pageKey: "tools", path: "/de/werkzeuge" },
       { pageKey: "about", path: "/de/ueber" },
       { pageKey: "privacy", path: "/de/datenschutz" },
+      {
+        pageKey: "randomTeamGenerator",
+        path: "/de/zufaelliger-teamgenerator",
+        heading: "Zufälliger Teamgenerator",
+      },
+      {
+        pageKey: "randomPairGenerator",
+        path: "/de/zufaellige-paare-bilden",
+        heading: "Zufällige Paare bilden",
+      },
+      {
+        pageKey: "removeLineBreaks",
+        path: "/de/zeilenumbrueche-entfernen",
+        heading: "Zeilenumbrüche entfernen",
+      },
+      {
+        pageKey: "columnToCommaSeparatedList",
+        path: "/de/spalte-in-kommagetrennte-liste",
+        heading: "Spalte in kommagetrennte Liste",
+      },
     ],
   },
   {
@@ -107,6 +151,26 @@ const LOCALES: readonly LocaleExpectation[] = [
       { pageKey: "tools", path: "/fr/outils" },
       { pageKey: "about", path: "/fr/a-propos" },
       { pageKey: "privacy", path: "/fr/confidentialite" },
+      {
+        pageKey: "randomTeamGenerator",
+        path: "/fr/generateur-equipes-aleatoires",
+        heading: "Générateur d’équipes aléatoires",
+      },
+      {
+        pageKey: "randomPairGenerator",
+        path: "/fr/generateur-paires-aleatoires",
+        heading: "Générateur de paires aléatoires",
+      },
+      {
+        pageKey: "removeLineBreaks",
+        path: "/fr/supprimer-sauts-de-ligne",
+        heading: "Supprimer les sauts de ligne",
+      },
+      {
+        pageKey: "columnToCommaSeparatedList",
+        path: "/fr/colonne-liste-separee-par-virgules",
+        heading: "Convertir une colonne en liste séparée par des virgules",
+      },
     ],
   },
   {
@@ -115,11 +179,7 @@ const LOCALES: readonly LocaleExpectation[] = [
     hreflang: "es",
     collatorLocale: "es",
     routes: [
-      {
-        pageKey: "home",
-        path: "/es/",
-        heading: "Comparar dos listas online",
-      },
+      { pageKey: "home", path: "/es/", heading: "Comparar dos listas online" },
       {
         pageKey: "alphabetizeList",
         path: "/es/ordenar-lista-alfabeticamente",
@@ -138,6 +198,26 @@ const LOCALES: readonly LocaleExpectation[] = [
       { pageKey: "tools", path: "/es/herramientas" },
       { pageKey: "about", path: "/es/acerca-de" },
       { pageKey: "privacy", path: "/es/privacidad" },
+      {
+        pageKey: "randomTeamGenerator",
+        path: "/es/generador-equipos-aleatorios",
+        heading: "Generador de equipos aleatorios",
+      },
+      {
+        pageKey: "randomPairGenerator",
+        path: "/es/generador-parejas-aleatorias",
+        heading: "Generador de parejas aleatorias",
+      },
+      {
+        pageKey: "removeLineBreaks",
+        path: "/es/eliminar-saltos-de-linea",
+        heading: "Eliminar saltos de línea",
+      },
+      {
+        pageKey: "columnToCommaSeparatedList",
+        path: "/es/columna-lista-separada-por-comas",
+        heading: "Columna a lista separada por comas",
+      },
     ],
   },
   {
@@ -165,6 +245,26 @@ const LOCALES: readonly LocaleExpectation[] = [
       { pageKey: "tools", path: "/pt-br/ferramentas" },
       { pageKey: "about", path: "/pt-br/sobre" },
       { pageKey: "privacy", path: "/pt-br/privacidade" },
+      {
+        pageKey: "randomTeamGenerator",
+        path: "/pt-br/sorteador-de-times",
+        heading: "Sorteador de Times e Equipes",
+      },
+      {
+        pageKey: "randomPairGenerator",
+        path: "/pt-br/sorteador-de-duplas",
+        heading: "Sorteador de Duplas",
+      },
+      {
+        pageKey: "removeLineBreaks",
+        path: "/pt-br/remover-quebras-de-linha",
+        heading: "Remover Quebras de Linha",
+      },
+      {
+        pageKey: "columnToCommaSeparatedList",
+        path: "/pt-br/coluna-lista-separada-por-virgulas",
+        heading: "Coluna para Lista Separada por Vírgulas",
+      },
     ],
   },
   {
@@ -173,11 +273,7 @@ const LOCALES: readonly LocaleExpectation[] = [
     hreflang: "ru",
     collatorLocale: "ru",
     routes: [
-      {
-        pageKey: "home",
-        path: "/ru/",
-        heading: "Сравнить два списка онлайн",
-      },
+      { pageKey: "home", path: "/ru/", heading: "Сравнить два списка онлайн" },
       {
         pageKey: "alphabetizeList",
         path: "/ru/sortirovat-spisok-po-alfavitu",
@@ -196,6 +292,26 @@ const LOCALES: readonly LocaleExpectation[] = [
       { pageKey: "tools", path: "/ru/instrumenty" },
       { pageKey: "about", path: "/ru/o-proekte" },
       { pageKey: "privacy", path: "/ru/konfidencialnost" },
+      {
+        pageKey: "randomTeamGenerator",
+        path: "/ru/generator-sluchaynyh-komand",
+        heading: "Генератор случайных команд",
+      },
+      {
+        pageKey: "randomPairGenerator",
+        path: "/ru/generator-sluchaynyh-par",
+        heading: "Генератор случайных пар",
+      },
+      {
+        pageKey: "removeLineBreaks",
+        path: "/ru/ubrat-perenosy-strok",
+        heading: "Убрать переносы строк",
+      },
+      {
+        pageKey: "columnToCommaSeparatedList",
+        path: "/ru/stolbec-v-spisok-cherez-zapyatuyu",
+        heading: "Столбец в список через запятую",
+      },
     ],
   },
 ] as const;
@@ -216,7 +332,7 @@ function routeFor(
   return route;
 }
 
-test("publishes the complete 42-route localization matrix with reciprocal SEO signals", async ({
+test("publishes the complete 66-route localization matrix with reciprocal SEO signals", async ({
   page,
 }, testInfo) => {
   test.skip(
@@ -224,7 +340,7 @@ test("publishes the complete 42-route localization matrix with reciprocal SEO si
     "matrix contract runs once",
   );
 
-  expect(LOCALES.flatMap((locale) => locale.routes)).toHaveLength(42);
+  expect(LOCALES.flatMap((locale) => locale.routes)).toHaveLength(66);
 
   for (const locale of LOCALES) {
     for (const route of locale.routes) {
@@ -328,8 +444,7 @@ test("keeps the localized language switcher usable without narrow-page overflow"
     "narrow-layout contract runs once",
   );
 
-  await page.goto("/ru/sortirovat-spisok-po-alfavitu");
-
+  await page.goto("/ru/generator-sluchaynyh-komand");
   const summary = page.locator(".language-switcher summary");
   await expect(summary).toBeVisible();
   await summary.click();

@@ -2,18 +2,12 @@
 import { contentFor } from "@/i18n/content";
 import { DEFAULT_LOCALE } from "@/i18n/locales";
 import { routeFor } from "@/i18n/routes";
-import type { ToolPageKey } from "@/i18n/types";
+import { SITE_TOOL_PAGE_KEYS } from "@/i18n/types";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 
 const locale = DEFAULT_LOCALE;
 const content = contentFor(locale);
 const { toolsPage } = content;
-const toolOrder: readonly ToolPageKey[] = [
-  "home",
-  "alphabetizeList",
-  "randomizeList",
-  "removeDuplicateLines",
-];
 ---
 
 <BaseLayout metadataKey="tools" locale={locale}>
@@ -24,7 +18,7 @@ const toolOrder: readonly ToolPageKey[] = [
     <nav aria-label={toolsPage.ariaLabel}>
       <ul class="tool-list">
         {
-          toolOrder.map((pageKey) => {
+          SITE_TOOL_PAGE_KEYS.map((pageKey) => {
             const item = toolsPage.items[pageKey];
             return (
               <li>

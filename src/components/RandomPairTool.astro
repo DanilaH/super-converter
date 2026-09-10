@@ -1,0 +1,93 @@
+---
+import type { RandomPairMessages } from "@/i18n/types";
+
+interface Props {
+  tool: RandomPairMessages;
+}
+
+const { tool } = Astro.props;
+---
+
+<section
+  class="expansion-tool"
+  data-random-pair-tool
+  data-example={tool.example}
+  data-label-item={tool.item}
+  data-label-items={tool.items}
+  data-label-generate={tool.generate}
+  data-label-reroll={tool.reroll}
+  data-label-pair={tool.pair}
+  data-label-unpaired={tool.unpaired}
+  data-label-empty-result={tool.emptyResult}
+  data-label-copy={tool.copy}
+  data-label-copied={tool.copied}
+  data-label-copy-error={tool.copyError}
+  data-label-replace-example-confirmation={tool.replaceExampleConfirmation}
+  aria-labelledby="random-pair-tool-heading"
+>
+  <h2 id="random-pair-tool-heading" class="visually-hidden">{tool.heading}</h2>
+
+  <div class="input-section">
+    <div class="input-toolbar">
+      <label for="random-pair-input">{tool.listLabel}</label>
+      <div class="input-actions">
+        <button type="button" class="example-button" data-load-example disabled>
+          {tool.loadExample}
+        </button>
+        <button type="button" class="text-button" data-clear-list disabled>
+          {tool.clear}
+        </button>
+      </div>
+    </div>
+    <textarea
+      id="random-pair-input"
+      data-list-input
+      rows="10"
+      placeholder={tool.pastePlaceholder}
+      spellcheck="false"></textarea>
+  </div>
+
+  <div class="controls">
+    <p class="validation-message" aria-hidden="true"></p>
+    <button type="button" class="primary-action" data-generate disabled>
+      {tool.generate}
+    </button>
+  </div>
+
+  <section class="result-section" aria-label={tool.resultLabel}>
+    <div class="result-toolbar">
+      <p class="result-title">
+        <span>{tool.resultLabel}</span>
+        <span aria-hidden="true">·</span>
+        <span data-result-count>0 {tool.items}</span>
+      </p>
+      <div class="result-actions">
+        <button type="button" class="action" data-copy-result disabled
+          >{tool.copy}</button
+        >
+        <button type="button" class="action" data-download-result disabled
+          >{tool.download}</button
+        >
+      </div>
+    </div>
+    <div class="viewer-shell">
+      <p data-empty-result>{tool.emptyResult}</p>
+      <pre class="viewer" data-result-viewer tabindex="0" hidden></pre>
+    </div>
+    <p
+      class="local-feedback"
+      data-local-feedback
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+    >
+    </p>
+  </section>
+
+  <noscript><p class="noscript">{tool.noscript}</p></noscript>
+</section>
+
+<script>
+  import { mountRandomPairTool } from "../scripts/random-pair-tool";
+  mountRandomPairTool();
+</script>

@@ -4,9 +4,10 @@ import { activeIndexablePaths, ROUTES, routeFor } from "./routes";
 import { PAGE_KEYS } from "./types";
 
 describe("localization routes", () => {
-  it("activates the complete Localization V1 locale set", () => {
+  it("activates the complete six-locale surface", () => {
     expect(ACTIVE_LOCALES).toEqual(["en", "de", "fr", "es", "pt-br", "ru"]);
-    expect(activeIndexablePaths()).toHaveLength(42);
+    expect(PAGE_KEYS).toHaveLength(11);
+    expect(activeIndexablePaths()).toHaveLength(66);
   });
 
   it("preserves the existing English route matrix", () => {
@@ -21,13 +22,26 @@ describe("localization routes", () => {
     expect(routeFor("en", "privacy")).toBe("/privacy");
   });
 
+  it("maps the four Expansion V2 English intents to one canonical route each", () => {
+    expect(routeFor("en", "randomTeamGenerator")).toBe(
+      "/random-team-generator",
+    );
+    expect(routeFor("en", "randomPairGenerator")).toBe(
+      "/random-pair-generator",
+    );
+    expect(routeFor("en", "removeLineBreaks")).toBe("/remove-line-breaks");
+    expect(routeFor("en", "columnToCommaSeparatedList")).toBe(
+      "/column-to-comma-separated-list",
+    );
+  });
+
   it("has a complete and collision-free route matrix", () => {
     const allPaths = Object.values(ROUTES).flatMap((routes) =>
       PAGE_KEYS.map((pageKey) => routes[pageKey]),
     );
 
-    expect(allPaths).toHaveLength(42);
-    expect(new Set(allPaths).size).toBe(42);
+    expect(allPaths).toHaveLength(66);
+    expect(new Set(allPaths).size).toBe(66);
 
     for (const routes of Object.values(ROUTES)) {
       for (const pageKey of PAGE_KEYS) {
@@ -64,14 +78,30 @@ describe("localization routes", () => {
     });
   });
 
-  it("maps Russian acquisition pages to one canonical intent URL each", () => {
-    expect(routeFor("ru", "home")).toBe("/ru/");
-    expect(routeFor("ru", "alphabetizeList")).toBe(
-      "/ru/sortirovat-spisok-po-alfavitu",
+  it("uses the approved localized Expansion V2 route registry", () => {
+    expect(routeFor("de", "randomTeamGenerator")).toBe(
+      "/de/zufaelliger-teamgenerator",
     );
-    expect(routeFor("ru", "randomizeList")).toBe("/ru/peremeshat-spisok");
-    expect(routeFor("ru", "removeDuplicateLines")).toBe(
-      "/ru/udalit-dublikaty-strok",
+    expect(routeFor("fr", "randomPairGenerator")).toBe(
+      "/fr/generateur-paires-aleatoires",
     );
+    expect(routeFor("es", "removeLineBreaks")).toBe(
+      "/es/eliminar-saltos-de-linea",
+    );
+    expect(routeFor("pt-br", "columnToCommaSeparatedList")).toBe(
+      "/pt-br/coluna-lista-separada-por-virgulas",
+    );
+    expect(routeFor("ru", "randomTeamGenerator")).toBe(
+      "/ru/generator-sluchaynyh-komand",
+    );
+  });
+
+  it("does not create rejected synonym routes", () => {
+    const paths = activeIndexablePaths();
+    expect(paths).not.toContain("/compare-lists");
+    expect(paths).not.toContain("/list-diff");
+    expect(paths).not.toContain("/random-group-generator");
+    expect(paths).not.toContain("/remove-newlines");
+    expect(paths).not.toContain("/new-line-remover");
   });
 });

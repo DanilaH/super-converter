@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { ACTIVE_LOCALES } from "./locales";
+import { ACTIVE_LOCALES, type ActiveLocale } from "./locales";
 import { contentFor } from "./content";
+import { SITE_TOOL_PAGE_KEYS } from "./types";
 
 describe("English localization baseline", () => {
   const content = contentFor("en");
@@ -40,12 +41,10 @@ describe("English localization baseline", () => {
     expect(content.alphabetizeList.page.heading).toBe(
       "Alphabetize a List Online",
     );
-
     expect(content.metadata.randomizeList.title).toBe(
       "List Randomizer — Randomize a List Online | ListContrast",
     );
     expect(content.randomizeList.page.heading).toBe("List Randomizer");
-
     expect(content.metadata.removeDuplicateLines.title).toBe(
       "Remove Duplicate Lines Online | ListContrast",
     );
@@ -54,7 +53,24 @@ describe("English localization baseline", () => {
     );
   });
 
-  it("preserves support-page metadata and labels", () => {
+  it("publishes all eight tools and current About copy", () => {
+    expect(SITE_TOOL_PAGE_KEYS).toHaveLength(8);
+    expect(Object.keys(content.toolsPage.items)).toHaveLength(8);
+    expect(content.toolsPage.items.randomTeamGenerator.label).toBe(
+      "Random Team Generator",
+    );
+    expect(content.toolsPage.items.removeLineBreaks.label).toBe(
+      "Remove Line Breaks",
+    );
+    expect(content.about.paragraphs.join(" ")).toContain(
+      "balanced team generation",
+    );
+    expect(content.about.paragraphs.join(" ")).toContain(
+      "column-to-delimiter conversion",
+    );
+  });
+
+  it("preserves support-page metadata and privacy labels", () => {
     expect(content.metadata.tools.title).toBe("List Tools | ListContrast");
     expect(content.toolsPage.heading).toBe("List tools");
     expect(content.about.heading).toBe("About ListContrast");
@@ -78,19 +94,81 @@ describe("English localization baseline", () => {
   });
 });
 
+const EXPANSION_HEADINGS = {
+  en: [
+    "Random Team & Group Generator",
+    "Random Pair Generator",
+    "Remove Line Breaks",
+    "Column to Comma Separated List",
+  ],
+  de: [
+    "Zufälliger Teamgenerator",
+    "Zufällige Paare bilden",
+    "Zeilenumbrüche entfernen",
+    "Spalte in kommagetrennte Liste",
+  ],
+  fr: [
+    "Générateur d’équipes aléatoires",
+    "Générateur de paires aléatoires",
+    "Supprimer les sauts de ligne",
+    "Convertir une colonne en liste séparée par des virgules",
+  ],
+  es: [
+    "Generador de equipos aleatorios",
+    "Generador de parejas aleatorias",
+    "Eliminar saltos de línea",
+    "Columna a lista separada por comas",
+  ],
+  "pt-br": [
+    "Sorteador de Times e Equipes",
+    "Sorteador de Duplas",
+    "Remover Quebras de Linha",
+    "Coluna para Lista Separada por Vírgulas",
+  ],
+  ru: [
+    "Генератор случайных команд",
+    "Генератор случайных пар",
+    "Убрать переносы строк",
+    "Столбец в список через запятую",
+  ],
+} as const satisfies Record<ActiveLocale, readonly string[]>;
+
 describe("localized content", () => {
-  it("provides complete content for every active locale", () => {
+  it("provides complete core and expansion content for every active locale", () => {
     for (const locale of ACTIVE_LOCALES) {
       const content = contentFor(locale);
       expect(content.siteName).toBe("ListContrast");
       expect(content.home.heading.length).toBeGreaterThan(0);
       expect(content.alphabetizeList.tool.example.length).toBeGreaterThan(0);
+      expect(content.randomTeamGenerator.tool.example.length).toBeGreaterThan(
+        0,
+      );
+      expect(content.randomPairGenerator.tool.example.length).toBeGreaterThan(
+        0,
+      );
+      expect(content.removeLineBreaks.tool.example.length).toBeGreaterThan(0);
+      expect(
+        content.columnToCommaSeparatedList.tool.example.length,
+      ).toBeGreaterThan(0);
       expect(content.header.language.length).toBeGreaterThan(0);
       expect(content.metadata.privacy.description.length).toBeGreaterThan(0);
+      expect(Object.keys(content.toolsPage.items)).toHaveLength(8);
     }
   });
 
-  it("uses the approved Russian acquisition wording", () => {
+  it("uses the approved localized Expansion V2 acquisition headings", () => {
+    for (const locale of ACTIVE_LOCALES) {
+      const content = contentFor(locale);
+      expect([
+        content.randomTeamGenerator.page.heading,
+        content.randomPairGenerator.page.heading,
+        content.removeLineBreaks.page.heading,
+        content.columnToCommaSeparatedList.page.heading,
+      ]).toEqual(EXPANSION_HEADINGS[locale]);
+    }
+  });
+
+  it("uses the approved Russian core acquisition wording", () => {
     const content = contentFor("ru");
     expect(content.home.heading).toBe("Сравнить два списка онлайн");
     expect(content.alphabetizeList.page.heading).toBe(
@@ -102,8 +180,5 @@ describe("localized content", () => {
     );
     expect(content.compare.rows).toBe("стр.");
     expect(content.compare.items).toBe("элем.");
-    expect(content.alphabetizeList.tool.items).toBe("элем.");
-    expect(content.randomizeList.tool.items).toBe("элем.");
-    expect(content.removeDuplicateLines.tool.items).toBe("элем.");
   });
 });

@@ -1,7 +1,7 @@
 import { contentFor } from "./content";
 import type { ActiveLocale } from "./locales";
 import { routeFor } from "./routes";
-import type { ToolPageKey } from "./types";
+import type { SiteToolPageKey } from "./types";
 
 export type ResolvedRelatedTool = {
   href: string;
@@ -11,7 +11,7 @@ export type ResolvedRelatedTool = {
 
 export function relatedToolsFor(
   locale: ActiveLocale,
-  pageKey: ToolPageKey,
+  pageKey: SiteToolPageKey,
 ): readonly ResolvedRelatedTool[] {
   return contentFor(locale).relatedTools.byPage[pageKey].map((item) => ({
     href: routeFor(locale, item.pageKey),

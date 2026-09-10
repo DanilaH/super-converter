@@ -1,4 +1,4 @@
-export const PAGE_KEYS = [
+export const CORE_PAGE_KEYS = [
   "home",
   "alphabetizeList",
   "randomizeList",
@@ -8,7 +8,19 @@ export const PAGE_KEYS = [
   "privacy",
 ] as const;
 
+export const EXPANSION_PAGE_KEYS = [
+  "randomTeamGenerator",
+  "randomPairGenerator",
+  "removeLineBreaks",
+  "columnToCommaSeparatedList",
+] as const;
+
+export const PAGE_KEYS = [...CORE_PAGE_KEYS, ...EXPANSION_PAGE_KEYS] as const;
+
+export type CorePageKey = (typeof CORE_PAGE_KEYS)[number];
+export type ExpansionPageKey = (typeof EXPANSION_PAGE_KEYS)[number];
 export type PageKey = (typeof PAGE_KEYS)[number];
+export type CoreMetadataKey = CorePageKey | "notFound";
 export type MetadataKey = PageKey | "notFound";
 
 export type CompareMessages = {
@@ -116,7 +128,9 @@ export type PageMetadata = {
   description: string;
 };
 
-export type MetadataContent = Record<MetadataKey, PageMetadata>;
+/** Core content shape retained so the already-shipped locale dictionaries remain valid. */
+export type MetadataContent = Record<CoreMetadataKey, PageMetadata>;
+export type SiteMetadataContent = Record<MetadataKey, PageMetadata>;
 
 export type NotFoundPageContent = {
   heading: string;
@@ -208,6 +222,116 @@ export type RemoveDuplicateLinesMessages = {
   noscript: string;
 };
 
+export type RandomTeamMessages = {
+  heading: string;
+  listLabel: string;
+  pastePlaceholder: string;
+  clear: string;
+  loadExample: string;
+  example: string;
+  replaceExampleConfirmation: string;
+  participant: string;
+  participants: string;
+  modeLabel: string;
+  numberOfTeams: string;
+  peoplePerTeam: string;
+  valueLabel: string;
+  generate: string;
+  reroll: string;
+  resultLabel: string;
+  team: string;
+  copy: string;
+  copied: string;
+  download: string;
+  copyError: string;
+  emptyResult: string;
+  invalidValue: string;
+  tooManyTeams: string;
+  noscript: string;
+};
+
+export type RandomPairMessages = {
+  heading: string;
+  listLabel: string;
+  pastePlaceholder: string;
+  clear: string;
+  loadExample: string;
+  example: string;
+  replaceExampleConfirmation: string;
+  item: string;
+  items: string;
+  generate: string;
+  reroll: string;
+  resultLabel: string;
+  pair: string;
+  unpaired: string;
+  copy: string;
+  copied: string;
+  download: string;
+  copyError: string;
+  emptyResult: string;
+  noscript: string;
+};
+
+export type RemoveLineBreaksMessages = {
+  heading: string;
+  textLabel: string;
+  pastePlaceholder: string;
+  clear: string;
+  loadExample: string;
+  example: string;
+  replaceExampleConfirmation: string;
+  options: string;
+  replaceWith: string;
+  separatorSpace: string;
+  separatorNothing: string;
+  separatorComma: string;
+  separatorCommaSpace: string;
+  separatorSemicolon: string;
+  separatorCustom: string;
+  customSeparator: string;
+  keepParagraphs: string;
+  trimEachLine: string;
+  collapseSpaces: string;
+  resultLabel: string;
+  emptyResult: string;
+  copy: string;
+  copied: string;
+  download: string;
+  copyError: string;
+  noscript: string;
+};
+
+export type ColumnToCommaMessages = {
+  heading: string;
+  listLabel: string;
+  pastePlaceholder: string;
+  clear: string;
+  loadExample: string;
+  example: string;
+  replaceExampleConfirmation: string;
+  options: string;
+  trimWhitespace: string;
+  ignoreEmptyLines: string;
+  separator: string;
+  separatorCommaSpace: string;
+  separatorComma: string;
+  separatorSemicolon: string;
+  separatorPipe: string;
+  separatorTab: string;
+  separatorCustom: string;
+  customSeparator: string;
+  resultLabel: string;
+  item: string;
+  items: string;
+  emptyResult: string;
+  copy: string;
+  copied: string;
+  download: string;
+  copyError: string;
+  noscript: string;
+};
+
 export type AlphabetizePageContent = {
   page: ToolPageIntro;
   tool: AlphabetizeMessages;
@@ -226,8 +350,44 @@ export type RemoveDuplicateLinesPageContent = {
   editorial: EditorialContent;
 };
 
+export type RandomTeamPageContent = {
+  page: ToolPageIntro;
+  tool: RandomTeamMessages;
+  editorial: EditorialContent;
+};
+
+export type RandomPairPageContent = {
+  page: ToolPageIntro;
+  tool: RandomPairMessages;
+  editorial: EditorialContent;
+};
+
+export type RemoveLineBreaksPageContent = {
+  page: ToolPageIntro;
+  tool: RemoveLineBreaksMessages;
+  editorial: EditorialContent;
+};
+
+export type ColumnToCommaPageContent = {
+  page: ToolPageIntro;
+  tool: ColumnToCommaMessages;
+  editorial: EditorialContent;
+};
+
+/** Existing four tool identities; retained for the shipped locale source files. */
 export type ToolPageKey =
   "home" | "alphabetizeList" | "randomizeList" | "removeDuplicateLines";
+
+export type ExpansionToolPageKey = ExpansionPageKey;
+export type SiteToolPageKey = ToolPageKey | ExpansionToolPageKey;
+
+export const SITE_TOOL_PAGE_KEYS = [
+  "home",
+  "alphabetizeList",
+  "randomizeList",
+  "removeDuplicateLines",
+  ...EXPANSION_PAGE_KEYS,
+] as const satisfies readonly SiteToolPageKey[];
 
 export type RelatedToolItem = {
   pageKey: ToolPageKey;
@@ -235,9 +395,20 @@ export type RelatedToolItem = {
   description: string;
 };
 
+export type SiteRelatedToolItem = {
+  pageKey: SiteToolPageKey;
+  label: string;
+  description: string;
+};
+
 export type RelatedToolsContent = {
   heading: string;
   byPage: Record<ToolPageKey, readonly RelatedToolItem[]>;
+};
+
+export type SiteRelatedToolsContent = {
+  heading: string;
+  byPage: Record<SiteToolPageKey, readonly SiteRelatedToolItem[]>;
 };
 
 export type ToolsPageItem = {
@@ -252,6 +423,11 @@ export type ToolsPageContent = {
   items: Record<ToolPageKey, ToolsPageItem>;
 };
 
+export type SiteToolsPageContent = Omit<ToolsPageContent, "items"> & {
+  items: Record<SiteToolPageKey, ToolsPageItem>;
+};
+
+/** Existing locale dictionaries implement this stable core shape. */
 export type LocaleContent = {
   siteName: string;
   home: {
@@ -272,4 +448,17 @@ export type LocaleContent = {
   notFoundPage: NotFoundPageContent;
   toolsPage: ToolsPageContent;
   relatedTools: RelatedToolsContent;
+};
+
+export type SiteLocaleContent = Omit<
+  LocaleContent,
+  "metadata" | "toolsPage" | "relatedTools"
+> & {
+  randomTeamGenerator: RandomTeamPageContent;
+  randomPairGenerator: RandomPairPageContent;
+  removeLineBreaks: RemoveLineBreaksPageContent;
+  columnToCommaSeparatedList: ColumnToCommaPageContent;
+  metadata: SiteMetadataContent;
+  toolsPage: SiteToolsPageContent;
+  relatedTools: SiteRelatedToolsContent;
 };
