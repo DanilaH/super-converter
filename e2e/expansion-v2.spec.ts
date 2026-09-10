@@ -16,7 +16,7 @@ test.describe("Expansion V2 tools", () => {
     );
     await input.fill(names.join("\n"));
 
-    const value = page.getByRole("spinbutton", { name: "Value" });
+    const value = page.getByRole("spinbutton", { name: "Number of teams" });
     await value.fill("3");
     await page.getByRole("button", { name: "Generate teams" }).click();
 
@@ -33,6 +33,9 @@ test.describe("Expansion V2 tools", () => {
     ).toEqual(sorted(names));
 
     await page.getByRole("radio", { name: "People per team" }).check();
+    await expect(
+      page.getByRole("spinbutton", { name: "People per team" }),
+    ).toBeVisible();
     await expect(
       page.getByRole("button", { name: "Generate teams" }),
     ).toBeVisible();
@@ -55,7 +58,7 @@ test.describe("Expansion V2 tools", () => {
     await page
       .getByRole("textbox", { name: "Participants or items" })
       .fill("A\nB\nC");
-    await page.getByRole("spinbutton", { name: "Value" }).fill("4");
+    await page.getByRole("spinbutton", { name: "Number of teams" }).fill("4");
     await page.getByRole("button", { name: "Generate teams" }).click();
     await expect(page.locator("[data-validation]")).toHaveText(
       "The number of teams cannot be greater than the number of items.",
@@ -146,6 +149,54 @@ test.describe("Expansion V2 tools", () => {
     const custom = page.getByRole("textbox", { name: "Custom separator" });
     await custom.fill(" / ");
     await expect(viewer).toHaveText("apple / banana / apple");
+  });
+
+  test("custom separator controls stay hidden until Custom is selected", async ({
+    page,
+  }) => {
+    for (const route of [
+      "/remove-line-breaks",
+      "/column-to-comma-separated-list",
+    ]) {
+      await page.goto(route);
+      const customRow = page.locator("[data-custom-row]");
+      await expect(customRow).toBeHidden();
+      await page.locator("[data-separator]").selectOption("custom");
+      await expect(customRow).toBeVisible();
+    }
+  });
+
+  test("result viewers keep list outputs unwrapped and prose output wrapped", async ({
+    page,
+  }) => {
+    for (const route of [
+      "/random-team-generator",
+      "/random-pair-generator",
+      "/column-to-comma-separated-list",
+    ]) {
+      await page.goto(route);
+      await expect(page.locator("[data-result-viewer]")).toHaveCSS(
+        "white-space",
+        "pre",
+      );
+    }
+
+    await page.goto("/remove-line-breaks");
+    await expect(page.locator("[data-result-viewer]")).toHaveCSS(
+      "white-space",
+      "pre-wrap",
+    );
+  });
+
+  test("Random Pair Generator keeps its action row compact", async ({
+    page,
+  }) => {
+    await page.goto("/random-pair-generator");
+    const controls = page.locator("[data-random-pair-tool] .controls");
+    await expect(controls).toHaveCSS("padding-left", "0px");
+    await expect(
+      page.locator("[data-random-pair-tool] .validation-message"),
+    ).toBeHidden();
   });
 
   test("localized expansion tool ships localized controls rather than English fallback", async ({

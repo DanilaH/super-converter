@@ -8,6 +8,8 @@ const DOWNLOAD_FILENAME = "random-teams.txt";
 type Labels = {
   participant: string;
   participants: string;
+  numberOfTeams: string;
+  peoplePerTeam: string;
   generate: string;
   reroll: string;
   team: string;
@@ -26,6 +28,7 @@ type Hooks = {
   loadExample: HTMLButtonElement;
   teamCountMode: HTMLInputElement;
   targetSizeMode: HTMLInputElement;
+  valueLabel: HTMLElement;
   value: HTMLInputElement;
   generate: HTMLButtonElement;
   resultCount: HTMLElement;
@@ -160,6 +163,9 @@ function renderInputState(hooks: Hooks, labels: Labels): void {
   const count = getItems(hooks.input.value).length;
   hooks.clear.disabled = hooks.input.value === "";
   hooks.generate.disabled = count < 2;
+  hooks.valueLabel.textContent = hooks.teamCountMode.checked
+    ? labels.numberOfTeams
+    : labels.peoplePerTeam;
   hooks.resultCount.textContent = `${count} ${count === 1 ? labels.participant : labels.participants}`;
 }
 
@@ -175,6 +181,7 @@ function findHooks(root: HTMLElement): Hooks {
     loadExample: requireElement(root, "[data-load-example]"),
     teamCountMode: requireElement(root, '[data-mode="teamCount"]'),
     targetSizeMode: requireElement(root, '[data-mode="targetSize"]'),
+    valueLabel: requireElement(root, "[data-group-value-label]"),
     value: requireElement(root, "[data-group-value]"),
     generate: requireElement(root, "[data-generate]"),
     resultCount: requireElement(root, "[data-result-count]"),
@@ -202,6 +209,8 @@ function readLabels(root: HTMLElement): Labels {
   const labels = {
     participant: root.dataset.labelParticipant ?? "",
     participants: root.dataset.labelParticipants ?? "",
+    numberOfTeams: root.dataset.labelNumberOfTeams ?? "",
+    peoplePerTeam: root.dataset.labelPeoplePerTeam ?? "",
     generate: root.dataset.labelGenerate ?? "",
     reroll: root.dataset.labelReroll ?? "",
     team: root.dataset.labelTeam ?? "",
