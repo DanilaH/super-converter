@@ -43,10 +43,15 @@ export function mountRandomPairTool(scope: ParentNode = document): void {
 }
 
 function findRoots(scope: ParentNode): HTMLElement[] {
-  if (scope instanceof HTMLElement && scope.matches("[data-random-pair-tool]")) {
+  if (
+    scope instanceof HTMLElement &&
+    scope.matches("[data-random-pair-tool]")
+  ) {
     return [scope];
   }
-  return Array.from(scope.querySelectorAll<HTMLElement>("[data-random-pair-tool]"));
+  return Array.from(
+    scope.querySelectorAll<HTMLElement>("[data-random-pair-tool]"),
+  );
 }
 
 function mountRoot(root: HTMLElement): void {
@@ -105,7 +110,10 @@ function mountRoot(root: HTMLElement): void {
     hooks.input.focus();
   });
   hooks.loadExample.addEventListener("click", () => {
-    if (hooks.input.value !== "" && !window.confirm(labels.replaceExampleConfirmation)) {
+    if (
+      hooks.input.value !== "" &&
+      !window.confirm(labels.replaceExampleConfirmation)
+    ) {
       return;
     }
     hooks.input.value = example;
@@ -144,7 +152,10 @@ function findHooks(root: HTMLElement): Hooks {
   };
 }
 
-function requireElement<T extends Element>(root: HTMLElement, selector: string): T {
+function requireElement<T extends Element>(
+  root: HTMLElement,
+  selector: string,
+): T {
   const element = root.querySelector<T>(selector);
   if (!element) {
     throw new Error(`RandomPairTool: missing required hook ${selector}`);
@@ -164,7 +175,8 @@ function readLabels(root: HTMLElement): Labels {
     copy: root.dataset.labelCopy ?? "",
     copied: root.dataset.labelCopied ?? "",
     copyError: root.dataset.labelCopyError ?? "",
-    replaceExampleConfirmation: root.dataset.labelReplaceExampleConfirmation ?? "",
+    replaceExampleConfirmation:
+      root.dataset.labelReplaceExampleConfirmation ?? "",
   } satisfies Labels;
 
   for (const [name, value] of Object.entries(labels)) {

@@ -2,8 +2,7 @@ import { shuffleItems } from "../../randomize-list/lib/randomize-list";
 import type { RandomSource } from "../../randomize-list/model/types";
 
 export type TeamSplitConfig =
-  | { mode: "teamCount"; value: number }
-  | { mode: "targetSize"; value: number };
+  { mode: "teamCount"; value: number } | { mode: "targetSize"; value: number };
 
 export type PairResult = {
   pairs: Array<readonly [string, string]>;

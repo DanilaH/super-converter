@@ -4,12 +4,7 @@ import { bindOutputActions } from "./output-actions";
 const DOWNLOAD_FILENAME = "text-without-line-breaks.txt";
 
 type SeparatorMode =
-  | "space"
-  | "nothing"
-  | "comma"
-  | "commaSpace"
-  | "semicolon"
-  | "custom";
+  "space" | "nothing" | "comma" | "commaSpace" | "semicolon" | "custom";
 
 type Labels = {
   emptyResult: string;
@@ -161,7 +156,10 @@ function findHooks(root: HTMLElement): Hooks {
   };
 }
 
-function requireElement<T extends Element>(root: HTMLElement, selector: string): T {
+function requireElement<T extends Element>(
+  root: HTMLElement,
+  selector: string,
+): T {
   const element = root.querySelector<T>(selector);
   if (!element) {
     throw new Error(`RemoveLineBreaksTool: missing required hook ${selector}`);

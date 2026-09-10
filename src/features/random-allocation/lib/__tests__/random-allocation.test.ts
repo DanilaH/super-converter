@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  pairRandomly,
-  splitIntoBalancedGroups,
-} from "../random-allocation";
+import { pairRandomly, splitIntoBalancedGroups } from "../random-allocation";
 
 const fixedRandom = () => 0;
 

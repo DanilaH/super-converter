@@ -69,8 +69,14 @@ const toolOrder: readonly SiteToolPageKey[] = SITE_TOOL_PAGE_KEYS;
           </p>
           <CompareTool compare={content.compare} />
         </div>
-        <EditorialContent content={content.editorial} privacyHref={privacyHref} />
-        <RelatedTools heading={content.relatedTools.heading} tools={relatedTools} />
+        <EditorialContent
+          content={content.editorial}
+          privacyHref={privacyHref}
+        />
+        <RelatedTools
+          heading={content.relatedTools.heading}
+          tools={relatedTools}
+        />
       </>
     )
   }
@@ -82,15 +88,23 @@ const toolOrder: readonly SiteToolPageKey[] = SITE_TOOL_PAGE_KEYS;
           <h1>{content.alphabetizeList.page.heading}</h1>
           <p class="description">
             {content.alphabetizeList.page.description}
-            <span class="privacy-note">{content.alphabetizeList.page.privacy}</span>
+            <span class="privacy-note">
+              {content.alphabetizeList.page.privacy}
+            </span>
           </p>
           <AlphabetizeTool
             tool={content.alphabetizeList.tool}
             collatorLocale={collatorLocale}
           />
         </div>
-        <EditorialContent content={content.alphabetizeList.editorial} privacyHref={privacyHref} />
-        <RelatedTools heading={content.relatedTools.heading} tools={relatedTools} />
+        <EditorialContent
+          content={content.alphabetizeList.editorial}
+          privacyHref={privacyHref}
+        />
+        <RelatedTools
+          heading={content.relatedTools.heading}
+          tools={relatedTools}
+        />
       </>
     )
   }
@@ -102,12 +116,20 @@ const toolOrder: readonly SiteToolPageKey[] = SITE_TOOL_PAGE_KEYS;
           <h1>{content.randomizeList.page.heading}</h1>
           <p class="description">
             {content.randomizeList.page.description}
-            <span class="privacy-note">{content.randomizeList.page.privacy}</span>
+            <span class="privacy-note">
+              {content.randomizeList.page.privacy}
+            </span>
           </p>
           <RandomizeTool tool={content.randomizeList.tool} />
         </div>
-        <EditorialContent content={content.randomizeList.editorial} privacyHref={privacyHref} />
-        <RelatedTools heading={content.relatedTools.heading} tools={relatedTools} />
+        <EditorialContent
+          content={content.randomizeList.editorial}
+          privacyHref={privacyHref}
+        />
+        <RelatedTools
+          heading={content.relatedTools.heading}
+          tools={relatedTools}
+        />
       </>
     )
   }
@@ -119,12 +141,20 @@ const toolOrder: readonly SiteToolPageKey[] = SITE_TOOL_PAGE_KEYS;
           <h1>{content.removeDuplicateLines.page.heading}</h1>
           <p class="description">
             {content.removeDuplicateLines.page.description}
-            <span class="privacy-note">{content.removeDuplicateLines.page.privacy}</span>
+            <span class="privacy-note">
+              {content.removeDuplicateLines.page.privacy}
+            </span>
           </p>
           <RemoveDuplicateLinesTool tool={content.removeDuplicateLines.tool} />
         </div>
-        <EditorialContent content={content.removeDuplicateLines.editorial} privacyHref={privacyHref} />
-        <RelatedTools heading={content.relatedTools.heading} tools={relatedTools} />
+        <EditorialContent
+          content={content.removeDuplicateLines.editorial}
+          privacyHref={privacyHref}
+        />
+        <RelatedTools
+          heading={content.relatedTools.heading}
+          tools={relatedTools}
+        />
       </>
     )
   }
@@ -136,12 +166,20 @@ const toolOrder: readonly SiteToolPageKey[] = SITE_TOOL_PAGE_KEYS;
           <h1>{content.randomTeamGenerator.page.heading}</h1>
           <p class="description">
             {content.randomTeamGenerator.page.description}
-            <span class="privacy-note">{content.randomTeamGenerator.page.privacy}</span>
+            <span class="privacy-note">
+              {content.randomTeamGenerator.page.privacy}
+            </span>
           </p>
           <RandomTeamTool tool={content.randomTeamGenerator.tool} />
         </div>
-        <EditorialContent content={content.randomTeamGenerator.editorial} privacyHref={privacyHref} />
-        <RelatedTools heading={content.relatedTools.heading} tools={relatedTools} />
+        <EditorialContent
+          content={content.randomTeamGenerator.editorial}
+          privacyHref={privacyHref}
+        />
+        <RelatedTools
+          heading={content.relatedTools.heading}
+          tools={relatedTools}
+        />
       </>
     )
   }
@@ -153,12 +191,20 @@ const toolOrder: readonly SiteToolPageKey[] = SITE_TOOL_PAGE_KEYS;
           <h1>{content.randomPairGenerator.page.heading}</h1>
           <p class="description">
             {content.randomPairGenerator.page.description}
-            <span class="privacy-note">{content.randomPairGenerator.page.privacy}</span>
+            <span class="privacy-note">
+              {content.randomPairGenerator.page.privacy}
+            </span>
           </p>
           <RandomPairTool tool={content.randomPairGenerator.tool} />
         </div>
-        <EditorialContent content={content.randomPairGenerator.editorial} privacyHref={privacyHref} />
-        <RelatedTools heading={content.relatedTools.heading} tools={relatedTools} />
+        <EditorialContent
+          content={content.randomPairGenerator.editorial}
+          privacyHref={privacyHref}
+        />
+        <RelatedTools
+          heading={content.relatedTools.heading}
+          tools={relatedTools}
+        />
       </>
     )
   }
@@ -170,12 +216,20 @@ const toolOrder: readonly SiteToolPageKey[] = SITE_TOOL_PAGE_KEYS;
           <h1>{content.removeLineBreaks.page.heading}</h1>
           <p class="description">
             {content.removeLineBreaks.page.description}
-            <span class="privacy-note">{content.removeLineBreaks.page.privacy}</span>
+            <span class="privacy-note">
+              {content.removeLineBreaks.page.privacy}
+            </span>
           </p>
           <RemoveLineBreaksTool tool={content.removeLineBreaks.tool} />
         </div>
-        <EditorialContent content={content.removeLineBreaks.editorial} privacyHref={privacyHref} />
-        <RelatedTools heading={content.relatedTools.heading} tools={relatedTools} />
+        <EditorialContent
+          content={content.removeLineBreaks.editorial}
+          privacyHref={privacyHref}
+        />
+        <RelatedTools
+          heading={content.relatedTools.heading}
+          tools={relatedTools}
+        />
       </>
     )
   }
@@ -187,12 +241,20 @@ const toolOrder: readonly SiteToolPageKey[] = SITE_TOOL_PAGE_KEYS;
           <h1>{content.columnToCommaSeparatedList.page.heading}</h1>
           <p class="description">
             {content.columnToCommaSeparatedList.page.description}
-            <span class="privacy-note">{content.columnToCommaSeparatedList.page.privacy}</span>
+            <span class="privacy-note">
+              {content.columnToCommaSeparatedList.page.privacy}
+            </span>
           </p>
           <ColumnToCommaTool tool={content.columnToCommaSeparatedList.tool} />
         </div>
-        <EditorialContent content={content.columnToCommaSeparatedList.editorial} privacyHref={privacyHref} />
-        <RelatedTools heading={content.relatedTools.heading} tools={relatedTools} />
+        <EditorialContent
+          content={content.columnToCommaSeparatedList.editorial}
+          privacyHref={privacyHref}
+        />
+        <RelatedTools
+          heading={content.relatedTools.heading}
+          tools={relatedTools}
+        />
       </>
     )
   }
@@ -227,7 +289,10 @@ const toolOrder: readonly SiteToolPageKey[] = SITE_TOOL_PAGE_KEYS;
           <p>{paragraph}</p>
         ))}
         <p class="tool-link">
-          <a class="button-link button-link--primary" href={routeFor(locale, "tools")}>
+          <a
+            class="button-link button-link--primary"
+            href={routeFor(locale, "tools")}
+          >
             {content.about.toolLinkLabel}
           </a>
         </p>

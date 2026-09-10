@@ -12,7 +12,8 @@ export const brazilianPortugueseExpansionContent = {
     description:
       "Compare duas listas para encontrar diferenças, itens em comum, itens exclusivos, interseção e união diretamente no navegador.",
     metadata: {
-      title: "Comparar listas online – diferenças e itens em comum | ListContrast",
+      title:
+        "Comparar listas online – diferenças e itens em comum | ListContrast",
       description:
         "Compare duas listas online e encontre diferenças, itens em comum, itens exclusivos, interseção e união. Grátis e processado localmente.",
     },
@@ -89,7 +90,8 @@ export const brazilianPortugueseExpansionContent = {
       copyError: "Não foi possível copiar. Selecione o resultado manualmente.",
       emptyResult: "Adicione pelo menos dois itens para sortear os times.",
       invalidValue: "Digite um número inteiro positivo.",
-      tooManyTeams: "O número de times não pode ser maior que o número de itens.",
+      tooManyTeams:
+        "O número de times não pode ser maior que o número de itens.",
       noscript:
         "JavaScript é necessário para sortear os times. A lista é processada localmente no seu navegador.",
     },
@@ -130,7 +132,8 @@ export const brazilianPortugueseExpansionContent = {
         "dinâmicas de escritório e eventos",
       ],
       dataHeading: "Sorteio privado no navegador",
-      dataParagraph: "O embaralhamento e a divisão acontecem inteiramente no navegador.",
+      dataParagraph:
+        "O embaralhamento e a divisão acontecem inteiramente no navegador.",
       dataItems,
       dataLinkLabel: "Veja mais detalhes na página de Privacidade.",
       faqHeading: "Perguntas frequentes",
@@ -141,13 +144,15 @@ export const brazilianPortugueseExpansionContent = {
             "Eles ficam o mais equilibrados possível. Quando a divisão não é exata, os tamanhos diferem em no máximo uma pessoa.",
         },
         {
-          question: "Posso escolher o tamanho do grupo em vez da quantidade de times?",
+          question:
+            "Posso escolher o tamanho do grupo em vez da quantidade de times?",
           answer:
             "Sim. Use Pessoas por time e a ferramenta criará grupos suficientes para não ultrapassar esse tamanho desejado.",
         },
         {
           question: "Duas pessoas podem ter o mesmo nome?",
-          answer: "Sim. Linhas repetidas são mantidas como ocorrências diferentes.",
+          answer:
+            "Sim. Linhas repetidas são mantidas como ocorrências diferentes.",
         },
         {
           question: "Os nomes são enviados para algum servidor?",
@@ -199,14 +204,19 @@ export const brazilianPortugueseExpansionContent = {
       resultsIntro:
         "A ferramenta embaralha todas as ocorrências válidas e percorre a lista sorteada de dois em dois.",
       resultsItems: [
-        { term: "Quantidade par", description: "cada item entra em uma dupla." },
+        {
+          term: "Quantidade par",
+          description: "cada item entra em uma dupla.",
+        },
         {
           term: "Quantidade ímpar",
-          description: "são formadas todas as duplas possíveis e um item fica Sem dupla.",
+          description:
+            "são formadas todas as duplas possíveis e um item fica Sem dupla.",
         },
         {
           term: "Nomes repetidos",
-          description: "são preservados como ocorrências separadas e não são removidos.",
+          description:
+            "são preservados como ocorrências separadas e não são removidos.",
         },
       ],
       commonUsesHeading: "Usos comuns",
@@ -218,7 +228,8 @@ export const brazilianPortugueseExpansionContent = {
         "jogos e atividades práticas",
       ],
       dataHeading: "Sorteio de duplas privado no navegador",
-      dataParagraph: "A formação das duplas acontece inteiramente no seu navegador.",
+      dataParagraph:
+        "A formação das duplas acontece inteiramente no seu navegador.",
       dataItems,
       dataLinkLabel: "Veja mais detalhes na página de Privacidade.",
       faqHeading: "Perguntas frequentes",
@@ -296,7 +307,8 @@ export const brazilianPortugueseExpansionContent = {
       resultsItems: [
         {
           term: "Espaço",
-          description: "é o padrão seguro para recompor texto sem colar palavras vizinhas.",
+          description:
+            "é o padrão seguro para recompor texto sem colar palavras vizinhas.",
         },
         {
           term: "Manter quebras de parágrafo",
@@ -305,7 +317,8 @@ export const brazilianPortugueseExpansionContent = {
         },
         {
           term: "Personalizado",
-          description: "permite substituir novas linhas por qualquer separador curto.",
+          description:
+            "permite substituir novas linhas por qualquer separador curto.",
         },
       ],
       commonUsesHeading: "Usos comuns",
@@ -317,7 +330,8 @@ export const brazilianPortugueseExpansionContent = {
         "OCR ou extração de texto",
       ],
       dataHeading: "Limpeza privada no navegador",
-      dataParagraph: "A transformação do texto acontece inteiramente no seu navegador.",
+      dataParagraph:
+        "A transformação do texto acontece inteiramente no seu navegador.",
       dataItems,
       dataLinkLabel: "Veja mais detalhes na página de Privacidade.",
       faqHeading: "Perguntas frequentes",
@@ -395,7 +409,8 @@ export const brazilianPortugueseExpansionContent = {
       resultsItems: [
         {
           term: "Vírgula + espaço",
-          description: "gera por padrão uma lista separada por vírgulas fácil de ler.",
+          description:
+            "gera por padrão uma lista separada por vírgulas fácil de ler.",
         },
         {
           term: "Outros separadores",
@@ -417,7 +432,8 @@ export const brazilianPortugueseExpansionContent = {
         "texto delimitado por ponto e vírgula, barra vertical ou tabulação",
       ],
       dataHeading: "Formatação privada no navegador",
-      dataParagraph: "A conversão da coluna acontece inteiramente no seu navegador.",
+      dataParagraph:
+        "A conversão da coluna acontece inteiramente no seu navegador.",
       dataItems,
       dataLinkLabel: "Veja mais detalhes na página de Privacidade.",
       faqHeading: "Perguntas frequentes",
@@ -455,7 +471,8 @@ export const brazilianPortugueseExpansionContent = {
         "Forme duplas aleatórias a partir de nomes ou itens. Listas ímpares são tratadas claramente e tudo roda localmente no navegador.",
     },
     removeLineBreaks: {
-      title: "Remover Quebras de Linha Online – Manter Parágrafos | ListContrast",
+      title:
+        "Remover Quebras de Linha Online – Manter Parágrafos | ListContrast",
       description:
         "Remova quebras de linha, mantenha parágrafos ou substitua novas linhas por um separador. Processamento local no navegador.",
     },
@@ -472,11 +489,13 @@ export const brazilianPortugueseExpansionContent = {
     },
     randomPairGenerator: {
       label: "Sorteador de Duplas",
-      description: "Forme duplas aleatórias e trate claramente um item restante.",
+      description:
+        "Forme duplas aleatórias e trate claramente um item restante.",
     },
     removeLineBreaks: {
       label: "Remover Quebras de Linha",
-      description: "Una texto quebrado e mantenha parágrafos quando necessário.",
+      description:
+        "Una texto quebrado e mantenha parágrafos quando necessário.",
     },
     columnToCommaSeparatedList: {
       label: "Coluna para Lista por Vírgulas",

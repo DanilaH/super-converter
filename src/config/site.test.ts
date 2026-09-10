@@ -9,7 +9,9 @@ import {
 
 describe("site origin", () => {
   it("throws when the site is missing", () => {
-    expect(() => resolveSiteOrigin(undefined)).toThrow(/Site origin is missing/);
+    expect(() => resolveSiteOrigin(undefined)).toThrow(
+      /Site origin is missing/,
+    );
   });
 
   it("rejects an HTTP origin", () => {
@@ -37,9 +39,9 @@ describe("site origin", () => {
   });
 
   it("rejects a hash", () => {
-    expect(() => resolveSiteOrigin(new URL("https://example.com/#top"))).toThrow(
-      /hash/,
-    );
+    expect(() =>
+      resolveSiteOrigin(new URL("https://example.com/#top")),
+    ).toThrow(/hash/);
   });
 
   it("accepts a valid HTTPS root origin", () => {

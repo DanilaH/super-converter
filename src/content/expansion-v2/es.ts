@@ -12,7 +12,8 @@ export const spanishExpansionContent = {
     description:
       "Compara dos listas para encontrar diferencias, coincidencias, elementos únicos, intersección y unión directamente en tu navegador.",
     metadata: {
-      title: "Comparar listas online – diferencias y coincidencias | ListContrast",
+      title:
+        "Comparar listas online – diferencias y coincidencias | ListContrast",
       description:
         "Compara dos listas online y encuentra diferencias, coincidencias, elementos únicos, intersección y unión. Gratis y procesado localmente.",
     },
@@ -143,17 +144,20 @@ export const spanishExpansionContent = {
             "Se equilibran todo lo posible. Si el número de personas no se divide exactamente, los tamaños difieren como máximo en una persona.",
         },
         {
-          question: "¿Puedo elegir el tamaño del grupo en vez del número de equipos?",
+          question:
+            "¿Puedo elegir el tamaño del grupo en vez del número de equipos?",
           answer:
             "Sí. Elige Personas por equipo y la herramienta creará suficientes grupos para no superar ese tamaño objetivo.",
         },
         {
           question: "¿Puede haber dos personas con el mismo nombre?",
-          answer: "Sí. Las líneas repetidas se conservan como apariciones distintas.",
+          answer:
+            "Sí. Las líneas repetidas se conservan como apariciones distintas.",
         },
         {
           question: "¿Se suben los nombres?",
-          answer: "No. La generación de equipos ocurre localmente en tu navegador.",
+          answer:
+            "No. La generación de equipos ocurre localmente en tu navegador.",
         },
       ],
     },
@@ -201,7 +205,10 @@ export const spanishExpansionContent = {
       resultsIntro:
         "La herramienta mezcla todas las apariciones válidas y recorre la lista resultante de dos en dos.",
       resultsItems: [
-        { term: "Cantidad par", description: "cada elemento queda dentro de una pareja." },
+        {
+          term: "Cantidad par",
+          description: "cada elemento queda dentro de una pareja.",
+        },
         {
           term: "Cantidad impar",
           description:
@@ -209,7 +216,8 @@ export const spanishExpansionContent = {
         },
         {
           term: "Nombres repetidos",
-          description: "se conservan como apariciones separadas y no se eliminan.",
+          description:
+            "se conservan como apariciones separadas y no se eliminan.",
         },
       ],
       commonUsesHeading: "Usos habituales",
@@ -309,11 +317,13 @@ export const spanishExpansionContent = {
         },
         {
           term: "Personalizado",
-          description: "permite sustituir nuevas líneas por cualquier separador corto.",
+          description:
+            "permite sustituir nuevas líneas por cualquier separador corto.",
         },
       ],
       commonUsesHeading: "Usos habituales",
-      commonUsesIntro: "Quitar saltos de línea resulta útil con texto copiado de:",
+      commonUsesIntro:
+        "Quitar saltos de línea resulta útil con texto copiado de:",
       commonUsesItems: [
         "documentos PDF",
         "correo electrónico y páginas web",
@@ -321,7 +331,8 @@ export const spanishExpansionContent = {
         "OCR o extracción de texto",
       ],
       dataHeading: "Limpieza privada en el navegador",
-      dataParagraph: "La transformación del texto ocurre por completo en tu navegador.",
+      dataParagraph:
+        "La transformación del texto ocurre por completo en tu navegador.",
       dataItems,
       dataLinkLabel: "Más información en la página de Privacidad.",
       faqHeading: "Preguntas frecuentes",
@@ -338,11 +349,13 @@ export const spanishExpansionContent = {
         },
         {
           question: "¿Funciona con finales de línea de Windows y Unix?",
-          answer: "Sí. Se normalizan LF, CRLF y CR antes de transformar el texto.",
+          answer:
+            "Sí. Se normalizan LF, CRLF y CR antes de transformar el texto.",
         },
         {
           question: "¿Se sube mi texto?",
-          answer: "No. La transformación se realiza localmente en tu navegador.",
+          answer:
+            "No. La transformación se realiza localmente en tu navegador.",
         },
       ],
     },
@@ -386,7 +399,8 @@ export const spanishExpansionContent = {
         "JavaScript es necesario para convertir la columna. La lista se procesa localmente en tu navegador.",
     },
     editorial: {
-      howToHeading: "Cómo convertir una columna en una lista separada por comas",
+      howToHeading:
+        "Cómo convertir una columna en una lista separada por comas",
       howToSteps: [
         "Pega un valor por línea.",
         "Mantén Coma + espacio o elige otro separador.",
@@ -399,7 +413,8 @@ export const spanishExpansionContent = {
       resultsItems: [
         {
           term: "Coma + espacio",
-          description: "genera por defecto una lista separada por comas fácil de leer.",
+          description:
+            "genera por defecto una lista separada por comas fácil de leer.",
         },
         {
           term: "Otros separadores",
@@ -421,7 +436,8 @@ export const spanishExpansionContent = {
         "texto separado por punto y coma, barra vertical o tabulación",
       ],
       dataHeading: "Formato privado en el navegador",
-      dataParagraph: "La conversión de la columna ocurre por completo en tu navegador.",
+      dataParagraph:
+        "La conversión de la columna ocurre por completo en tu navegador.",
       dataItems,
       dataLinkLabel: "Más información en la página de Privacidad.",
       faqHeading: "Preguntas frecuentes",
@@ -449,7 +465,8 @@ export const spanishExpansionContent = {
   },
   metadata: {
     randomTeamGenerator: {
-      title: "Generador de equipos aleatorios – crear grupos al azar | ListContrast",
+      title:
+        "Generador de equipos aleatorios – crear grupos al azar | ListContrast",
       description:
         "Pega nombres, elige número de equipos o personas por equipo y crea grupos aleatorios equilibrados. Procesado localmente en el navegador.",
     },
@@ -459,7 +476,8 @@ export const spanishExpansionContent = {
         "Crea parejas aleatorias a partir de nombres o elementos. Las listas impares se gestionan claramente y todo ocurre en tu navegador.",
     },
     removeLineBreaks: {
-      title: "Eliminar saltos de línea online – conservar párrafos | ListContrast",
+      title:
+        "Eliminar saltos de línea online – conservar párrafos | ListContrast",
       description:
         "Quita saltos de línea y nuevas líneas, conserva párrafos o reemplaza los saltos con un separador. Procesado localmente.",
     },
@@ -472,19 +490,23 @@ export const spanishExpansionContent = {
   toolsPageItems: {
     randomTeamGenerator: {
       label: "Generador de equipos aleatorios",
-      description: "Divide nombres o elementos en equipos al azar equilibrados.",
+      description:
+        "Divide nombres o elementos en equipos al azar equilibrados.",
     },
     randomPairGenerator: {
       label: "Generador de parejas aleatorias",
-      description: "Crea parejas al azar y muestra claramente un elemento restante.",
+      description:
+        "Crea parejas al azar y muestra claramente un elemento restante.",
     },
     removeLineBreaks: {
       label: "Eliminar saltos de línea",
-      description: "Une texto cortado y conserva los párrafos cuando lo necesites.",
+      description:
+        "Une texto cortado y conserva los párrafos cuando lo necesites.",
     },
     columnToCommaSeparatedList: {
       label: "Columna a lista separada por comas",
-      description: "Convierte una columna de líneas en una lista con separadores.",
+      description:
+        "Convierte una columna de líneas en una lista con separadores.",
     },
   },
   aboutParagraphs: [

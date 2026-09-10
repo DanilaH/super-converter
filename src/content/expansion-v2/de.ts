@@ -12,7 +12,8 @@ export const germanExpansionContent = {
     description:
       "Vergleiche zwei Listen und finde Unterschiede, Übereinstimmungen, eindeutige Einträge sowie Schnittmenge und Vereinigung direkt im Browser.",
     metadata: {
-      title: "Listen online vergleichen – Unterschiede & Übereinstimmungen | ListContrast",
+      title:
+        "Listen online vergleichen – Unterschiede & Übereinstimmungen | ListContrast",
       description:
         "Vergleiche zwei Listen online und finde Unterschiede, Übereinstimmungen, eindeutige Einträge, Schnittmenge und Vereinigung. Kostenlos und lokal im Browser.",
     },
@@ -149,7 +150,8 @@ export const germanExpansionContent = {
         },
         {
           question: "Dürfen zwei Personen gleich heißen?",
-          answer: "Ja. Wiederholte Zeilen bleiben als getrennte Vorkommen erhalten.",
+          answer:
+            "Ja. Wiederholte Zeilen bleiben als getrennte Vorkommen erhalten.",
         },
         {
           question: "Werden Namen hochgeladen?",
@@ -312,7 +314,8 @@ export const germanExpansionContent = {
         },
         {
           term: "Benutzerdefiniert",
-          description: "ersetzt neue Zeilen durch ein eigenes kurzes Trennzeichen.",
+          description:
+            "ersetzt neue Zeilen durch ein eigenes kurzes Trennzeichen.",
         },
       ],
       commonUsesHeading: "Typische Anwendungen",
@@ -341,7 +344,8 @@ export const germanExpansionContent = {
         },
         {
           question: "Werden Windows- und Unix-Zeilenenden unterstützt?",
-          answer: "Ja. LF, CRLF und einzelne CR-Zeilenenden werden vereinheitlicht.",
+          answer:
+            "Ja. LF, CRLF und einzelne CR-Zeilenenden werden vereinheitlicht.",
         },
         {
           question: "Wird mein Text hochgeladen?",
@@ -389,7 +393,8 @@ export const germanExpansionContent = {
         "JavaScript ist erforderlich, um die Spalte umzuwandeln. Die Liste wird lokal in deinem Browser verarbeitet.",
     },
     editorial: {
-      howToHeading: "So wandelst du eine Spalte in eine kommagetrennte Liste um",
+      howToHeading:
+        "So wandelst du eine Spalte in eine kommagetrennte Liste um",
       howToSteps: [
         "Füge einen Wert pro Zeile ein.",
         "Lass Komma + Leerzeichen ausgewählt oder wähle ein anderes Trennzeichen.",
@@ -402,7 +407,8 @@ export const germanExpansionContent = {
       resultsItems: [
         {
           term: "Komma + Leerzeichen",
-          description: "erzeugt standardmäßig eine gut lesbare kommagetrennte Liste.",
+          description:
+            "erzeugt standardmäßig eine gut lesbare kommagetrennte Liste.",
         },
         {
           term: "Andere Trennzeichen",
@@ -424,19 +430,22 @@ export const germanExpansionContent = {
         "Semikolon-, Pipe- oder Tabulator-getrennten Text",
       ],
       dataHeading: "Private Formatierung im Browser",
-      dataParagraph: "Die Spaltenumwandlung läuft vollständig in deinem Browser.",
+      dataParagraph:
+        "Die Spaltenumwandlung läuft vollständig in deinem Browser.",
       dataItems,
       dataLinkLabel: "Weitere Details findest du auf der Datenschutzseite.",
       faqHeading: "Häufig gestellte Fragen",
       faqItems: [
         {
-          question: "Kann ich ein anderes Trennzeichen als ein Komma verwenden?",
+          question:
+            "Kann ich ein anderes Trennzeichen als ein Komma verwenden?",
           answer:
             "Ja. Wähle Semikolon, Pipe, Tabulator oder gib ein eigenes Trennzeichen ein.",
         },
         {
           question: "Werden doppelte Werte entfernt?",
-          answer: "Nein. Doppelte Zeilen bleiben in ihrer ursprünglichen Reihenfolge erhalten.",
+          answer:
+            "Nein. Doppelte Zeilen bleiben in ihrer ursprünglichen Reihenfolge erhalten.",
         },
         {
           question: "Kann ich Leerzeichen an den Werten behalten?",
@@ -452,7 +461,8 @@ export const germanExpansionContent = {
   },
   metadata: {
     randomTeamGenerator: {
-      title: "Zufälliger Teamgenerator – Teams & Gruppen auslosen | ListContrast",
+      title:
+        "Zufälliger Teamgenerator – Teams & Gruppen auslosen | ListContrast",
       description:
         "Füge Namen ein, wähle Teamanzahl oder Personen pro Team und teile alle in ausgeglichene zufällige Teams ein. Lokal im Browser.",
     },
@@ -462,7 +472,8 @@ export const germanExpansionContent = {
         "Bilde aus Namen oder Listeneinträgen zufällige Paare. Ungerade Listen werden klar behandelt und lokal im Browser verarbeitet.",
     },
     removeLineBreaks: {
-      title: "Zeilenumbrüche online entfernen – Absätze behalten | ListContrast",
+      title:
+        "Zeilenumbrüche online entfernen – Absätze behalten | ListContrast",
       description:
         "Entferne Zeilenumbrüche und neue Zeilen, behalte Absätze oder ersetze Umbrüche durch ein Trennzeichen. Lokal im Browser.",
     },
@@ -475,15 +486,18 @@ export const germanExpansionContent = {
   toolsPageItems: {
     randomTeamGenerator: {
       label: "Zufälliger Teamgenerator",
-      description: "Teile Namen oder Einträge in ausgeglichene zufällige Teams ein.",
+      description:
+        "Teile Namen oder Einträge in ausgeglichene zufällige Teams ein.",
     },
     randomPairGenerator: {
       label: "Zufällige Paare",
-      description: "Lose zufällige Paare aus und zeige einen übrigen Eintrag klar an.",
+      description:
+        "Lose zufällige Paare aus und zeige einen übrigen Eintrag klar an.",
     },
     removeLineBreaks: {
       label: "Zeilenumbrüche entfernen",
-      description: "Verbinde umgebrochenen Text und behalte auf Wunsch Absätze.",
+      description:
+        "Verbinde umgebrochenen Text und behalte auf Wunsch Absätze.",
     },
     columnToCommaSeparatedList: {
       label: "Spalte in kommagetrennte Liste",

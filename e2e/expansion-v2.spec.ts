@@ -5,10 +5,15 @@ function sorted(values: string[]): string[] {
 }
 
 test.describe("Expansion V2 tools", () => {
-  test("Random Team Generator balances by team count and target size", async ({ page }) => {
+  test("Random Team Generator balances by team count and target size", async ({
+    page,
+  }) => {
     await page.goto("/random-team-generator");
     const input = page.getByRole("textbox", { name: "Participants or items" });
-    const names = Array.from({ length: 10 }, (_, index) => `Person ${index + 1}`);
+    const names = Array.from(
+      { length: 10 },
+      (_, index) => `Person ${index + 1}`,
+    );
     await input.fill(names.join("\n"));
 
     const value = page.getByRole("spinbutton", { name: "Value" });
@@ -20,9 +25,9 @@ test.describe("Expansion V2 tools", () => {
     const teamCountText = await viewer.innerText();
     const teamBlocks = teamCountText.split("\n\n");
     expect(teamBlocks).toHaveLength(3);
-    expect(teamBlocks.map((block) => block.split("\n").slice(1).length)).toEqual([
-      4, 3, 3,
-    ]);
+    expect(
+      teamBlocks.map((block) => block.split("\n").slice(1).length),
+    ).toEqual([4, 3, 3]);
     expect(
       sorted(teamBlocks.flatMap((block) => block.split("\n").slice(1))),
     ).toEqual(sorted(names));
@@ -35,15 +40,17 @@ test.describe("Expansion V2 tools", () => {
     const targetText = await viewer.innerText();
     const targetBlocks = targetText.split("\n\n");
     expect(targetBlocks).toHaveLength(4);
-    expect(targetBlocks.map((block) => block.split("\n").slice(1).length)).toEqual([
-      3, 3, 2, 2,
-    ]);
+    expect(
+      targetBlocks.map((block) => block.split("\n").slice(1).length),
+    ).toEqual([3, 3, 2, 2]);
     expect(
       sorted(targetBlocks.flatMap((block) => block.split("\n").slice(1))),
     ).toEqual(sorted(names));
   });
 
-  test("Random Team Generator rejects impossible team counts cleanly", async ({ page }) => {
+  test("Random Team Generator rejects impossible team counts cleanly", async ({
+    page,
+  }) => {
     await page.goto("/random-team-generator");
     await page
       .getByRole("textbox", { name: "Participants or items" })
@@ -58,7 +65,9 @@ test.describe("Expansion V2 tools", () => {
     ).toBeHidden();
   });
 
-  test("Random Pair Generator keeps every occurrence and exposes the odd item", async ({ page }) => {
+  test("Random Pair Generator keeps every occurrence and exposes the odd item", async ({
+    page,
+  }) => {
     await page.goto("/random-pair-generator");
     const names = ["Alex", "Blair", "Alex", "Drew", "Emery"];
     await page
@@ -80,7 +89,9 @@ test.describe("Expansion V2 tools", () => {
     expect(sorted(values)).toEqual(sorted(names));
   });
 
-  test("Remove Line Breaks joins hard wraps while preserving paragraphs by default", async ({ page }) => {
+  test("Remove Line Breaks joins hard wraps while preserving paragraphs by default", async ({
+    page,
+  }) => {
     await page.goto("/remove-line-breaks");
     const input = page.getByRole("textbox", { name: "Text" });
     await input.fill(
@@ -109,7 +120,9 @@ test.describe("Expansion V2 tools", () => {
     );
   });
 
-  test("Column converter trims, ignores blanks, preserves duplicates and switches delimiter", async ({ page }) => {
+  test("Column converter trims, ignores blanks, preserves duplicates and switches delimiter", async ({
+    page,
+  }) => {
     await page.goto("/column-to-comma-separated-list");
     const input = page.getByRole("textbox", { name: "Column" });
     await input.fill(" apple \n\nbanana\n apple ");
@@ -122,7 +135,9 @@ test.describe("Expansion V2 tools", () => {
       page.locator("[data-column-to-comma-tool] [data-result-count]"),
     ).toHaveText("3 items");
 
-    await page.getByRole("combobox", { name: "Separator" }).selectOption("pipe");
+    await page
+      .getByRole("combobox", { name: "Separator" })
+      .selectOption("pipe");
     await expect(viewer).toHaveText("apple|banana|apple");
 
     await page
@@ -133,7 +148,9 @@ test.describe("Expansion V2 tools", () => {
     await expect(viewer).toHaveText("apple / banana / apple");
   });
 
-  test("localized expansion tool ships localized controls rather than English fallback", async ({ page }) => {
+  test("localized expansion tool ships localized controls rather than English fallback", async ({
+    page,
+  }) => {
     await page.goto("/ru/generator-sluchaynyh-par");
     await expect(page.locator("h1")).toHaveText("Генератор случайных пар");
     await page.locator("[data-random-pair-tool] [data-load-example]").click();

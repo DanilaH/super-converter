@@ -23,14 +23,42 @@ const relatedTools = relatedToolsFor(locale, "randomPairGenerator");
     </p>
     <RandomPairTool tool={tool} />
   </div>
-  <EditorialContent content={editorial} privacyHref={routeFor(locale, "privacy")} />
+  <EditorialContent
+    content={editorial}
+    privacyHref={routeFor(locale, "privacy")}
+  />
   <RelatedTools heading={content.relatedTools.heading} tools={relatedTools} />
 </BaseLayout>
 
 <style>
-  .intro { display: flex; flex-direction: column; gap: var(--space-2); padding-block: var(--space-3) var(--space-5); }
-  .intro h1 { margin: 0; font-size: var(--font-size-h1-mobile); line-height: var(--line-height-h1-mobile); font-weight: var(--font-weight-h1); }
-  .description { display: flex; flex-wrap: wrap; gap: 0 var(--space-1); margin: 0; max-width: var(--container-editorial); font-size: var(--font-size-body); line-height: var(--line-height-body); }
-  .privacy { color: var(--color-text-secondary); }
-  @media (min-width: 760px) { .intro h1 { font-size: var(--font-size-h1); line-height: var(--line-height-h1); } }
+  .intro {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding-block: var(--space-3) var(--space-5);
+  }
+  .intro h1 {
+    margin: 0;
+    font-size: var(--font-size-h1-mobile);
+    line-height: var(--line-height-h1-mobile);
+    font-weight: var(--font-weight-h1);
+  }
+  .description {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--space-1);
+    margin: 0;
+    max-width: var(--container-editorial);
+    font-size: var(--font-size-body);
+    line-height: var(--line-height-body);
+  }
+  .privacy {
+    color: var(--color-text-secondary);
+  }
+  @media (min-width: 760px) {
+    .intro h1 {
+      font-size: var(--font-size-h1);
+      line-height: var(--line-height-h1);
+    }
+  }
 </style>

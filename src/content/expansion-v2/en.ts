@@ -40,7 +40,8 @@ export const englishExpansionContent = {
       copyError: "Could not copy. Select the result manually.",
       emptyResult: "Add at least two items to generate random teams.",
       invalidValue: "Enter a positive whole number.",
-      tooManyTeams: "The number of teams cannot be greater than the number of items.",
+      tooManyTeams:
+        "The number of teams cannot be greater than the number of items.",
       noscript:
         "JavaScript is required to generate teams. Your list is processed locally in your browser.",
     },
@@ -163,7 +164,8 @@ export const englishExpansionContent = {
         },
         {
           term: "Repeated names",
-          description: "remain separate occurrences and are not silently removed.",
+          description:
+            "remain separate occurrences and are not silently removed.",
         },
       ],
       commonUsesHeading: "Common uses",
@@ -263,7 +265,8 @@ export const englishExpansionContent = {
         },
         {
           term: "Custom",
-          description: "lets you replace newlines with any short separator you need.",
+          description:
+            "lets you replace newlines with any short separator you need.",
         },
       ],
       commonUsesHeading: "Common uses",
@@ -292,7 +295,8 @@ export const englishExpansionContent = {
         },
         {
           question: "Does it handle Windows and Unix line endings?",
-          answer: "Yes. LF, CRLF and bare CR line endings are normalized first.",
+          answer:
+            "Yes. LF, CRLF and bare CR line endings are normalized first.",
         },
         {
           question: "Is my text uploaded?",
@@ -357,11 +361,13 @@ export const englishExpansionContent = {
         },
         {
           term: "Other separators",
-          description: "include comma, semicolon, pipe, tab and a custom value.",
+          description:
+            "include comma, semicolon, pipe, tab and a custom value.",
         },
         {
           term: "Duplicates",
-          description: "are preserved because this tool formats rather than deduplicates.",
+          description:
+            "are preserved because this tool formats rather than deduplicates.",
         },
       ],
       commonUsesHeading: "Common uses",
@@ -401,17 +407,20 @@ export const englishExpansionContent = {
   },
   metadata: {
     randomTeamGenerator: {
-      title: "Random Team Generator — Split Names into Random Groups | ListContrast",
+      title:
+        "Random Team Generator — Split Names into Random Groups | ListContrast",
       description:
         "Paste a list of names, choose the number of teams or group size, and split everyone into balanced random teams. Free and processed locally in your browser.",
     },
     randomPairGenerator: {
-      title: "Random Pair Generator — Create Random Pairs Online | ListContrast",
+      title:
+        "Random Pair Generator — Create Random Pairs Online | ListContrast",
       description:
         "Paste names or list items and create random pairs instantly. Handles odd-sized lists clearly and runs locally in your browser.",
     },
     removeLineBreaks: {
-      title: "Remove Line Breaks Online — Join Lines & Keep Paragraphs | ListContrast",
+      title:
+        "Remove Line Breaks Online — Join Lines & Keep Paragraphs | ListContrast",
       description:
         "Remove unwanted line breaks and newlines from text, keep paragraph breaks, or replace newlines with a separator. Runs locally in your browser.",
     },

@@ -4,12 +4,7 @@ import { bindOutputActions } from "./output-actions";
 const DOWNLOAD_FILENAME = "converted-list.txt";
 
 type SeparatorMode =
-  | "commaSpace"
-  | "comma"
-  | "semicolon"
-  | "pipe"
-  | "tab"
-  | "custom";
+  "commaSpace" | "comma" | "semicolon" | "pipe" | "tab" | "custom";
 
 type Labels = {
   item: string;
@@ -168,7 +163,10 @@ function findHooks(root: HTMLElement): Hooks {
   };
 }
 
-function requireElement<T extends Element>(root: HTMLElement, selector: string): T {
+function requireElement<T extends Element>(
+  root: HTMLElement,
+  selector: string,
+): T {
   const element = root.querySelector<T>(selector);
   if (!element) {
     throw new Error(`ColumnToCommaTool: missing required hook ${selector}`);

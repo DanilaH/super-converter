@@ -140,10 +140,16 @@ describe("localized content", () => {
       expect(content.siteName).toBe("ListContrast");
       expect(content.home.heading.length).toBeGreaterThan(0);
       expect(content.alphabetizeList.tool.example.length).toBeGreaterThan(0);
-      expect(content.randomTeamGenerator.tool.example.length).toBeGreaterThan(0);
-      expect(content.randomPairGenerator.tool.example.length).toBeGreaterThan(0);
+      expect(content.randomTeamGenerator.tool.example.length).toBeGreaterThan(
+        0,
+      );
+      expect(content.randomPairGenerator.tool.example.length).toBeGreaterThan(
+        0,
+      );
       expect(content.removeLineBreaks.tool.example.length).toBeGreaterThan(0);
-      expect(content.columnToCommaSeparatedList.tool.example.length).toBeGreaterThan(0);
+      expect(
+        content.columnToCommaSeparatedList.tool.example.length,
+      ).toBeGreaterThan(0);
       expect(content.header.language.length).toBeGreaterThan(0);
       expect(content.metadata.privacy.description.length).toBeGreaterThan(0);
       expect(Object.keys(content.toolsPage.items)).toHaveLength(8);

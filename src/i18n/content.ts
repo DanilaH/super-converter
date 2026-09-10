@@ -214,14 +214,38 @@ const ACTIVE_CORE_CONTENT = {
 } as const satisfies Record<ActiveLocale, LocaleContent>;
 
 const RELATED_PAGE_KEYS = {
-  home: ["removeDuplicateLines", "removeLineBreaks", "columnToCommaSeparatedList"],
-  alphabetizeList: ["removeDuplicateLines", "columnToCommaSeparatedList", "randomizeList"],
-  randomizeList: ["randomTeamGenerator", "randomPairGenerator", "alphabetizeList"],
-  removeDuplicateLines: ["home", "removeLineBreaks", "columnToCommaSeparatedList"],
+  home: [
+    "removeDuplicateLines",
+    "removeLineBreaks",
+    "columnToCommaSeparatedList",
+  ],
+  alphabetizeList: [
+    "removeDuplicateLines",
+    "columnToCommaSeparatedList",
+    "randomizeList",
+  ],
+  randomizeList: [
+    "randomTeamGenerator",
+    "randomPairGenerator",
+    "alphabetizeList",
+  ],
+  removeDuplicateLines: [
+    "home",
+    "removeLineBreaks",
+    "columnToCommaSeparatedList",
+  ],
   randomTeamGenerator: ["randomPairGenerator", "randomizeList"],
   randomPairGenerator: ["randomTeamGenerator", "randomizeList"],
-  removeLineBreaks: ["columnToCommaSeparatedList", "removeDuplicateLines", "home"],
-  columnToCommaSeparatedList: ["removeLineBreaks", "removeDuplicateLines", "home"],
+  removeLineBreaks: [
+    "columnToCommaSeparatedList",
+    "removeDuplicateLines",
+    "home",
+  ],
+  columnToCommaSeparatedList: [
+    "removeLineBreaks",
+    "removeDuplicateLines",
+    "home",
+  ],
 } as const satisfies Record<SiteToolPageKey, readonly SiteToolPageKey[]>;
 
 function relatedItemsFor(

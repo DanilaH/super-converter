@@ -62,15 +62,26 @@ const { tool } = Astro.props;
         <span data-result-count>0 {tool.items}</span>
       </p>
       <div class="result-actions">
-        <button type="button" class="action" data-copy-result disabled>{tool.copy}</button>
-        <button type="button" class="action" data-download-result disabled>{tool.download}</button>
+        <button type="button" class="action" data-copy-result disabled
+          >{tool.copy}</button
+        >
+        <button type="button" class="action" data-download-result disabled
+          >{tool.download}</button
+        >
       </div>
     </div>
     <div class="viewer-shell">
       <p data-empty-result>{tool.emptyResult}</p>
       <pre class="viewer" data-result-viewer tabindex="0" hidden></pre>
     </div>
-    <p class="local-feedback" data-local-feedback role="status" aria-live="polite" aria-atomic="true"></p>
+    <p
+      class="local-feedback"
+      data-local-feedback
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+    >
+    </p>
   </section>
 
   <noscript><p class="noscript">{tool.noscript}</p></noscript>

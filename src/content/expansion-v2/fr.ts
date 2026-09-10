@@ -12,7 +12,8 @@ export const frenchExpansionContent = {
     description:
       "Comparez deux listes pour trouver les différences, les éléments communs, les éléments uniques, l’intersection et l’union directement dans votre navigateur.",
     metadata: {
-      title: "Comparer des listes en ligne – différences et correspondances | ListContrast",
+      title:
+        "Comparer des listes en ligne – différences et correspondances | ListContrast",
       description:
         "Comparez deux listes en ligne pour trouver différences, éléments communs, éléments uniques, intersection et union. Gratuit et traité localement.",
     },
@@ -143,17 +144,20 @@ export const frenchExpansionContent = {
             "Elles sont réparties aussi équitablement que possible. Si la division n’est pas exacte, leur taille diffère au maximum d’une personne.",
         },
         {
-          question: "Puis-je choisir la taille des groupes plutôt que leur nombre ?",
+          question:
+            "Puis-je choisir la taille des groupes plutôt que leur nombre ?",
           answer:
             "Oui. Choisissez Personnes par équipe et l’outil créera assez de groupes pour ne pas dépasser cette taille cible.",
         },
         {
           question: "Deux personnes peuvent-elles avoir le même nom ?",
-          answer: "Oui. Les lignes répétées restent des occurrences distinctes.",
+          answer:
+            "Oui. Les lignes répétées restent des occurrences distinctes.",
         },
         {
           question: "Les noms sont-ils envoyés sur un serveur ?",
-          answer: "Non. La répartition est effectuée localement dans votre navigateur.",
+          answer:
+            "Non. La répartition est effectuée localement dans votre navigateur.",
         },
       ],
     },
@@ -201,7 +205,10 @@ export const frenchExpansionContent = {
       resultsIntro:
         "L’outil mélange toutes les occurrences valides puis prend la liste mélangée deux éléments à la fois.",
       resultsItems: [
-        { term: "Nombre pair", description: "chaque élément appartient à une paire." },
+        {
+          term: "Nombre pair",
+          description: "chaque élément appartient à une paire.",
+        },
         {
           term: "Nombre impair",
           description:
@@ -209,7 +216,8 @@ export const frenchExpansionContent = {
         },
         {
           term: "Noms identiques",
-          description: "restent des occurrences séparées et ne sont pas supprimés.",
+          description:
+            "restent des occurrences séparées et ne sont pas supprimés.",
         },
       ],
       commonUsesHeading: "Usages courants",
@@ -221,7 +229,8 @@ export const frenchExpansionContent = {
         "les jeux et exercices pratiques",
       ],
       dataHeading: "Création de paires privée dans le navigateur",
-      dataParagraph: "La création des paires s’effectue entièrement dans votre navigateur.",
+      dataParagraph:
+        "La création des paires s’effectue entièrement dans votre navigateur.",
       dataItems,
       dataLinkLabel: "Plus de détails sur la page Confidentialité.",
       faqHeading: "Questions fréquentes",
@@ -232,7 +241,8 @@ export const frenchExpansionContent = {
             "L’outil crée autant de paires que possible et marque l’élément restant comme Sans paire.",
         },
         {
-          question: "Une nouvelle génération évite-t-elle les anciennes paires ?",
+          question:
+            "Une nouvelle génération évite-t-elle les anciennes paires ?",
           answer:
             "Non. Chaque génération est indépendante et aucun historique des paires n’est conservé.",
         },
@@ -257,7 +267,8 @@ export const frenchExpansionContent = {
     tool: {
       heading: "Supprimer ou remplacer les sauts de ligne",
       textLabel: "Texte",
-      pastePlaceholder: "Collez un texte contenant des sauts de ligne indésirables",
+      pastePlaceholder:
+        "Collez un texte contenant des sauts de ligne indésirables",
       clear: "Effacer",
       loadExample: "Essayer un exemple",
       example:
@@ -309,7 +320,8 @@ export const frenchExpansionContent = {
         },
         {
           term: "Personnalisé",
-          description: "permet de remplacer les retours par le séparateur de votre choix.",
+          description:
+            "permet de remplacer les retours par le séparateur de votre choix.",
         },
       ],
       commonUsesHeading: "Usages courants",
@@ -321,28 +333,34 @@ export const frenchExpansionContent = {
         "des résultats OCR ou d’extraction de texte",
       ],
       dataHeading: "Nettoyage privé dans le navigateur",
-      dataParagraph: "La transformation du texte s’effectue entièrement dans votre navigateur.",
+      dataParagraph:
+        "La transformation du texte s’effectue entièrement dans votre navigateur.",
       dataItems,
       dataLinkLabel: "Plus de détails sur la page Confidentialité.",
       faqHeading: "Questions fréquentes",
       faqItems: [
         {
-          question: "Puis-je supprimer les retours sans supprimer les paragraphes ?",
+          question:
+            "Puis-je supprimer les retours sans supprimer les paragraphes ?",
           answer:
             "Oui. Activez Conserver les paragraphes pour garder les blocs séparés par des lignes vides.",
         },
         {
-          question: "Puis-je remplacer les retours à la ligne par des virgules ?",
+          question:
+            "Puis-je remplacer les retours à la ligne par des virgules ?",
           answer:
             "Oui. Choisissez Virgule, Virgule + espace ou saisissez un séparateur personnalisé.",
         },
         {
-          question: "Les fins de ligne Windows et Unix sont-elles prises en charge ?",
-          answer: "Oui. LF, CRLF et CR sont normalisés avant la transformation.",
+          question:
+            "Les fins de ligne Windows et Unix sont-elles prises en charge ?",
+          answer:
+            "Oui. LF, CRLF et CR sont normalisés avant la transformation.",
         },
         {
           question: "Mon texte est-il envoyé ?",
-          answer: "Non. La transformation s’effectue localement dans le navigateur.",
+          answer:
+            "Non. La transformation s’effectue localement dans le navigateur.",
         },
       ],
     },
@@ -386,7 +404,8 @@ export const frenchExpansionContent = {
         "JavaScript est nécessaire pour convertir la colonne. La liste est traitée localement dans votre navigateur.",
     },
     editorial: {
-      howToHeading: "Comment convertir une colonne en liste séparée par des virgules",
+      howToHeading:
+        "Comment convertir une colonne en liste séparée par des virgules",
       howToSteps: [
         "Collez une valeur par ligne.",
         "Gardez Virgule + espace ou choisissez un autre séparateur.",
@@ -399,7 +418,8 @@ export const frenchExpansionContent = {
       resultsItems: [
         {
           term: "Virgule + espace",
-          description: "produit par défaut une liste séparée par des virgules lisible.",
+          description:
+            "produit par défaut une liste séparée par des virgules lisible.",
         },
         {
           term: "Autres séparateurs",
@@ -421,7 +441,8 @@ export const frenchExpansionContent = {
         "du texte séparé par point-virgule, barre verticale ou tabulation",
       ],
       dataHeading: "Formatage privé dans le navigateur",
-      dataParagraph: "La conversion s’effectue entièrement dans votre navigateur.",
+      dataParagraph:
+        "La conversion s’effectue entièrement dans votre navigateur.",
       dataItems,
       dataLinkLabel: "Plus de détails sur la page Confidentialité.",
       faqHeading: "Questions fréquentes",
@@ -433,7 +454,8 @@ export const frenchExpansionContent = {
         },
         {
           question: "Les valeurs en double sont-elles supprimées ?",
-          answer: "Non. Les lignes en double sont conservées dans leur ordre d’origine.",
+          answer:
+            "Non. Les lignes en double sont conservées dans leur ordre d’origine.",
         },
         {
           question: "Puis-je conserver les espaces autour de mes valeurs ?",
@@ -442,14 +464,16 @@ export const frenchExpansionContent = {
         },
         {
           question: "Ma colonne est-elle envoyée ?",
-          answer: "Non. La conversion s’effectue localement dans votre navigateur.",
+          answer:
+            "Non. La conversion s’effectue localement dans votre navigateur.",
         },
       ],
     },
   },
   metadata: {
     randomTeamGenerator: {
-      title: "Générateur d’équipes aléatoires – créer des groupes | ListContrast",
+      title:
+        "Générateur d’équipes aléatoires – créer des groupes | ListContrast",
       description:
         "Collez des noms, choisissez le nombre d’équipes ou leur taille et créez des groupes aléatoires équilibrés. Traitement local dans le navigateur.",
     },
@@ -459,7 +483,8 @@ export const frenchExpansionContent = {
         "Créez instantanément des paires aléatoires à partir de noms ou d’éléments. Les listes impaires sont gérées clairement et localement.",
     },
     removeLineBreaks: {
-      title: "Supprimer les sauts de ligne en ligne – garder les paragraphes | ListContrast",
+      title:
+        "Supprimer les sauts de ligne en ligne – garder les paragraphes | ListContrast",
       description:
         "Supprimez les sauts de ligne, conservez les paragraphes ou remplacez les retours par un séparateur. Traitement local dans le navigateur.",
     },
@@ -472,19 +497,23 @@ export const frenchExpansionContent = {
   toolsPageItems: {
     randomTeamGenerator: {
       label: "Générateur d’équipes aléatoires",
-      description: "Répartissez des noms ou éléments en groupes aléatoires équilibrés.",
+      description:
+        "Répartissez des noms ou éléments en groupes aléatoires équilibrés.",
     },
     randomPairGenerator: {
       label: "Générateur de paires aléatoires",
-      description: "Créez des paires aléatoires et gérez clairement un élément restant.",
+      description:
+        "Créez des paires aléatoires et gérez clairement un élément restant.",
     },
     removeLineBreaks: {
       label: "Supprimer les sauts de ligne",
-      description: "Recomposez du texte tout en conservant les paragraphes si besoin.",
+      description:
+        "Recomposez du texte tout en conservant les paragraphes si besoin.",
     },
     columnToCommaSeparatedList: {
       label: "Colonne en liste séparée par des virgules",
-      description: "Transformez une colonne de lignes en liste avec séparateur.",
+      description:
+        "Transformez une colonne de lignes en liste avec séparateur.",
     },
   },
   aboutParagraphs: [

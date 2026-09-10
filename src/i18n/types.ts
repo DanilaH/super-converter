@@ -376,10 +376,7 @@ export type ColumnToCommaPageContent = {
 
 /** Existing four tool identities; retained for the shipped locale source files. */
 export type ToolPageKey =
-  | "home"
-  | "alphabetizeList"
-  | "randomizeList"
-  | "removeDuplicateLines";
+  "home" | "alphabetizeList" | "randomizeList" | "removeDuplicateLines";
 
 export type ExpansionToolPageKey = ExpansionPageKey;
 export type SiteToolPageKey = ToolPageKey | ExpansionToolPageKey;
