@@ -32,6 +32,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Format temporary audit test
+        run: pnpm exec prettier --write e2e/__audit-rendered.spec.ts
+
       - name: Check formatting
         run: pnpm format:check
 
