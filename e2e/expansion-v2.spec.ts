@@ -58,9 +58,7 @@ test.describe("Expansion V2 tools", () => {
     await page
       .getByRole("textbox", { name: "Participants or items" })
       .fill("A\nB\nC");
-    await page
-      .getByRole("spinbutton", { name: "Number of teams" })
-      .fill("4");
+    await page.getByRole("spinbutton", { name: "Number of teams" }).fill("4");
     await page.getByRole("button", { name: "Generate teams" }).click();
     await expect(page.locator("[data-validation]")).toHaveText(
       "The number of teams cannot be greater than the number of items.",
