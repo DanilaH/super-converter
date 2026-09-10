@@ -52,3 +52,19 @@ jobs:
 
       - name: Run E2E smoke
         run: pnpm test:e2e
+
+      - name: Upload rendered dist for audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rendered-dist
+          path: dist
+          if-no-files-found: error
+
+      - name: Upload audit screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: audit-screenshots
+          path: audit-screenshots
+          if-no-files-found: error
