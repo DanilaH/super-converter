@@ -1,5 +1,6 @@
 import { alphabetizeListContent } from "../content/alphabetize-list";
 import { englishContent } from "../content/en";
+import { expansionContentFor } from "../content/expansion-v2";
 import { germanContent } from "../content/locales/de";
 import { spanishContent } from "../content/locales/es";
 import { frenchContent } from "../content/locales/fr";
@@ -8,7 +9,14 @@ import { russianContent } from "../content/locales/ru";
 import { randomizeListContent } from "../content/randomize-list";
 import { removeDuplicateLinesContent } from "../content/remove-duplicate-lines";
 import type { ActiveLocale } from "./locales";
-import type { LocaleContent, ToolPageKey } from "./types";
+import type {
+  LocaleContent,
+  SiteLocaleContent,
+  SiteRelatedToolItem,
+  SiteToolPageKey,
+  SiteToolsPageContent,
+  ToolPageKey,
+} from "./types";
 
 const englishToolItems = {
   home: {
@@ -196,7 +204,7 @@ export const englishLocaleContent = {
   },
 } satisfies LocaleContent;
 
-const ACTIVE_CONTENT = {
+const ACTIVE_CORE_CONTENT = {
   en: englishLocaleContent,
   de: germanContent,
   fr: frenchContent,
@@ -205,6 +213,81 @@ const ACTIVE_CONTENT = {
   ru: russianContent,
 } as const satisfies Record<ActiveLocale, LocaleContent>;
 
-export function contentFor(locale: ActiveLocale): LocaleContent {
-  return ACTIVE_CONTENT[locale];
+const RELATED_PAGE_KEYS = {
+  home: ["removeDuplicateLines", "removeLineBreaks", "columnToCommaSeparatedList"],
+  alphabetizeList: ["removeDuplicateLines", "columnToCommaSeparatedList", "randomizeList"],
+  randomizeList: ["randomTeamGenerator", "randomPairGenerator", "alphabetizeList"],
+  removeDuplicateLines: ["home", "removeLineBreaks", "columnToCommaSeparatedList"],
+  randomTeamGenerator: ["randomPairGenerator", "randomizeList"],
+  randomPairGenerator: ["randomTeamGenerator", "randomizeList"],
+  removeLineBreaks: ["columnToCommaSeparatedList", "removeDuplicateLines", "home"],
+  columnToCommaSeparatedList: ["removeLineBreaks", "removeDuplicateLines", "home"],
+} as const satisfies Record<SiteToolPageKey, readonly SiteToolPageKey[]>;
+
+function relatedItemsFor(
+  items: SiteToolsPageContent["items"],
+  pageKey: SiteToolPageKey,
+): readonly SiteRelatedToolItem[] {
+  return RELATED_PAGE_KEYS[pageKey].map((relatedPageKey) => ({
+    pageKey: relatedPageKey,
+    label: items[relatedPageKey].label,
+    description: items[relatedPageKey].description,
+  }));
+}
+
+function composeLocaleContent(locale: ActiveLocale): SiteLocaleContent {
+  const core = ACTIVE_CORE_CONTENT[locale];
+  const expansion = expansionContentFor(locale);
+  const homePatch = expansion.homePatch;
+  const items = {
+    ...core.toolsPage.items,
+    ...expansion.toolsPageItems,
+  } satisfies SiteToolsPageContent["items"];
+
+  return {
+    ...core,
+    home: homePatch
+      ? { ...core.home, description: homePatch.description }
+      : core.home,
+    editorial: homePatch
+      ? { ...core.editorial, ...homePatch.editorial }
+      : core.editorial,
+    randomTeamGenerator: expansion.randomTeamGenerator,
+    randomPairGenerator: expansion.randomPairGenerator,
+    removeLineBreaks: expansion.removeLineBreaks,
+    columnToCommaSeparatedList: expansion.columnToCommaSeparatedList,
+    metadata: {
+      ...core.metadata,
+      ...(homePatch ? { home: homePatch.metadata } : {}),
+      ...expansion.metadata,
+    },
+    toolsPage: {
+      ...core.toolsPage,
+      items,
+    },
+    about: {
+      ...core.about,
+      paragraphs: expansion.aboutParagraphs,
+    },
+    relatedTools: {
+      heading: core.relatedTools.heading,
+      byPage: {
+        home: relatedItemsFor(items, "home"),
+        alphabetizeList: relatedItemsFor(items, "alphabetizeList"),
+        randomizeList: relatedItemsFor(items, "randomizeList"),
+        removeDuplicateLines: relatedItemsFor(items, "removeDuplicateLines"),
+        randomTeamGenerator: relatedItemsFor(items, "randomTeamGenerator"),
+        randomPairGenerator: relatedItemsFor(items, "randomPairGenerator"),
+        removeLineBreaks: relatedItemsFor(items, "removeLineBreaks"),
+        columnToCommaSeparatedList: relatedItemsFor(
+          items,
+          "columnToCommaSeparatedList",
+        ),
+      },
+    },
+  };
+}
+
+export function contentFor(locale: ActiveLocale): SiteLocaleContent {
+  return composeLocaleContent(locale);
 }
