@@ -190,7 +190,9 @@ test.describe("Expansion V2 tools", () => {
     );
   });
 
-  test("Random Pair Generator keeps its action row compact", async ({ page }) => {
+  test("Random Pair Generator keeps its action row compact", async ({
+    page,
+  }) => {
     await page.goto("/random-pair-generator");
     const controls = page.locator("[data-random-pair-tool] .controls");
     await expect(controls).toHaveCSS("padding-left", "0px");
