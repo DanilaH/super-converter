@@ -9,9 +9,7 @@ import {
 
 describe("site origin", () => {
   it("throws when the site is missing", () => {
-    expect(() => resolveSiteOrigin(undefined)).toThrow(
-      /Site origin is missing/,
-    );
+    expect(() => resolveSiteOrigin(undefined)).toThrow(/Site origin is missing/);
   });
 
   it("rejects an HTTP origin", () => {
@@ -39,9 +37,9 @@ describe("site origin", () => {
   });
 
   it("rejects a hash", () => {
-    expect(() =>
-      resolveSiteOrigin(new URL("https://example.com/#top")),
-    ).toThrow(/hash/);
+    expect(() => resolveSiteOrigin(new URL("https://example.com/#top"))).toThrow(
+      /hash/,
+    );
   });
 
   it("accepts a valid HTTPS root origin", () => {
@@ -75,31 +73,37 @@ describe("site origin", () => {
     );
   });
 
-  it("maps default-locale metadata keys to the existing English paths", () => {
+  it("maps default-locale metadata keys to English paths", () => {
     expect(canonicalPathFor("home")).toBe("/");
     expect(canonicalPathFor("alphabetizeList")).toBe("/alphabetize-list");
     expect(canonicalPathFor("randomizeList")).toBe("/randomize-list");
     expect(canonicalPathFor("removeDuplicateLines")).toBe(
       "/remove-duplicate-lines",
     );
+    expect(canonicalPathFor("randomTeamGenerator")).toBe(
+      "/random-team-generator",
+    );
+    expect(canonicalPathFor("randomPairGenerator")).toBe(
+      "/random-pair-generator",
+    );
+    expect(canonicalPathFor("removeLineBreaks")).toBe("/remove-line-breaks");
+    expect(canonicalPathFor("columnToCommaSeparatedList")).toBe(
+      "/column-to-comma-separated-list",
+    );
     expect(canonicalPathFor("tools")).toBe("/tools");
     expect(canonicalPathFor("about")).toBe("/about");
     expect(canonicalPathFor("privacy")).toBe("/privacy");
   });
 
-  it("exposes all 42 approved localized indexable paths", () => {
-    expect(INDEXABLE_PATHS).toHaveLength(42);
-    expect(new Set(INDEXABLE_PATHS).size).toBe(42);
-    expect(INDEXABLE_PATHS.slice(0, 7)).toEqual([
-      "/",
-      "/alphabetize-list",
-      "/randomize-list",
-      "/remove-duplicate-lines",
-      "/tools",
-      "/about",
-      "/privacy",
-    ]);
-    expect(INDEXABLE_PATHS).toContain("/ru/");
-    expect(INDEXABLE_PATHS).toContain("/ru/udalit-dublikaty-strok");
+  it("exposes all 66 approved localized indexable paths", () => {
+    expect(INDEXABLE_PATHS).toHaveLength(66);
+    expect(new Set(INDEXABLE_PATHS).size).toBe(66);
+    expect(INDEXABLE_PATHS).toContain("/random-team-generator");
+    expect(INDEXABLE_PATHS).toContain("/column-to-comma-separated-list");
+    expect(INDEXABLE_PATHS).toContain("/de/zufaellige-paare-bilden");
+    expect(INDEXABLE_PATHS).toContain("/fr/supprimer-sauts-de-ligne");
+    expect(INDEXABLE_PATHS).toContain("/es/generador-equipos-aleatorios");
+    expect(INDEXABLE_PATHS).toContain("/pt-br/remover-quebras-de-linha");
+    expect(INDEXABLE_PATHS).toContain("/ru/stolbec-v-spisok-cherez-zapyatuyu");
   });
 });
