@@ -1,0 +1,36 @@
+---
+import EditorialContent from "@/components/EditorialContent.astro";
+import RandomTeamTool from "@/components/RandomTeamTool.astro";
+import RelatedTools from "@/components/RelatedTools.astro";
+import { contentFor } from "@/i18n/content";
+import { DEFAULT_LOCALE } from "@/i18n/locales";
+import { relatedToolsFor } from "@/i18n/page";
+import { routeFor } from "@/i18n/routes";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+
+const locale = DEFAULT_LOCALE;
+const content = contentFor(locale);
+const { page, editorial, tool } = content.randomTeamGenerator;
+const relatedTools = relatedToolsFor(locale, "randomTeamGenerator");
+---
+
+<BaseLayout metadataKey="randomTeamGenerator" locale={locale}>
+  <div class="intro">
+    <h1>{page.heading}</h1>
+    <p class="description">
+      {page.description}
+      <span class="privacy">{page.privacy}</span>
+    </p>
+    <RandomTeamTool tool={tool} />
+  </div>
+  <EditorialContent content={editorial} privacyHref={routeFor(locale, "privacy")} />
+  <RelatedTools heading={content.relatedTools.heading} tools={relatedTools} />
+</BaseLayout>
+
+<style>
+  .intro { display: flex; flex-direction: column; gap: var(--space-2); padding-block: var(--space-3) var(--space-5); }
+  .intro h1 { margin: 0; font-size: var(--font-size-h1-mobile); line-height: var(--line-height-h1-mobile); font-weight: var(--font-weight-h1); }
+  .description { display: flex; flex-wrap: wrap; gap: 0 var(--space-1); margin: 0; max-width: var(--container-editorial); font-size: var(--font-size-body); line-height: var(--line-height-body); }
+  .privacy { color: var(--color-text-secondary); }
+  @media (min-width: 760px) { .intro h1 { font-size: var(--font-size-h1); line-height: var(--line-height-h1); } }
+</style>
