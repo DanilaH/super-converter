@@ -44,6 +44,15 @@ describe("removeLineBreaks", () => {
     ).toBe("a\n\nb");
   });
 
+  it("drops blank paragraph separator lines when paragraph preservation is disabled", () => {
+    expect(
+      removeLineBreaks("a\nb\n\n  \nc\nd", {
+        ...baseLineBreakOptions,
+        replacement: ", ",
+      }),
+    ).toBe("a, b, c, d");
+  });
+
   it.each([
     ["", "ab"],
     [",", "a,b"],
