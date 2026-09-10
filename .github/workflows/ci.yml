@@ -32,6 +32,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Diagnose temporary audit formatting
+        run: |
+          pnpm exec prettier --write e2e/production-live-audit.spec.ts
+          git diff -- e2e/production-live-audit.spec.ts
+          exit 1
+
       - name: Check formatting
         run: pnpm format:check
 
