@@ -1,0 +1,100 @@
+---
+import type { RemoveLineBreaksMessages } from "@/i18n/types";
+
+interface Props {
+  tool: RemoveLineBreaksMessages;
+}
+
+const { tool } = Astro.props;
+---
+
+<section
+  class="expansion-tool"
+  data-remove-line-breaks-tool
+  data-example={tool.example}
+  data-label-empty-result={tool.emptyResult}
+  data-label-copy={tool.copy}
+  data-label-copied={tool.copied}
+  data-label-copy-error={tool.copyError}
+  data-label-replace-example-confirmation={tool.replaceExampleConfirmation}
+  aria-labelledby="remove-line-breaks-tool-heading"
+>
+  <h2 id="remove-line-breaks-tool-heading" class="visually-hidden">{tool.heading}</h2>
+
+  <div class="input-section">
+    <div class="input-toolbar">
+      <label for="remove-line-breaks-input">{tool.textLabel}</label>
+      <div class="input-actions">
+        <button type="button" class="example-button" data-load-example disabled>
+          {tool.loadExample}
+        </button>
+        <button type="button" class="text-button" data-clear-text disabled>
+          {tool.clear}
+        </button>
+      </div>
+    </div>
+    <textarea
+      id="remove-line-breaks-input"
+      data-text-input
+      rows="10"
+      placeholder={tool.pastePlaceholder}
+      spellcheck="false"></textarea>
+  </div>
+
+  <div class="controls">
+    <fieldset class="options">
+      <legend class="control-label">{tool.options}</legend>
+      <label class="value-control">
+        <span>{tool.replaceWith}</span>
+        <select data-separator>
+          <option value="space" selected>{tool.separatorSpace}</option>
+          <option value="nothing">{tool.separatorNothing}</option>
+          <option value="comma">{tool.separatorComma}</option>
+          <option value="commaSpace">{tool.separatorCommaSpace}</option>
+          <option value="semicolon">{tool.separatorSemicolon}</option>
+          <option value="custom">{tool.separatorCustom}</option>
+        </select>
+      </label>
+      <label class="custom-control" data-custom-row hidden>
+        <span>{tool.customSeparator}</span>
+        <input type="text" data-custom-separator disabled />
+      </label>
+      <div class="option-row">
+        <label class="option">
+          <input type="checkbox" data-keep-paragraphs checked />
+          {tool.keepParagraphs}
+        </label>
+        <label class="option">
+          <input type="checkbox" data-trim-each-line checked />
+          {tool.trimEachLine}
+        </label>
+        <label class="option">
+          <input type="checkbox" data-collapse-spaces checked />
+          {tool.collapseSpaces}
+        </label>
+      </div>
+    </fieldset>
+  </div>
+
+  <section class="result-section" aria-label={tool.resultLabel}>
+    <div class="result-toolbar">
+      <p class="result-title"><span>{tool.resultLabel}</span></p>
+      <div class="result-actions">
+        <button type="button" class="action" data-copy-result disabled>{tool.copy}</button>
+        <button type="button" class="action" data-download-result disabled>{tool.download}</button>
+      </div>
+    </div>
+    <div class="viewer-shell">
+      <p data-empty-result>{tool.emptyResult}</p>
+      <pre class="viewer" data-result-viewer tabindex="0" hidden></pre>
+    </div>
+    <p class="local-feedback" data-local-feedback role="status" aria-live="polite" aria-atomic="true"></p>
+  </section>
+
+  <noscript><p class="noscript">{tool.noscript}</p></noscript>
+</section>
+
+<script>
+  import { mountRemoveLineBreaksTool } from "../scripts/remove-line-breaks-tool";
+  mountRemoveLineBreaksTool();
+</script>
