@@ -2,7 +2,7 @@
 
 State date: 2026-09-10
 
-This document is the concise source of truth for the **current production surface, active release work and indexing expectations**. Historical planning/audit documents remain useful for rationale, but when an older current-state statement conflicts with this file or `EXPANSION_V2_DECISION_2026-09-10.md`, use the newer documents.
+This document is the concise source of truth for the **current production surface, completed release state and indexing expectations**. Historical planning/audit documents remain useful for rationale, but when an older current-state statement conflicts with this file or `EXPANSION_V2_DECISION_2026-09-10.md`, use the newer documents.
 
 ## Product and stack
 
@@ -19,10 +19,10 @@ Compare Lists on `/` remains the anchor utility. The site must stay focused, bro
 
 ## Verified production state
 
-Localization V1 was deployed and production-verified on 2026-09-08. The live indexable surface is currently:
+Expansion V2 was deployed and production-smoked on 2026-09-10. The live indexable surface is now:
 
 ```text
-6 locales × 7 page identities = 42 canonical/indexable URLs
+6 locales × 11 page identities = 66 canonical/indexable URLs
 ```
 
 Locales:
@@ -36,21 +36,31 @@ pt-br  Brazilian Portuguese (`pt-BR`)
 ru     generic Russian
 ```
 
-Current page identities:
+Live page identities:
 
 ```text
 Compare Lists
 Alphabetizer
 List Randomizer
 Remove Duplicate Lines
+Random Team Generator
+Random Pair Generator
+Remove Line Breaks
+Column to Comma Separated List
 Tools
 About
 Privacy
 ```
 
-Production checks completed for that release included: production container health, internal and public 42/42 HTTP 200 sweep, sitemap count 42, reciprocal hreflang/canonical inspection, crawlable `robots.txt`, public HTTPS headers, `www` → apex redirect and real 404 with `noindex,nofollow` and no canonical.
+Production verification for this release included a healthy production container, public smoke for all English page identities, sitemap count 66, an all-sitemap-URL HTTP sweep, real 404 behavior, `www` → apex redirect and crawlable `robots.txt`. Repository CI before and after the hardening merge was green across formatting, lint, typecheck, unit tests, build and Playwright E2E.
 
-The deployed source SHA before the current expansion work is:
+The deployed source SHA is:
+
+```text
+45bf1811d8a08cf70c163bdcfeabf72f3d1584a5
+```
+
+Last known-good rollback SHA from the pre-Expansion-V2 production release:
 
 ```text
 30c7ad234cedc876080b22b50ff26cb9d06d1bdb
@@ -92,39 +102,37 @@ Release invariants that remain active:
 
 The older Localization V1 planning docs are implementation history where they conflict with the final decision or this current-state snapshot.
 
-## Active release — Expansion V2
+## Completed release — Expansion V2
 
-Research for the current wave is closed. The binding repository-compatible implementation decision is:
+The binding implementation decision remains:
 
 ```text
 EXPANSION_V2_DECISION_2026-09-10.md
 ```
 
-Approved work:
+Shipped work:
 
-1. strengthen the existing `/` for the Compare Lists / List Difference cluster without creating synonym routes or redesigning the comparator;
-2. add Random Team / Group Generator;
-3. add Random Pair Generator;
-4. add Remove Line Breaks / Remove Newlines on one canonical tool page;
-5. add Column to Comma Separated List;
-6. integrate the four tools into all six existing locales, `/tools`, About, related links, sitemap and hreflang/canonical infrastructure.
+1. strengthened `/` for the Compare Lists / List Difference cluster without creating synonym routes or redesigning the comparator;
+2. added Random Team / Group Generator;
+3. added Random Pair Generator;
+4. added Remove Line Breaks / Remove Newlines on one canonical tool page;
+5. added Column to Comma Separated List;
+6. integrated the four tools into all six existing locales, `/tools`, About, related links, sitemap and hreflang/canonical infrastructure;
+7. completed post-implementation UI/UX hardening for custom-separator visibility, Team Generator mode-aware labeling, Pair Generator action-row density and result wrapping semantics.
 
-If all six locales ship in the release, the intended post-deployment surface becomes:
+The resulting live surface is:
 
 ```text
-6 locales × 11 page identities = 66 canonical/indexable URLs
-42 current URLs + 24 new localized/tool URLs
+42 previous URLs + 24 new localized/tool URLs = 66 canonical/indexable URLs
 ```
 
-Do **not** report 66 URLs as live until production deployment and public smoke are verified.
-
-No separate pages are approved for `/list-diff`, `/list-difference`, `/random-group-generator`, `/remove-newlines`, `/new-line-remover`, Random Name Picker, Random Item Picker, Email Extractor, generic List Cleaner, Multi-list Compare, fuzzy matching or other adjacency ideas rejected/reserved by the expansion decision.
+No separate pages are approved for `/list-diff`, `/list-difference`, `/compare-lists`, `/random-group-generator`, `/remove-newlines`, `/new-line-remover`, Random Name Picker, Random Item Picker, Email Extractor, generic List Cleaner, Multi-list Compare, fuzzy matching or other adjacency ideas rejected/reserved by the expansion decision.
 
 ## Homepage SEO exception
 
-The old localization-era rule to preserve English search-facing copy unchanged is no longer absolute. Expansion V2 contains a new explicit evidence-backed decision to strengthen `/` for `compare lists / list comparison / list diff / list difference` vocabulary.
+The old localization-era rule to preserve English search-facing copy unchanged is no longer absolute. Expansion V2 explicitly strengthened `/` for `compare lists / list comparison / list diff / list difference` vocabulary.
 
-The canonical route and interaction model stay unchanged. Mathematical set labels must remain truthful: when duplicates are retained, Compare Lists is occurrence/multiset based rather than strict set algebra. The approved implementation therefore prefers neutral UI labels plus explanatory set terminology with a deduplicated-mode caveat.
+The canonical route and interaction model stay unchanged. Mathematical set labels must remain truthful: when duplicates are retained, Compare Lists is occurrence/multiset based rather than strict set algebra. The implementation therefore keeps neutral UI labels plus explanatory set terminology with a deduplicated-mode caveat.
 
 ## Privacy boundary
 
@@ -137,7 +145,7 @@ Raw user list/result content must never enter:
 - `localStorage`;
 - `sessionStorage`.
 
-The four Expansion V2 tools remain fully browser-side. Copy/download occur only after explicit user action.
+All list tools remain fully browser-side. Copy/download occur only after explicit user action.
 
 ## Research correctness backlog
 
@@ -145,30 +153,30 @@ The SEO Research Runner has a known market/geo caveat: `research.market`, `googl
 
 For Expansion V2, measured Surfer figures are demand evidence rather than a traffic forecast. Exact DE/FR/ES/RU monthly local volume is not claimed; Russian quantitative truth should come from Yandex/GSC data after launch.
 
-## Active delivery sequence
+## Post-release observation
 
-```text
-Batch 0 — repository/docs inspection and contradiction cleanup
-Batch 1 — homepage P0 SEO/content upgrade
-Batch 2 — shared random allocation engine + Team/Pair tools
-Batch 3 — shared text transform engine + Line Breaks/Column tools
-Batch 4 — site integration
-Batch 5 — all six locales
-Batch 6 — full QA and release
-```
+Do not immediately retune titles, H1s, slugs, canonical or hreflang after launch. The next evidence source is actual Search Console and Yandex Webmaster behavior over approximately 7/14/28-day windows.
 
-Do not reopen broad keyword discovery during this wave.
+Watch for:
+
+- first impressions and indexed-page growth across DE/FR/ES/PT-BR/RU;
+- query → page pair formation for the four new tool families;
+- Compare Lists / List Difference query expansion on `/`;
+- `Crawled - currently not indexed`, `Discovered - currently not indexed`, duplicate/canonical issues or unexpected locale cannibalization;
+- whether PT-BR and RU begin producing useful localized demand signals.
+
+Broad keyword discovery remains closed until live evidence justifies reopening it.
 
 ## Documentation precedence
 
 For present work use this order:
 
 1. `CURRENT_STATE.md` — current production/release snapshot;
-2. `EXPANSION_V2_DECISION_2026-09-10.md` — binding active expansion scope, route decisions and repository-level corrections;
+2. `EXPANSION_V2_DECISION_2026-09-10.md` — binding expansion scope, route decisions and repository-level corrections;
 3. `LOCALIZATION_FINAL_DECISION_2026-09-07.md` — locale/language targeting rules that remain active;
 4. `PRODUCT.md`, `UX.md`, `DESIGN.md`, `ARCHITECTURE.md`, `ANALYTICS.md` — domain-specific existing contracts where not explicitly changed by Expansion V2;
-5. `LISTCONTRAST_EXPANSION_SCOPE_V1_1.md` — historical shipped V1.1 tool semantics, still authoritative for the original four tools but not for current expansion scope;
+5. `LISTCONTRAST_EXPANSION_SCOPE_V1_1.md` — historical shipped V1.1 tool semantics for the original four tools;
 6. localization planning/evidence docs — historical rationale and evidence;
 7. `SEO_LEGACY_MVP.md`, `LAUNCH_PLAN.md`, `IMPLEMENTATION_PLAN.md`, `RELEASE_AUDIT.md` — historical planning/audit context.
 
-Operational production commands and live acceptance checks remain in `deploy/vps/PRODUCTION.md`. Its route-count gate must be updated to the current release target before Expansion V2 is deployed.
+Operational production commands and live acceptance checks remain in `deploy/vps/PRODUCTION.md`, whose release gates now target the live 66-URL surface.
