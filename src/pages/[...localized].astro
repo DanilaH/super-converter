@@ -1,10 +1,14 @@
 ---
 import AlphabetizeTool from "@/components/AlphabetizeTool.astro";
+import ColumnToCommaTool from "@/components/ColumnToCommaTool.astro";
 import CompareTool from "@/components/CompareTool.astro";
 import EditorialContent from "@/components/EditorialContent.astro";
+import RandomPairTool from "@/components/RandomPairTool.astro";
+import RandomTeamTool from "@/components/RandomTeamTool.astro";
 import RandomizeTool from "@/components/RandomizeTool.astro";
 import RelatedTools from "@/components/RelatedTools.astro";
 import RemoveDuplicateLinesTool from "@/components/RemoveDuplicateLinesTool.astro";
+import RemoveLineBreaksTool from "@/components/RemoveLineBreaksTool.astro";
 import { contentFor } from "@/i18n/content";
 import {
   ACTIVE_LOCALES,
@@ -13,7 +17,12 @@ import {
 } from "@/i18n/locales";
 import { relatedToolsFor } from "@/i18n/page";
 import { routeFor } from "@/i18n/routes";
-import { PAGE_KEYS, type PageKey, type ToolPageKey } from "@/i18n/types";
+import {
+  PAGE_KEYS,
+  SITE_TOOL_PAGE_KEYS,
+  type PageKey,
+  type SiteToolPageKey,
+} from "@/i18n/types";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 
 interface Props {
@@ -34,28 +43,18 @@ export function getStaticPaths() {
   );
 }
 
-function isToolPageKey(pageKey: PageKey): pageKey is ToolPageKey {
-  return (
-    pageKey === "home" ||
-    pageKey === "alphabetizeList" ||
-    pageKey === "randomizeList" ||
-    pageKey === "removeDuplicateLines"
-  );
+function isSiteToolPageKey(pageKey: PageKey): pageKey is SiteToolPageKey {
+  return pageKey !== "tools" && pageKey !== "about" && pageKey !== "privacy";
 }
 
 const { locale, pageKey } = Astro.props;
 const content = contentFor(locale);
 const privacyHref = routeFor(locale, "privacy");
-const relatedTools = isToolPageKey(pageKey)
+const relatedTools = isSiteToolPageKey(pageKey)
   ? relatedToolsFor(locale, pageKey)
   : [];
 const collatorLocale = localeConfigFor(locale).collatorLocale;
-const toolOrder: readonly ToolPageKey[] = [
-  "home",
-  "alphabetizeList",
-  "randomizeList",
-  "removeDuplicateLines",
-];
+const toolOrder: readonly SiteToolPageKey[] = SITE_TOOL_PAGE_KEYS;
 ---
 
 <BaseLayout metadataKey={pageKey} locale={locale}>
@@ -70,14 +69,8 @@ const toolOrder: readonly ToolPageKey[] = [
           </p>
           <CompareTool compare={content.compare} />
         </div>
-        <EditorialContent
-          content={content.editorial}
-          privacyHref={privacyHref}
-        />
-        <RelatedTools
-          heading={content.relatedTools.heading}
-          tools={relatedTools}
-        />
+        <EditorialContent content={content.editorial} privacyHref={privacyHref} />
+        <RelatedTools heading={content.relatedTools.heading} tools={relatedTools} />
       </>
     )
   }
@@ -89,23 +82,15 @@ const toolOrder: readonly ToolPageKey[] = [
           <h1>{content.alphabetizeList.page.heading}</h1>
           <p class="description">
             {content.alphabetizeList.page.description}
-            <span class="privacy-note">
-              {content.alphabetizeList.page.privacy}
-            </span>
+            <span class="privacy-note">{content.alphabetizeList.page.privacy}</span>
           </p>
           <AlphabetizeTool
             tool={content.alphabetizeList.tool}
             collatorLocale={collatorLocale}
           />
         </div>
-        <EditorialContent
-          content={content.alphabetizeList.editorial}
-          privacyHref={privacyHref}
-        />
-        <RelatedTools
-          heading={content.relatedTools.heading}
-          tools={relatedTools}
-        />
+        <EditorialContent content={content.alphabetizeList.editorial} privacyHref={privacyHref} />
+        <RelatedTools heading={content.relatedTools.heading} tools={relatedTools} />
       </>
     )
   }
@@ -117,20 +102,12 @@ const toolOrder: readonly ToolPageKey[] = [
           <h1>{content.randomizeList.page.heading}</h1>
           <p class="description">
             {content.randomizeList.page.description}
-            <span class="privacy-note">
-              {content.randomizeList.page.privacy}
-            </span>
+            <span class="privacy-note">{content.randomizeList.page.privacy}</span>
           </p>
           <RandomizeTool tool={content.randomizeList.tool} />
         </div>
-        <EditorialContent
-          content={content.randomizeList.editorial}
-          privacyHref={privacyHref}
-        />
-        <RelatedTools
-          heading={content.relatedTools.heading}
-          tools={relatedTools}
-        />
+        <EditorialContent content={content.randomizeList.editorial} privacyHref={privacyHref} />
+        <RelatedTools heading={content.relatedTools.heading} tools={relatedTools} />
       </>
     )
   }
@@ -142,20 +119,80 @@ const toolOrder: readonly ToolPageKey[] = [
           <h1>{content.removeDuplicateLines.page.heading}</h1>
           <p class="description">
             {content.removeDuplicateLines.page.description}
-            <span class="privacy-note">
-              {content.removeDuplicateLines.page.privacy}
-            </span>
+            <span class="privacy-note">{content.removeDuplicateLines.page.privacy}</span>
           </p>
           <RemoveDuplicateLinesTool tool={content.removeDuplicateLines.tool} />
         </div>
-        <EditorialContent
-          content={content.removeDuplicateLines.editorial}
-          privacyHref={privacyHref}
-        />
-        <RelatedTools
-          heading={content.relatedTools.heading}
-          tools={relatedTools}
-        />
+        <EditorialContent content={content.removeDuplicateLines.editorial} privacyHref={privacyHref} />
+        <RelatedTools heading={content.relatedTools.heading} tools={relatedTools} />
+      </>
+    )
+  }
+
+  {
+    pageKey === "randomTeamGenerator" && (
+      <>
+        <div class="tool-intro">
+          <h1>{content.randomTeamGenerator.page.heading}</h1>
+          <p class="description">
+            {content.randomTeamGenerator.page.description}
+            <span class="privacy-note">{content.randomTeamGenerator.page.privacy}</span>
+          </p>
+          <RandomTeamTool tool={content.randomTeamGenerator.tool} />
+        </div>
+        <EditorialContent content={content.randomTeamGenerator.editorial} privacyHref={privacyHref} />
+        <RelatedTools heading={content.relatedTools.heading} tools={relatedTools} />
+      </>
+    )
+  }
+
+  {
+    pageKey === "randomPairGenerator" && (
+      <>
+        <div class="tool-intro">
+          <h1>{content.randomPairGenerator.page.heading}</h1>
+          <p class="description">
+            {content.randomPairGenerator.page.description}
+            <span class="privacy-note">{content.randomPairGenerator.page.privacy}</span>
+          </p>
+          <RandomPairTool tool={content.randomPairGenerator.tool} />
+        </div>
+        <EditorialContent content={content.randomPairGenerator.editorial} privacyHref={privacyHref} />
+        <RelatedTools heading={content.relatedTools.heading} tools={relatedTools} />
+      </>
+    )
+  }
+
+  {
+    pageKey === "removeLineBreaks" && (
+      <>
+        <div class="tool-intro">
+          <h1>{content.removeLineBreaks.page.heading}</h1>
+          <p class="description">
+            {content.removeLineBreaks.page.description}
+            <span class="privacy-note">{content.removeLineBreaks.page.privacy}</span>
+          </p>
+          <RemoveLineBreaksTool tool={content.removeLineBreaks.tool} />
+        </div>
+        <EditorialContent content={content.removeLineBreaks.editorial} privacyHref={privacyHref} />
+        <RelatedTools heading={content.relatedTools.heading} tools={relatedTools} />
+      </>
+    )
+  }
+
+  {
+    pageKey === "columnToCommaSeparatedList" && (
+      <>
+        <div class="tool-intro">
+          <h1>{content.columnToCommaSeparatedList.page.heading}</h1>
+          <p class="description">
+            {content.columnToCommaSeparatedList.page.description}
+            <span class="privacy-note">{content.columnToCommaSeparatedList.page.privacy}</span>
+          </p>
+          <ColumnToCommaTool tool={content.columnToCommaSeparatedList.tool} />
+        </div>
+        <EditorialContent content={content.columnToCommaSeparatedList.editorial} privacyHref={privacyHref} />
+        <RelatedTools heading={content.relatedTools.heading} tools={relatedTools} />
       </>
     )
   }
@@ -190,10 +227,7 @@ const toolOrder: readonly ToolPageKey[] = [
           <p>{paragraph}</p>
         ))}
         <p class="tool-link">
-          <a
-            class="button-link button-link--primary"
-            href={routeFor(locale, "tools")}
-          >
+          <a class="button-link button-link--primary" href={routeFor(locale, "tools")}>
             {content.about.toolLinkLabel}
           </a>
         </p>
