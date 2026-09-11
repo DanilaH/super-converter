@@ -1,6 +1,6 @@
 import { createRequire } from "node:module";
 import { readFileSync } from "node:fs";
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
 const require = createRequire(import.meta.url);
 const axeSource = readFileSync(require.resolve("axe-core/axe.min.js"), "utf8");
@@ -21,16 +21,16 @@ const ROUTES = [
 
 const HREFLANGS = ["en", "de", "fr", "es", "pt-BR", "ru", "x-default"];
 
-async function collectPageErrors(page: Parameters<typeof test>[0] extends never ? never : any) {
+function collectPageErrors(page: Page): string[] {
   const errors: string[] = [];
-  page.on("console", (message: any) => {
+  page.on("console", (message) => {
     if (message.type() === "error") errors.push(`console: ${message.text()}`);
   });
-  page.on("pageerror", (error: Error) => errors.push(`pageerror: ${error.message}`));
+  page.on("pageerror", (error) => errors.push(`pageerror: ${error.message}`));
   return errors;
 }
 
-async function checkMetadata(page: any, route: string) {
+async function checkMetadata(page: Page, route: string) {
   const expectedCanonical = new URL(route, "https://listcontrast.com").href;
   const metadata = await page.evaluate(() => ({
     lang: document.documentElement.lang,
@@ -56,7 +56,7 @@ async function checkMetadata(page: any, route: string) {
   expect(metadata.websiteJsonLd).toBe(route === "/" ? 1 : 0);
 }
 
-async function checkNoOverflow(page: any) {
+async function checkNoOverflow(page: Page) {
   const overflow = await page.evaluate(() => ({
     scrollWidth: document.documentElement.scrollWidth,
     clientWidth: document.documentElement.clientWidth,
@@ -69,7 +69,7 @@ test.describe("production desktop shell and SEO", () => {
 
   for (const route of ROUTES) {
     test(`${route} keeps the restored desktop shell`, async ({ page }, testInfo) => {
-      const errors = await collectPageErrors(page);
+      const errors = collectPageErrors(page);
       const response = await page.goto(route, { waitUntil: "networkidle" });
       expect(response?.status()).toBe(200);
       await checkMetadata(page, route);
@@ -110,7 +110,7 @@ test.describe("production mobile layout", () => {
 
   for (const route of ROUTES) {
     test(`${route} has no mobile document overflow`, async ({ page }, testInfo) => {
-      const errors = await collectPageErrors(page);
+      const errors = collectPageErrors(page);
       const response = await page.goto(route, { waitUntil: "networkidle" });
       expect(response?.status()).toBe(200);
       await checkMetadata(page, route);
@@ -145,7 +145,7 @@ for (const route of ["/", "/random-team-generator", "/remove-line-breaks"] as co
     await page.goto(route, { waitUntil: "networkidle" });
     await page.addScriptTag({ content: axeSource });
     const violations = await page.evaluate(async () => {
-      const axe = (window as any).axe;
+      const axe = (window as typeof window & { axe: any }).axe;
       const result = await axe.run(document, {
         runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"] },
       });
