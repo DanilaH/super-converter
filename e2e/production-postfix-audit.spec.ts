@@ -1,9 +1,7 @@
-import { createRequire } from "node:module";
 import { readFileSync } from "node:fs";
 import { expect, test, type Page } from "@playwright/test";
 
-const require = createRequire(import.meta.url);
-const axeSource = readFileSync(require.resolve("axe-core/axe.min.js"), "utf8");
+const axeSource = readFileSync("node_modules/axe-core/axe.min.js", "utf8");
 
 const ROUTES = [
   "/",
