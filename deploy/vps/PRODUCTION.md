@@ -4,9 +4,7 @@ This runbook deploys the accepted static build to `https://listcontrast.com`.
 Production is a separate Compose project/container. Do not reuse, rename or expose
 the protected preview container.
 
-`CURRENT_STATE.md` records the currently verified live surface. During Expansion
-V2, production remains the previous 42-URL surface until the release is actually
-deployed and live-smoked; the accepted release target is 66 canonical URLs.
+The current accepted production surface contains 66 canonical URLs.
 
 ## Topology
 
@@ -18,7 +16,7 @@ existing Caddy (:80/:443)
   ├── www → apex redirect
   └── public reverse proxy (no Basic Auth, no noindex)
   ↓
-external Docker network: vps_booking_network
+external Docker network: web_proxy
   ↓
 listcontrast-production:8080
   ↓
@@ -28,16 +26,16 @@ static Astro dist/
 ```
 
 The application service exposes port 8080 only inside Docker. It publishes no
-host port and contains no Caddy, TLS keys, application secrets, Node.js backend
-or database.
+host port and contains no TLS keys, application secrets, Node.js backend or
+database.
 
 ## Release order
 
 1. Merge the accepted release PR only after repository CI and review pass.
 2. Update the dedicated VPS checkout to the accepted `main` commit.
 3. Build and start the production Compose service.
-4. Verify the container through the shared Docker network.
-5. Run public route, redirect, privacy and SEO smoke.
+4. Verify the container through the shared `web_proxy` network.
+5. Run public route, redirect, security-header and SEO smoke.
 6. Verify the complete live sitemap surface.
 7. Update Search Console / Yandex Webmaster only after live verification.
 
@@ -67,11 +65,6 @@ if [ "${#INDEXABLE_HTML[@]}" -ne 66 ]; then
   exit 1
 fi
 
-rg -n 'https://listcontrast\.com' \
-  "${INDEXABLE_HTML[@]}" \
-  dist/robots.txt \
-  dist/sitemap.xml
-
 if rg -n 'example\.com|preview\.listcontrast\.com' dist; then
   echo "Unexpected placeholder or preview hostname in dist" >&2
   exit 1
@@ -97,9 +90,7 @@ Required generated-output state:
 - all 66 indexable routes contain no `noindex` directive;
 - 404 remains `noindex,nofollow` and has no canonical or `og:url`;
 - robots allows crawling and references the production sitemap;
-- sitemap contains exactly the 66 canonical routes from the typed route registry;
-- no rejected synonym route such as `/compare-lists`, `/list-diff`,
-  `/random-group-generator` or `/remove-newlines` appears.
+- sitemap contains exactly the 66 canonical routes from the typed route registry.
 
 Do not commit `dist/`.
 
@@ -113,8 +104,7 @@ git pull --ff-only origin main
 git rev-parse HEAD
 ```
 
-The printed SHA must equal the accepted release commit. Record it in the release
-notes before continuing.
+Record the deployed SHA before continuing.
 
 ## Validate and start production
 
@@ -141,12 +131,12 @@ for path in \
   /tools \
   /about \
   /privacy; do
-  docker run --rm --network vps_booking_network curlimages/curl:8.11.1 \
+  docker run --rm --network web_proxy curlimages/curl:8.11.1 \
     -fsS -o /dev/null -w "$path -> %{http_code}\n" \
     "http://listcontrast-production:8080$path"
 done
 
-docker run --rm --network vps_booking_network curlimages/curl:8.11.1 \
+docker run --rm --network web_proxy curlimages/curl:8.11.1 \
   -sS -o /dev/null -w '/missing-production-check -> %{http_code}\n' \
   http://listcontrast-production:8080/missing-production-check
 ```
@@ -162,7 +152,10 @@ docker compose -f deploy/vps/compose.production.yml logs --tail=150 \
 ## External Caddy production blocks
 
 The live Caddyfile is owned outside this repository. Keep the existing ingress
-project and protected preview block intact.
+project and protected preview block intact. Caddy and ListContrast must both be
+attached to the external `web_proxy` network.
+
+Representative production routing:
 
 ```caddyfile
 www.listcontrast.com {
@@ -181,14 +174,21 @@ listcontrast.com {
 }
 ```
 
-The production blocks intentionally contain no Basic Auth, no
-`X-Robots-Tag: noindex`, no TLS secret path and no published nginx host port.
+The application nginx layer supplies:
+
+- `Strict-Transport-Security: max-age=31536000`;
+- `Permissions-Policy: camera=(), geolocation=(), microphone=(), payment=(), usb=()`;
+- `X-Frame-Options: DENY`;
+- `server_tokens off`.
+
+Do not add a duplicate HSTS header in Caddy unless the nginx-owned header is
+removed deliberately.
 
 Validate and gracefully reload the existing Caddy container only if ingress
 configuration actually changed:
 
 ```bash
-CADDY_CONTAINER=<EXISTING_CADDY_CONTAINER>
+CADDY_CONTAINER=caddy
 docker exec "$CADDY_CONTAINER" \
   caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
 docker exec "$CADDY_CONTAINER" \
@@ -196,23 +196,6 @@ docker exec "$CADDY_CONTAINER" \
 ```
 
 Do not run Compose down for the ingress project.
-
-## DNS
-
-Expansion V2 normally requires no DNS change. If DNS must be re-verified, the
-intended Beget records remain:
-
-```text
-@     A       <VPS_IPV4>
-www   CNAME   listcontrast.com.
-```
-
-Do not change the existing `preview` record. Confirm resolution when relevant:
-
-```bash
-getent ahostsv4 listcontrast.com
-getent ahostsv4 www.listcontrast.com
-```
 
 ## Public smoke
 
@@ -246,8 +229,21 @@ Required:
 - production has no Basic Auth challenge or `X-Robots-Tag: noindex`;
 - protected preview behavior is unchanged.
 
-Verify every canonical locale URL from the live sitemap rather than manually
-maintaining a second 66-entry route list:
+## Security-header smoke
+
+```bash
+curl -sSI https://listcontrast.com/ | grep -Ei \
+'^(HTTP/|strict-transport-security:|permissions-policy:|x-frame-options:|x-content-type-options:|referrer-policy:|server:)'
+```
+
+Required:
+
+- exactly one `Strict-Transport-Security` header with `max-age=31536000`;
+- expected `Permissions-Policy` and `X-Frame-Options: DENY`;
+- `X-Content-Type-Options: nosniff` and `Referrer-Policy: strict-origin-when-cross-origin`;
+- no nginx version disclosure such as `nginx/1.x.x`.
+
+## Complete sitemap smoke
 
 ```bash
 SITEMAP_URLS=$(curl -fsS https://listcontrast.com/sitemap.xml | \
@@ -268,22 +264,6 @@ EOF
 ```
 
 Expected: all 66 canonical URLs return `200`.
-
-Then verify representative browser behavior:
-
-- Compare Lists: both inputs, options, counters, result tabs, Swap, Clear,
-  example, Copy and Download;
-- Alphabetizer, List Randomizer and Remove Duplicate Lines core regressions;
-- Random Team Generator: team-count and people-per-team modes, balanced output,
-  reroll, invalid team count, Copy and Download;
-- Random Pair Generator: even and odd input, explicit Unpaired result, reroll,
-  Copy and Download;
-- Remove Line Breaks: default space replacement, paragraph preservation,
-  replacement presets/custom separator, Copy and Download;
-- Column to Comma Separated List: trim/empty-line defaults, delimiter presets,
-  custom separator, duplicate preservation, Copy and Download;
-- at least one non-English version of each new tool family;
-- desktop and narrow/mobile layout, Tools, About, Privacy and an unknown route.
 
 ## Live SEO verification
 
@@ -313,31 +293,20 @@ curl -fsS https://listcontrast.com/404-does-not-exist | \
 
 Required:
 
-- robots contains `Allow: /` and
-  `Sitemap: https://listcontrast.com/sitemap.xml`;
+- robots contains `Allow: /` and `Sitemap: https://listcontrast.com/sitemap.xml`;
 - sitemap has exactly 66 production `<loc>` values;
 - every indexable page self-canonicalizes and has production `og:url`;
-- every page has the expected reciprocal `en`, `de`, `fr`, `es`, `pt-BR`, `ru`
-  and `x-default` alternates;
+- every page has reciprocal `en`, `de`, `fr`, `es`, `pt-BR`, `ru` and `x-default` alternates;
 - indexable pages contain no `noindex`;
 - live 404 contains `noindex,nofollow` and no canonical/`og:url`;
-- neither placeholder nor preview hostname appears;
-- homepage remains the only page with the accepted `WebSite` JSON-LD entity.
+- neither placeholder nor preview hostname appears.
 
 ## Search Console and Yandex Webmaster
 
-Only after public smoke and SEO verification pass:
-
-1. verify the existing `listcontrast.com` property remains healthy;
-2. submit or re-submit `https://listcontrast.com/sitemap.xml` if needed;
-3. inspect `/` and representative new English routes;
-4. spot-check new localized routes, especially PT-BR and RU;
-5. request indexing only after the live URL reports the intended canonical and
-   indexability;
-6. use approximately 7/14/28-day Search Console and Yandex Webmaster windows as
-   the next evidence source instead of immediately changing titles/slugs.
-
-Product analytics remains optional and must not delay release.
+After public smoke and SEO verification pass, use roughly 7/14/28-day Search
+Console and Yandex Webmaster windows as the next evidence source instead of
+immediately changing titles/slugs. Yandex ownership is already verified via
+Beget; no HTML verification file is required.
 
 ## Rollback
 
@@ -360,20 +329,7 @@ cd /opt/listcontrast-preview
 docker compose -f deploy/vps/compose.production.yml stop
 ```
 
-Do not remove `vps_booking_network`, the shared Caddy container or the preview
-Compose project.
+Do not remove `web_proxy`, the shared Caddy container or the preview Compose
+project.
 
-## Release record
-
-Record:
-
-- deployed Git commit;
-- deployment time;
-- internal results for every shipped English route identity;
-- public 66-URL sitemap smoke and redirect results;
-- live canonical/hreflang/robots/sitemap results;
-- representative browser behavior results for the four new tools;
-- Search Console / Yandex Webmaster follow-up state;
-- rollback commit.
-
-Never record credentials, bcrypt hashes, tokens or the VPS IP in Git.
+Never record credentials, hashes, tokens or the VPS IP in Git.
