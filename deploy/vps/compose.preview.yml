@@ -9,7 +9,7 @@ services:
     expose:
       - "8080"
     networks:
-      vps_booking_network:
+      web_proxy:
         aliases:
           - listcontrast-preview
     healthcheck:
@@ -20,6 +20,6 @@ services:
       start_period: 10s
 
 networks:
-  vps_booking_network:
+  web_proxy:
     external: true
-    name: vps_booking_network
+    name: web_proxy
