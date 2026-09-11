@@ -1,0 +1,117 @@
+name: Production post-fix audit
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up pnpm and Node.js
+        uses: pnpm/setup@v2
+        with:
+          runtime: node@22.13.0
+          cache: true
+          install: false
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Run browser production audit
+        run: pnpm exec playwright test --config playwright.production-audit.config.ts
+
+      - name: Verify live sitemap and canonical URLs
+        shell: bash
+        run: |
+          set -euo pipefail
+          SITEMAP_URLS=$(curl -fsS https://listcontrast.com/sitemap.xml | grep -oE '<loc>[^<]+' | sed 's#<loc>##')
+          COUNT=$(printf '%s\n' "$SITEMAP_URLS" | sed '/^$/d' | wc -l)
+          echo "Sitemap URLs: $COUNT"
+          test "$COUNT" -eq 66
+          failures=0
+          while IFS= read -r url; do
+            [ -n "$url" ] || continue
+            code=$(curl -sS -o /dev/null -w '%{http_code}' "$url")
+            echo "$url -> $code"
+            [ "$code" = "200" ] || failures=$((failures + 1))
+          done <<< "$SITEMAP_URLS"
+          test "$failures" -eq 0
+
+      - name: Verify redirect, 404 and security headers
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(curl -sS -o /dev/null -w '%{http_code}' https://listcontrast.com/postfix-audit-missing)" = "404"
+          curl -sSI https://www.listcontrast.com/audit-path | tee /tmp/www-headers.txt
+          grep -Ei '^HTTP/.* (301|308)' /tmp/www-headers.txt
+          grep -Ei '^location: https://listcontrast.com/audit-path' /tmp/www-headers.txt
+          curl -sSI https://listcontrast.com/ | tee /tmp/headers.txt
+          test "$(grep -ic '^strict-transport-security:' /tmp/headers.txt)" -eq 1
+          grep -Ei '^strict-transport-security: max-age=31536000' /tmp/headers.txt
+          grep -Ei '^permissions-policy: .*camera=\(\).*geolocation=\(\).*microphone=\(\)' /tmp/headers.txt
+          grep -Ei '^x-frame-options: DENY' /tmp/headers.txt
+          grep -Ei '^x-content-type-options: nosniff' /tmp/headers.txt
+          grep -Ei '^referrer-policy: strict-origin-when-cross-origin' /tmp/headers.txt
+          grep -Ei '^server: nginx\s*$' /tmp/headers.txt
+          ! grep -Ei '^server: nginx/' /tmp/headers.txt
+
+      - name: Lighthouse desktop homepage
+        shell: bash
+        run: |
+          mkdir -p lighthouse-results
+          CHROME_PATH=$(node -e "console.log(require('@playwright/test').chromium.executablePath())")
+          npx --yes lighthouse@12.8.2 https://listcontrast.com/ \
+            --preset=desktop \
+            --only-categories=performance,accessibility,best-practices,seo \
+            --output=json \
+            --output-path=lighthouse-results/desktop.json \
+            --chrome-path="$CHROME_PATH" \
+            --chrome-flags='--headless --no-sandbox --disable-gpu' \
+            --quiet
+
+      - name: Lighthouse mobile homepage
+        shell: bash
+        run: |
+          CHROME_PATH=$(node -e "console.log(require('@playwright/test').chromium.executablePath())")
+          npx --yes lighthouse@12.8.2 https://listcontrast.com/ \
+            --only-categories=performance,accessibility,best-practices,seo \
+            --output=json \
+            --output-path=lighthouse-results/mobile.json \
+            --chrome-path="$CHROME_PATH" \
+            --chrome-flags='--headless --no-sandbox --disable-gpu' \
+            --quiet
+
+      - name: Print Lighthouse summary
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          for (const mode of ['desktop', 'mobile']) {
+            const r = JSON.parse(fs.readFileSync(`lighthouse-results/${mode}.json`, 'utf8'));
+            const c = r.categories;
+            const a = r.audits;
+            const pct = (x) => Math.round(x.score * 100);
+            console.log(`${mode}: performance=${pct(c.performance)} accessibility=${pct(c.accessibility)} best-practices=${pct(c['best-practices'])} seo=${pct(c.seo)} FCP=${a['first-contentful-paint'].displayValue} LCP=${a['largest-contentful-paint'].displayValue} TBT=${a['total-blocking-time'].displayValue} CLS=${a['cumulative-layout-shift'].displayValue}`);
+          }
+          NODE
+
+      - name: Upload production audit artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-postfix-audit
+          path: |
+            test-results/production-audit
+            lighthouse-results
+          if-no-files-found: warn
