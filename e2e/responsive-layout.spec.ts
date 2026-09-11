@@ -71,7 +71,7 @@ test.describe("Compare Lists narrow-tablet layout", () => {
     const hasHorizontalOverflow = await page.evaluate(
       () =>
         document.documentElement.scrollWidth >
-          document.documentElement.clientWidth,
+        document.documentElement.clientWidth,
     );
     expect(hasHorizontalOverflow).toBe(false);
   });
@@ -99,7 +99,7 @@ test.describe("Compare Lists upper narrow-tablet edge", () => {
     const hasHorizontalOverflow = await page.evaluate(
       () =>
         document.documentElement.scrollWidth >
-          document.documentElement.clientWidth,
+        document.documentElement.clientWidth,
     );
     expect(hasHorizontalOverflow).toBe(false);
   });
