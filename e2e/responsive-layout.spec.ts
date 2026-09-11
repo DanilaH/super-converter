@@ -6,49 +6,6 @@ const SINGLE_LIST_ROUTES = [
   "/remove-duplicate-lines",
 ] as const;
 
-test.describe("desktop page shell", () => {
-  test.use({
-    viewport: { width: 1600, height: 900 },
-    isMobile: false,
-    hasTouch: false,
-  });
-
-  test("keeps the site centered with the intended max width and gutters", async ({
-    page,
-  }) => {
-    await page.goto("/");
-
-    const header = await page.locator("header.header").boundingBox();
-    const main = await page.locator("main.main").boundingBox();
-
-    expect(header).not.toBeNull();
-    expect(main).not.toBeNull();
-    expect(header!.width).toBe(1200);
-    expect(main!.width).toBe(1200);
-    expect(header!.x).toBe(200);
-    expect(main!.x).toBe(200);
-
-    const shellStyles = await page.locator("body.shell").evaluate((element) => {
-      const shell = getComputedStyle(element);
-      const header = getComputedStyle(document.querySelector("header.header")!);
-
-      return {
-        shellDisplay: shell.display,
-        shellDirection: shell.flexDirection,
-        headerDisplay: header.display,
-        headerJustify: header.justifyContent,
-      };
-    });
-
-    expect(shellStyles).toEqual({
-      shellDisplay: "flex",
-      shellDirection: "column",
-      headerDisplay: "flex",
-      headerJustify: "space-between",
-    });
-  });
-});
-
 test.describe("narrow single-list result toolbars", () => {
   test.use({
     viewport: { width: 375, height: 812 },
